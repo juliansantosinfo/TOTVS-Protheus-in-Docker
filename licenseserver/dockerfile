@@ -1,7 +1,7 @@
 FROM oraclelinux:8-slim
 
-LABEL version="20.3.2.1"
-LABEL description="TOTVS DBAccess" 
+LABEL version="3.6.1"
+LABEL description="TOTVS LicenseServer" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
 ENV LICENSE_TCP_PORT=2234
