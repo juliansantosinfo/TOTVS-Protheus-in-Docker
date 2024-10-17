@@ -29,7 +29,7 @@ fi
 # Verifica o valor da variável booleana
 if [ $resources_exists = true ]; then
   # Se o diretório existe ou foi extraído, executa o comando docker build
-  docker build --no-cache -t juliansantosinfo/totvs_appserver:latest .
+  docker build --no-cache -t juliansantosinfo/totvs_appserver:release-2410.build-24.3.0.1.dbapi-24.1.0.0 .
 else
   # Se o diretório não existe e não foi extraído, exibe uma mensagem de erro
   echo "O diretório totvs não existe e o arquivo totvs.tar.gzaa não foi encontrado."

@@ -19,7 +19,7 @@ services:
       - ./volume/mssql/data:/var/opt/mssql/data
 
   licenseserver:
-    image: juliansantosinfo/totvs_licenseserver:latest
+    image: juliansantosinfo/totvs_licenseserver:3.6.2
     container_name: totvs_licenseserver
     build:
       context: ./licenseserver
@@ -38,7 +38,7 @@ services:
       - network
 
   dbaccess:
-    image: juliansantosinfo/totvs_dbaccess:latest
+    image: juliansantosinfo/totvs_dbaccess:24.1.0.0
     container_name: totvs_dbaccess
     build:
       context: ./dbaccess
@@ -59,7 +59,7 @@ services:
       - licenseserver
 
   appserver:
-    image: juliansantosinfo/totvs_appserver:latest
+    image: juliansantosinfo/totvs_appserver:release-2410.build-24.3.0.1.dbapi-24.1.0.0
     container_name: totvs_appserver
     build:
       context: ./appserver
@@ -93,7 +93,7 @@ services:
       - dbaccess
 
   apprest:
-    image: juliansantosinfo/totvs_apprest:latest
+    image: juliansantosinfo/totvs_apprest:release-2410.build-24.3.0.1.dbapi-24.1.0.0
     container_name: totvs_apprest
     build:
       context: ./apprest
