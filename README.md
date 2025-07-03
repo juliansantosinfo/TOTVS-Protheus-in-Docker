@@ -219,9 +219,13 @@ Após iniciar todos os containers, você pode acessar as aplicações TOTVS atra
 
 ## Perguntas Frequentes
 
-**Pergunta:** Ao iniciar os containers `appserver` e `apprest`, a mensagem `[ERROR][SERVER] OPERATIONAL LIMITS ARE INSUFFICIENT, CHECK THE INSTALATION PROCEDURES AS WELL AS 'ULIMIT' CONFIGURATION` é exibida. Como corrigir?
+**Pergunta:** Ao iniciar os containers `appserver` e `apprest`, a mensagem `[ERROR][SERVER] OPERATIONAL LIMITS ARE INSUFFICIENT, CHECK THE INSTALLATION PROCEDURES AS WELL AS 'ULIMIT' CONFIGURATION` é exibida. Como corrigir?
 
-**Resposta:** Se você utiliza um sistema Debian/Ubuntu, este erro pode indicar que a configuração do número máximo de arquivos abertos simultaneamente na sua máquina **host** (não no container) está definida como o valor máximo de 64 bits (`9223372036854775807`).  Siga os passos abaixo para verificar e corrigir:
+**Resposta:** Este erro pode ocorrer quando o número máximo de arquivos abertos simultaneamente está configurado com um valor excessivamente alto no sistema **host** (por exemplo, `9223372036854775807`). Isso pode causar inconsistências, fazendo com que o Docker ou os contêineres interpretem esse valor como inválido (como `-1`), resultando em falhas na inicialização dos serviços.
+
+Para corrigir o problema, recomenda-se ajustar o parâmetro `/proc/sys/fs/file-max` para um valor mais adequado, como `65535`, que já é suficiente para a maioria dos ambientes.
+
+Siga os passos abaixo:
 
 1. **Acesse a conta root:**
 
@@ -235,21 +239,33 @@ Após iniciar todos os containers, você pode acessar as aplicações TOTVS atra
    cat /proc/sys/fs/file-max
    ```
 
-3. **Se o valor for `9223372036854775807`, altere para o maior valor de 63 bits:**
+3. **Se o valor for muito alto (por exemplo, `9223372036854775807`), ajuste para `65535`:**
 
    ```bash
-   echo 4611686018427387903 > /proc/sys/fs/file-max
+   echo 65535 > /proc/sys/fs/file-max
    ```
 
-4. **Para tornar essa alteração persistente após reiniciar a máquina, adicione a seguinte linha ao arquivo `/etc/sysctl.conf`:**
+4. **Para tornar essa alteração persistente após reinicializações, adicione a seguinte linha ao arquivo `/etc/sysctl.conf`:**
 
    ```bash
-   fs.file-max = 4611686018427387903
+   fs.file-max = 65535
    ```
 
-   Você pode editar o arquivo com o comando `sudo nano /etc/sysctl.conf` e adicionar a linha no final do arquivo.
+   Edite o arquivo com:
 
-**Observação:** Esta solução ajusta o limite de arquivos abertos no nível do sistema operacional host. Certifique-se de entender as implicações de segurança antes de realizar esta alteração.
+   ```bash
+   sudo nano /etc/sysctl.conf
+   ```
+
+   Adicione a linha ao final do arquivo.
+
+5. **Aplique imediatamente a configuração sem precisar reiniciar:**
+
+   ```bash
+   sudo sysctl -p
+   ```
+
+**Observação:** Esta solução ajusta o limite de arquivos abertos no nível do sistema operacional host. Certifique-se de avaliar o impacto no seu ambiente antes de aplicar a alteração. Para cargas específicas que demandem valores mais altos, revise as necessidades reais do sistema antes de definir um novo limite.
 
 ### Variáveis de Ambiente
 
