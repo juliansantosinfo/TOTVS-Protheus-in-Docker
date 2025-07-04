@@ -225,7 +225,7 @@ Após iniciar todos os containers, você pode acessar as aplicações TOTVS atra
 
 Para corrigir o problema, recomenda-se ajustar o parâmetro `/proc/sys/fs/file-max` para um valor mais adequado, como `65535`, que já é suficiente para a maioria dos ambientes.
 
-Siga os passos abaixo:
+Siga os passos abaixo ou veja o [Vídeo](https://learn.microsoft.com/pt-br/windows/wsl/install):
 
 1. **Acesse a conta root:**
 
