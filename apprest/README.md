@@ -24,7 +24,7 @@ Protheus.
 
 Para começar com este projeto, siga os passos abaixo.
 
-**Importante:** Este container precisa estar na mesma rede que os serviços DBAccess e LicenseServer para funcionar corretamente.
+**Importante:** Este container precisa estar na mesma rede que os serviços MSSQL, DBAccess e LicenseServer para funcionar corretamente.
 
 1. Baixe a imagem:
 
@@ -32,7 +32,7 @@ Para começar com este projeto, siga os passos abaixo.
     docker pull juliansantosinfo/totvs_apprest:latest
     ```
 
-2. Criar rede exclusiva para os containeres do projeteto:
+2. Criar rede exclusiva para os containeres do projeto, caso inda não exista:
 
     ```bash
     docker network create totvs
@@ -41,7 +41,7 @@ Para começar com este projeto, siga os passos abaixo.
 3. Executar o container.
 
     ```bash
-    docker run -d --name totvs_apprest --network totvs -p 1235:1235 -p 12355:12355 -p8089:8089 --ulimit nofile=65536:65536 juliansantosinfo/totvs_apprest:latest
+    docker run -d --name totvs_apprest --network totvs -p 1235:1234 -p 12355:12345 -p 8089:8088 juliansantosinfo/totvs_apprest:latest
     ```
 
 ### Build local
@@ -80,7 +80,7 @@ Caso queira construir as imagens localmente
 | `APPSERVER_MULTIPROTOCOLPORT` | `1` | Define a porta para o protocolo múltiplo. |
 | `APPSERVER_LICENSE_SERVER` | `totvs_licenseserver` | Define o nome do host do servidor de licenças. |
 | `APPSERVER_LICENSE_PORT` | `5555` | Define a porta do servidor de licenças. |
-| `APPSERVER_PORT` | `1235` | Define a porta principal do AppServer. |
-| `APPSERVER_WEB_PORT` | `12355` | Define a porta para a interface web do AppServer. |
+| `APPSERVER_PORT` | `1234` | Define a porta principal do AppServer. |
+| `APPSERVER_WEB_PORT` | `12345` | Define a porta para a interface web do AppServer. |
 | `APPSERVER_REST_PORT` | `8080` | Define a porta para serviço REST do AppServer. |
 | `APPSERVER_WEB_MANAGER` | `8088` | Define a porta para a interface web de gerenciamento do AppServer. |

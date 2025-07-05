@@ -319,8 +319,8 @@ Siga os passos abaixo ou veja o [Vídeo](https://learn.microsoft.com/pt-br/windo
 | `APPSERVER_MULTIPROTOCOLPORT` | `1` | Define a porta para o protocolo múltiplo. |
 | `APPSERVER_LICENSE_SERVER` | `totvs_licenseserver` | Define o nome do host do servidor de licenças. |
 | `APPSERVER_LICENSE_PORT` | `5555` | Define a porta do servidor de licenças. |
-| `APPSERVER_PORT` | `1235` | Define a porta principal do AppServer. |
-| `APPSERVER_WEB_PORT` | `12355` | Define a porta para a interface web do AppServer. |
+| `APPSERVER_PORT` | `1234` | Define a porta principal do AppServer. |
+| `APPSERVER_WEB_PORT` | `12345` | Define a porta para a interface web do AppServer. |
 | `APPSERVER_REST_PORT` | `8080` | Define a porta para serviço REST do AppServer. |
 | `APPSERVER_WEB_MANAGER` | `8088` | Define a porta para a interface web de gerenciamento do AppServer. |
 

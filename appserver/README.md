@@ -23,7 +23,7 @@ Protheus.
 
 Para começar com este projeto, siga os passos abaixo.
 
-**Importante:** Este container precisa estar na mesma rede que os serviços DBAccess e LicenseServer para funcionar corretamente.
+**Importante:** Este container precisa estar na mesma rede que os serviços MSSQL, DBAccess e LicenseServer para funcionar corretamente.
 
 1. Baixe a imagem:
 
@@ -31,7 +31,7 @@ Para começar com este projeto, siga os passos abaixo.
     docker pull juliansantosinfo/totvs_appserver:latest
     ```
 
-2. Criar rede exclusiva para os containeres do projeteto:
+2. Criar rede exclusiva para os containeres do projeto, caso inda não exista:
 
     ```bash
     docker network create totvs
@@ -40,7 +40,7 @@ Para começar com este projeto, siga os passos abaixo.
 3. Executar o container.
 
     ```bash
-    docker run -d --name totvs_appserver --network totvs -p 1234:1234 -p 12345:12345 -p8088:8088 --ulimit nofile=65536:65536 juliansantosinfo/totvs_appserver:latest
+    docker run -d --name totvs_appserver --network totvs -p 1234:1234 -p 12345:12345 -p 8088:8088 juliansantosinfo/totvs_appserver:latest
     ```
 
 ### Build local
