@@ -91,8 +91,12 @@ services:
     networks:
       - network
     volumes:
-      - ./volume/appserver/data:/totvs/protheus_data/data
-      - ./volume/appserver/apo:/totvs/protheus/apo/custom
+      # Para utilizar arquivos personalizados de configuração (appserver.ini) e log (appserver.log), 
+      # crie os diretórios e arquivos necessários e descomente as linhas abaixo.
+      # - ./volume/appserver/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
+      # - ./volume/appserver/appserver.log:/totvs/protheus/bin/appserver/appserver.log
+      - ./volume/appserver/apo:/totvs/protheus/apo
+      - ./volume/protheus_data:/totvs/protheus_data
     depends_on:
       - licenseserver
       - dbaccess
@@ -107,10 +111,10 @@ services:
       - manual
     restart: always
     ports:
-      - "1235:1235"
-      - "12355:12355"
+      - "1235:1234"
+      - "12355:12345"
       - "8080:8080"
-      - "8089:8089"
+      - "8089:8088"
     environment:
       - APPSERVER_RPO_CUSTOM=/totvs/protheus/apo/custom/custom.rpo
       - APPSERVER_DBACCESS_DATABASE=MSSQL
@@ -122,15 +126,19 @@ services:
       - APPSERVER_MULTIPROTOCOLPORT=1
       - APPSERVER_LICENSE_SERVER=totvs_licenseserver
       - APPSERVER_LICENSE_PORT=5555
-      - APPSERVER_PORT=1235
-      - APPSERVER_WEB_PORT=12355
+      - APPSERVER_PORT=1234
+      - APPSERVER_WEB_PORT=12345
       - APPSERVER_REST_PORT=8080
-      - APPSERVER_WEB_MANAGER=8089
+      - APPSERVER_WEB_MANAGER=8088
     networks:
       - network
     volumes:
-      - ./volume/apprest/data:/totvs/protheus_data/data
-      - ./volume/apprest/apo:/totvs/protheus/apo/custom
+      # Para utilizar arquivos personalizados de configuração (appserver.ini) e log (appserver.log), 
+      # crie os diretórios e arquivos necessários e descomente as linhas abaixo.
+      # - ./volume/apprest/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
+      # - ./volume/apprest/appserver.log:/totvs/protheus/bin/appserver/appserver.log
+      - ./volume/apprest/apo:/totvs/protheus/apo
+      - ./volume/protheus_data:/totvs/protheus_data
     depends_on:
       - licenseserver
       - dbaccess

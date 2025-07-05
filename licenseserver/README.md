@@ -14,8 +14,9 @@ Este repositório contém um dos quatro principais componentes:
 
 Outros contêineres necessários
 
-* **appserver**: O servidor de aplicação principal do sistema ERP Protheus.
+* **mssql**: Serviço de banco de dados para persistencia dos dados do sistema.
 * **dbaccess**: Um serviço que fornece acesso ao banco de dados.
+* **appserver**: O servidor de aplicação principal do sistema ERP Protheus.
 * **apprest**: O servidor de aplicação REST do sistema ERP Protheus.
 
 ### Início Rápido
@@ -30,7 +31,7 @@ Para começar com este projeto, siga os passos abaixo.
     docker pull juliansantosinfo/totvs_licenseserver:latest
     ```
 
-2. Criar rede exclusiva para os containeres do projeteto:
+2. Criar rede exclusiva para os containeres do projeto, caso inda não exista:
 
     ```bash
     docker network create totvs
@@ -39,7 +40,7 @@ Para começar com este projeto, siga os passos abaixo.
 3. Executar o container.
 
     ```bash
-    docker run -d --name totvs_dbaccess --network totvs -p 5555:5555 -p 2234:2234 -p 8020:8020 --ulimit nofile=65536:65536 juliansantosinfo/totvs_licenseserver:latest
+    docker run -d --name totvs_dbaccess --network totvs -p 5555:5555 -p 2234:2234 -p 8020:8020 --ulimit juliansantosinfo/totvs_licenseserver:latest
     ```
 
 ### Build local
@@ -52,13 +53,13 @@ Caso queira construir as imagens localmente
     git clone https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker.git
     ```
 
-2. acesse o diretório dbaccess:
+2. acesse o diretório licenseserver:
 
     ```bash
     cd licenseserver
     ```
 
-3. Execute o script `build.sh:
+3. Execute o script `build.sh
 
     ```bash
     ./build.sh

@@ -2,9 +2,9 @@
 
 ## Overview
 
-Este repositório contém a implementação da aplicação DBAccess para ERP TOTVS Protheus utilizando containers Docker.
+Este repositório contém a implementação da aplicação DBAccess para ERP TOTVS Protheus utilizando contêineres Docker.
 
-O sistema de ERP Protheus é uma solução de software complexa que requer configurações e dependências específicas para funcionar. Este projeto visa simplificar a instalação, configuração e execução do Protheus ao containerizar-o utilizando Docker.
+O sistema de ERP Protheus é uma solução de software complexa que requer configurações e dependências específicas para funcionar. Este projeto visa simplificar a instalação, configuração e execução do Protheus ao containerizar o DbAccess utilizando Docker.
 
 ### Componentes
 
@@ -15,6 +15,10 @@ Este repositório contém um dos quatro principais componentes:
 Outros containeres necessários
 
 * **appserver**: O servidor de aplicação principal do sistema ERP Protheus.
+
+Outros contêineres necessários
+
+* **mssql**: Serviço de banco de dados para persistencia dos dados do sistema.
 * **licenseserver**: Um serviço que gerencia licenças para o sistema ERP Protheus.
 * **apprest**: O servidor de aplicação REST do sistema ERP Protheus.
 
@@ -22,7 +26,7 @@ Outros containeres necessários
 
 Para começar com este projeto, siga os passos abaixo.
 
-**Importante:** Este container precisa estar na mesma rede que os serviços MSSQL, LicenseServerm e AppServer para funcionar corretamente.
+**Importante:** Este container precisa estar na mesma rede que os serviços MSSQL, LicenseServer para funcionar corretamente.
 
 1. Baixe a imagem:
 
@@ -30,7 +34,7 @@ Para começar com este projeto, siga os passos abaixo.
     docker pull juliansantosinfo/totvs_dbaccess:latest
     ```
 
-2. Criar rede exclusiva para os containeres do projeteto:
+2. Criar rede exclusiva para os containeres do projeto, caso inda não exista:
 
     ```bash
     docker network create totvs
