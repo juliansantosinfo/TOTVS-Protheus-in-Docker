@@ -14,7 +14,7 @@ COPY ./totvs /totvs
 RUN cp /totvs/resources/etc/* /etc/ \
     && cp -r /totvs/resources/opt/* /opt/ \
     && chmod +x /totvs/entrypoint.sh \
-    && microdnf install nano unixODBC-devel
+    && microdnf install nano unixODBC-devel iputils
 
 ENTRYPOINT [ "/totvs/entrypoint.sh" ]
 

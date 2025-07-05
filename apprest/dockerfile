@@ -26,6 +26,8 @@ COPY ./totvs /totvs
 RUN chmod +x /totvs/entrypoint.sh \
     && chmod +x /totvs/appserver.sh \
     && microdnf update -y \
+    && microdnf install nano \
+    && microdnf install iputils \
     && microdnf install procps-ng \
     && microdnf install python3 \
     && pip3 install flask
