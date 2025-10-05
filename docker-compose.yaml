@@ -9,7 +9,7 @@ networks:
 services:
 
   mssql:
-    image: juliansantosinfo/totvs_mssql:latest
+    image: juliansantosinfo/totvs_mssql:release-2410.build-24.3.0.1.dbapi-24.1.0.0
     container_name: totvs_mssql
     user: root
     restart: always
