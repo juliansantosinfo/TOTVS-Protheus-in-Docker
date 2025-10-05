@@ -57,8 +57,8 @@ Para começar com este projeto, siga os passos abaixo:
 
     Após a inicialização, acesse a aplicação em seu navegador através do endereço: <http://localhost:12345> (Smartclient Web).
 
-    1. **Acesse a aplicação no endereço indicado e realize a criação da empresa de teste.**
-    2. **Após concluir a criação da empresa, inicie o serviço `apprest` manualmente.**
+    - **Usuário:** admin
+    - **Senha:** admin
 
     **Informações adicionais sobre como iniciar o serviço `apprest` manualmente podem ser encontradas na documentação.**
 
