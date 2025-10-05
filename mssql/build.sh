@@ -10,10 +10,10 @@ if [ -f ./data.tar.gz ]; then
 else
 
   # Se não existir, verifica se o arquivo data_part_aa existe
-  if [ -f ./data_part_aa ]; then
+  if [ -f ./data.tar.gzaa ]; then
 
     # Se existir, junta as partes do arquivo tar
-    cat data_part_* > data.tar.gz
+    cat data.tar.gz* > data.tar.gz
 
     # Define a variável como true
     resources_exists=true
