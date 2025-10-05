@@ -1,0 +1,55 @@
+# 📦 CHANGELOG
+
+Este changelog documenta as principais alterações realizadas no projeto desde sua criação.
+
+---
+
+## [Versão Inicial] - 2024-07-02 a 2025-10-05
+
+### 🚀 Funcionalidades
+- Dockerização completa do ERP TOTVS Protheus com três containers:
+  - `appserver`: servidor de aplicação.
+  - `dbaccess`: serviço de acesso ao banco de dados.
+  - `licenseserver`: gerenciamento de licenças.
+- Implementado serviço REST para Protheus.
+- Adicionado serviço `apprest` com profile separado para não subir automaticamente.
+- Implementadas páginas web para gerenciamento dos serviços `appserver` e `appserver REST`, incluindo:
+  - Alteração do `appserver.ini`.
+  - Início/parada dos serviços.
+  - Visualização e download do `consolelog`.
+- Implementados arquivos web-agent para `appserver`.
+
+### 🧱 Infraestrutura e Scripts
+- Criação de `Dockerfiles` para todos os serviços.
+- Criação e atualização de `docker-compose.yaml` para orquestração dos containers.
+- Atualização da imagem base do Oracle Linux para `8-slim`.
+- Atualização de versão do `appserver` para `20.3.2.8`.
+- Adição de variáveis de ambiente para configuração dos containers.
+- Correção de nome da imagem do `DBAccess`.
+- Atualização de scripts `build` e `run` para torná-los executáveis.
+- Adição de tag `latest` nos scripts de build.
+- Atualização de `Dockerfiles` com informações de mantenedor, versão de release, build e dbapi.
+- Atualização de `Dockerfile` para permitir customização do `appserver.ini`.
+- Remoção de instruções `RUN` descontinuadas.
+- Atualização da network criada pelo `docker-compose.yaml` de `totvs` para `network`.
+- Adicionada nova imagem para `mssql-server` com banco Protheus pré-configurado.
+
+### 📄 Documentação
+- Criação do arquivo de licença `LICENSE.txt`.
+- Atualizações no `README.md` com:
+  - Instruções de uso.
+  - Requisitos de sistema.
+  - Aviso legal.
+  - Informações sobre build local.
+  - Configuração de `ulimit` para sistemas Debian/Ubuntu.
+  - Correções em seções de componentes.
+  - Informações faltantes sobre o container `apprest`.
+
+### 🧹 Organização
+- Atualização do `.gitignore` para excluir ambientes virtuais Python.
+- Atualização de recursos para os serviços `apprest`, `appserver` e `dbaccess`.
+- Atualização de versão da release para `12.1.2410`.
+
+---
+
+> Este changelog representa a versão inicial do projeto e será atualizado conforme novas versões forem lançadas.
