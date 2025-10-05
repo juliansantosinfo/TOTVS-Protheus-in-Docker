@@ -1,0 +1,28 @@
+# Imagem base oficial do SQL Server 2019
+FROM mcr.microsoft.com/mssql/server:2019-latest
+
+LABEL version="24.1.0.0"
+LABEL description="TOTVS MSSQL" 
+LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
+
+USER root
+
+# Variáveis obrigatórias de configuração do SQL Server
+ENV ACCEPT_EULA=Y
+ENV MSSQL_SA_PASSWORD=MicrosoftSQL2019
+
+# Copiar o backup compactado para dentro da imagem
+COPY data.tar.gz /tmp/data.tar.gz
+
+# Parar o SQL Server, descompactar o backup e ajustar permissões
+RUN mkdir -p /var/opt/mssql/data && \
+    tar -xzvf /tmp/data.tar.gz -C /var/opt/mssql && \
+    rm -rfv /tmp/data.tar.gz && \
+    chown -R root:root /var/opt/mssql && \
+    chmod -R 770 /var/opt/mssql
+
+# Expor a porta padrão
+EXPOSE 1433
+
+# Comando padrão para iniciar o SQL Server
+CMD ["/opt/mssql/bin/sqlservr"]

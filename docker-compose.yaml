@@ -9,7 +9,7 @@ networks:
 services:
 
   mssql:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: juliansantosinfo/totvs_mssql:latest
     container_name: totvs_mssql
     user: root
     restart: always
