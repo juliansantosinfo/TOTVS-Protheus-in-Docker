@@ -9,7 +9,7 @@ networks:
 services:
 
   mssql:
-    image: juliansantosinfo/totvs_mssql:release-2410.build-24.3.0.1.dbapi-24.1.0.0
+    image: juliansantosinfo/totvs_mssql:release-2510.build-24.3.1.1.dbapi-24.1.1.0
     container_name: totvs_mssql
     user: root
     restart: always
@@ -20,11 +20,11 @@ services:
       ACCEPT_EULA: "Y"
     networks:
       - network
-    volumes:
-      - ./volume/mssql/data:/var/opt/mssql/data
+    # volumes:
+    #   - ./volume/2510/mssql/data:/var/opt/mssql/data
 
   licenseserver:
-    image: juliansantosinfo/totvs_licenseserver:3.6.2
+    image: juliansantosinfo/totvs_licenseserver:3.7.0
     container_name: totvs_licenseserver
     build:
       context: ./licenseserver
@@ -43,7 +43,7 @@ services:
       - network
 
   dbaccess:
-    image: juliansantosinfo/totvs_dbaccess:24.1.0.0
+    image: juliansantosinfo/totvs_dbaccess:24.1.1.0
     container_name: totvs_dbaccess
     build:
       context: ./dbaccess
@@ -64,7 +64,7 @@ services:
       - licenseserver
 
   appserver:
-    image: juliansantosinfo/totvs_appserver:release-2410.build-24.3.0.1.dbapi-24.1.0.0
+    image: juliansantosinfo/totvs_appserver:release-2510.build-24.3.1.1.dbapi-24.1.1.0
     container_name: totvs_appserver
     build:
       context: ./appserver
@@ -75,7 +75,7 @@ services:
       - "12345:12345"
       - "8088:8088"
     environment:
-      - APPSERVER_RPO_CUSTOM=/totvs/protheus/apo/custom/custom.rpo
+      - APPSERVER_RPO_CUSTOM=/totvs/protheus/apo/custom.rpo
       - APPSERVER_DBACCESS_DATABASE=MSSQL
       - APPSERVER_DBACCESS_SERVER=totvs_dbaccess
       - APPSERVER_DBACCESS_PORT=7890
@@ -90,19 +90,19 @@ services:
       - APPSERVER_WEB_MANAGER=8088
     networks:
       - network
-    volumes:
+    # volumes:
       # Para utilizar arquivos personalizados de configuração (appserver.ini) e log (appserver.log), 
       # crie os diretórios e arquivos necessários e descomente as linhas abaixo.
-      # - ./volume/appserver/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
-      # - ./volume/appserver/appserver.log:/totvs/protheus/bin/appserver/appserver.log
-      - ./volume/appserver/apo:/totvs/protheus/apo
-      - ./volume/protheus_data:/totvs/protheus_data
+      # - ./volume/2510/appserver/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
+      # - ./volume/2510/appserver/appserver.log:/totvs/protheus/bin/appserver/appserver.log
+      # - ./volume/2510/appserver/apo:/totvs/protheus/apo
+      # - ./volume/2510/protheus_data:/totvs/protheus_data
     depends_on:
       - licenseserver
       - dbaccess
 
   apprest:
-    image: juliansantosinfo/totvs_apprest:release-2410.build-24.3.0.1.dbapi-24.1.0.0
+    image: juliansantosinfo/totvs_apprest:release-2510.build-24.3.1.1.dbapi-24.1.1.0
     container_name: totvs_apprest
     build:
       context: ./apprest
@@ -116,7 +116,7 @@ services:
       - "8080:8080"
       - "8089:8088"
     environment:
-      - APPSERVER_RPO_CUSTOM=/totvs/protheus/apo/custom/custom.rpo
+      - APPSERVER_RPO_CUSTOM=/totvs/protheus/apo/custom.rpo
       - APPSERVER_DBACCESS_DATABASE=MSSQL
       - APPSERVER_DBACCESS_SERVER=totvs_dbaccess
       - APPSERVER_DBACCESS_PORT=7890
@@ -132,13 +132,13 @@ services:
       - APPSERVER_WEB_MANAGER=8088
     networks:
       - network
-    volumes:
+    # volumes:
       # Para utilizar arquivos personalizados de configuração (appserver.ini) e log (appserver.log), 
       # crie os diretórios e arquivos necessários e descomente as linhas abaixo.
-      # - ./volume/apprest/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
-      # - ./volume/apprest/appserver.log:/totvs/protheus/bin/appserver/appserver.log
-      - ./volume/apprest/apo:/totvs/protheus/apo
-      - ./volume/protheus_data:/totvs/protheus_data
+      # - ./volume/2510/appserver/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
+      # - ./volume/2510/appserver/appserver.log:/totvs/protheus/bin/appserver/appserver.log
+      # - ./volume/2510/appserver/apo:/totvs/protheus/apo
+      # - ./volume/2510/protheus_data:/totvs/protheus_data
     depends_on:
       - licenseserver
       - dbaccess

@@ -1,6 +1,6 @@
 FROM oraclelinux:8-slim
 
-LABEL version="3.6.2"
+LABEL version="3.7.0"
 LABEL description="TOTVS DBAccess" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
@@ -15,4 +15,4 @@ RUN chmod +x /totvs/entrypoint.sh
 
 ENTRYPOINT [ "/totvs/entrypoint.sh" ]
 
-EXPOSE 2234 5555 8020
+EXPOSE 2234 4000 5555 8020

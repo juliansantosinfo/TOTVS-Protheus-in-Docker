@@ -1,4 +1,4 @@
-# Dockerização do DBAccess para ERP TOTVS Protheus
+# Dockerização do MSSQL para ERP TOTVS Protheus
 
 ## Overview
 

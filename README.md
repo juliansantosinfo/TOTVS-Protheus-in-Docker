@@ -57,8 +57,13 @@ Para começar com este projeto, siga os passos abaixo:
 
     Após a inicialização, acesse a aplicação em seu navegador através do endereço: <http://localhost:12345> (Smartclient Web).
 
-    - **Usuário:** admin
-    - **Senha:** admin
+    **Release 12.1.2410**
+      - **Usuário:** admin
+      - **Senha:** admin
+
+    **Release 12.1.2510**
+      - **Usuário:** admin
+      - **Senha:** Docker@123
 
     **Informações adicionais sobre como iniciar o serviço `apprest` manualmente podem ser encontradas na documentação.**
 
@@ -154,7 +159,7 @@ docker run -d \
   -p 1433:1433 \
   -e "ACCEPT_EULA=Y" \
   -e "SA_PASSWORD=MicrosoftSQL2019" \
-  mcr.microsoft.com/mssql/server:2019-latest
+  juliansantosinfo/totvs_mssql:latest
 ```
 
 **2.2. TOTVS License Server (licenseserver):**

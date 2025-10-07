@@ -1,6 +1,6 @@
 FROM oraclelinux:8-slim
 
-LABEL version="24.1.0.0"
+LABEL version="24.1.1.0"
 LABEL description="TOTVS DBAccess" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
@@ -14,7 +14,11 @@ COPY ./totvs /totvs
 RUN cp /totvs/resources/etc/* /etc/ \
     && cp -r /totvs/resources/opt/* /opt/ \
     && chmod +x /totvs/entrypoint.sh \
-    && microdnf install nano unixODBC-devel
+    && microdnf update -y \
+    && microdnf install gzip \
+    && microdnf install iputils \
+    && microdnf install nano \
+    && microdnf install unixODBC-devel
 
 ENTRYPOINT [ "/totvs/entrypoint.sh" ]
 

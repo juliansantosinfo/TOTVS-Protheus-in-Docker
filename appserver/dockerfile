@@ -1,8 +1,8 @@
 FROM oraclelinux:8-slim
 
-LABEL release="12.1.2410"
-LABEL build="24.3.0.1"
-LABEL dbapi="24.1.0.0"
+LABEL release="12.1.2510"
+LABEL build="24.3.1.1"
+LABEL dbapi="24.1.1.0"
 LABEL description="TOTVS Aplication Server Protheus" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
@@ -25,6 +25,9 @@ COPY ./totvs /totvs
 RUN chmod +x /totvs/entrypoint.sh \
     && chmod +x /totvs/appserver.sh \
     && microdnf update -y \
+    && microdnf install gzip \
+    && microdnf install iputils \
+    && microdnf install nano \
     && microdnf install procps-ng \
     && microdnf install python3 \
     && pip3 install flask

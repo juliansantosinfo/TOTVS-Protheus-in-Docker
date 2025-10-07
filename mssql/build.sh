@@ -23,7 +23,7 @@ fi
 # Verifica o valor da variável booleana
 if [ $resources_exists=false ]; then
   # Se o arquivo de dados existe, executa o comando docker build
-  docker build --no-cache --progress=plain -t juliansantosinfo/totvs_mssql:latest .
+  docker build --no-cache --progress=plain -t juliansantosinfo/totvs_mssql:release-2510.build-24.3.1.1.dbapi-24.1.1.0 .
 else
   # Se o arquivo não existe, exibe uma mensagem de erro
   echo "O arquivo de dados não foi encontrado."

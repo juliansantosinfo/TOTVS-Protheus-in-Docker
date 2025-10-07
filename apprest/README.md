@@ -44,6 +44,10 @@ Para começar com este projeto, siga os passos abaixo.
     docker run -d --name totvs_apprest --network totvs -p 1235:1234 -p 12355:12345 -p 8089:8088 juliansantosinfo/totvs_apprest:latest
     ```
 
+4. Login.
+
+    Para efetuar login utilize o usuário `admin` se senha `Docker@123`.
+
 ### Build local
 
 Caso queira construir as imagens localmente
