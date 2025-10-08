@@ -13,16 +13,14 @@ ENV MSSQL_SA_PASSWORD=MicrosoftSQL2019
 
 # Copiar o backup compactado para dentro da imagem
 COPY data.tar.gz /tmp/data.tar.gz
+COPY entrypoint.sh /entrypoint.sh
 
-# Parar o SQL Server, descompactar o backup e ajustar permissões
-RUN mkdir -p /var/opt/mssql/data && \
-    tar -xzvf /tmp/data.tar.gz -C /var/opt/mssql && \
-    rm -rfv /tmp/data.tar.gz && \
-    chown -R root:root /var/opt/mssql && \
-    chmod -R 770 /var/opt/mssql
+# Ajustar permissões para entrypoint.sh
+RUN chown -R root:root /entrypoint.sh && \
+    chmod -R 770 /entrypoint.sh
 
 # Expor a porta padrão
 EXPOSE 1433
 
 # Comando padrão para iniciar o SQL Server
-CMD ["/opt/mssql/bin/sqlservr"]
+CMD ["/entrypoint.sh"]
