@@ -3,4 +3,4 @@ temp/
 volume/
 .venv/
 **/data/
-data.tar.gz
+mssql/resources/data.tar.gz
