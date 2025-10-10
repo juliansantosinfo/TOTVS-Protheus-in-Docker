@@ -18,17 +18,23 @@ ENV APPSERVER_LICENSE_SERVER=totvs_licenseserver
 ENV APPSERVER_LICENSE_PORT=5555
 ENV APPSERVER_PORT=1234
 ENV APPSERVER_WEB_PORT=12345
+ENV APPSERVER_REST_PORT=8080
 ENV APPSERVER_WEB_MANAGER=8088
+ENV APPSERVER_MODE=application
+ENV EXTRACT_RESOURCES=true
 
 COPY ./totvs /totvs
 
 RUN chmod +x /totvs/entrypoint.sh \
     && chmod +x /totvs/appserver.sh \
     && microdnf update -y \
+    && microdnf install nano \
+    && microdnf install iputils \
+    && microdnf install telnet \
     && microdnf install procps-ng \
     && microdnf install python3 \
     && pip3 install flask
 
 ENTRYPOINT [ "/totvs/entrypoint.sh" ]
 
-EXPOSE 1234 12345 8088
+EXPOSE 1234 12345 8080 8088
