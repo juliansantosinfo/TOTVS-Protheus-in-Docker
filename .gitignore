@@ -1,6 +1,7 @@
 **/totvs/
+**/data/
+.venv/
 temp/
 volume/
-.venv/
-**/data/
+dbaccess/resources/totvs.tar.gz
 mssql/resources/data.tar.gz

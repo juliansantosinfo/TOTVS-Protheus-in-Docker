@@ -10,10 +10,10 @@ if [ -d ./totvs ]; then
 else
 
   # Se não existir, verifica se o arquivo totvs.tar.gzaa existe
-  if [ -f ./totvs.tar.gzaa ]; then
+  if [ -f ./resources/totvs.tar.gzaa ]; then
 
     # Se existir, junta as partes do arquivo tar
-    cat totvs.tar.gza* > totvs.tar.gz
+    cat ./resources/totvs.tar.gza* > ./totvs.tar.gz
 
     # Extrai o arquivo tar
     tar -xzvf totvs.tar.gz
@@ -29,7 +29,7 @@ fi
 # Verifica o valor da variável booleana
 if [ $resources_exists = true ]; then
   # Se o diretório existe ou foi extraído, executa o comando docker build
-  docker build --no-cache -t juliansantosinfo/totvs_dbaccess:24.1.0.0 .
+  docker build --no-cache --progress=plain -t juliansantosinfo/totvs_dbaccess:24.1.0.0 .
 else
   # Se o diretório não existe e não foi extraído, exibe uma mensagem de erro
   echo "O diretório totvs não existe e o arquivo totvs.tar.gzaa não foi encontrado."
@@ -44,12 +44,12 @@ if [ -d ./totvs ]; then
   # Verifica a resposta do usuário
   if [ "$resposta" = "s" ] || [ "$resposta" = "S" ]; then
     # Remove arquivos de partes existentes
-    rm -f totvs.tar.gz*
+    rm -f ./resources/totvs.tar.gz*
 
-    # Comprime o arquivo em partes de 99MB
-    tar -czvf - totvs | split -b 99m - totvs.tar.gz
+    # Comprime o arquivo em partes de 1MB
+    tar -czvf - ./totvs | split -b 1m - ./resources/totvs.tar.gz
 
-    echo "Arquivo totvs.tar.gz atualizado com sucesso!"
+    echo "Arquivo ./resources/totvs.tar.gz atualizado com sucesso!"
   fi
 
 fi

@@ -4,6 +4,10 @@ LABEL version="24.1.0.0"
 LABEL description="TOTVS DBAccess" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
+ENV DATABASE_SERVER=totvs_mssql
+ENV DATABASE_PORT=1433
+ENV DATABASE_ALIAS=protheus
+ENV DATABASE_NAME=protheus
 ENV DATABASE_PASSWORD=MicrosoftSQL2019
 ENV DBACCESS_LICENSE_SERVER=totvs_licenseserver
 ENV DBACCESS_LICENSE_PORT=5555
@@ -11,10 +15,17 @@ ENV DBACCESS_CONSOLEFILE=/totvs/dbaccess/multi/dbconsole.log
 
 COPY ./totvs /totvs
 
-RUN cp /totvs/resources/etc/* /etc/ \
+RUN cp /totvs/resources/dbaccess.ini /totvs/dbaccess/multi/dbaccess.ini \
+    && cp /totvs/resources/etc/* /etc/ \
     && cp -r /totvs/resources/opt/* /opt/ \
+    && cp /totvs/resources/create_database.sql /totvs/create_database.sql \
     && chmod +x /totvs/entrypoint.sh \
-    && microdnf install nano unixODBC-devel
+    && rm -rf /totvs/resources \
+    && microdnf update -y \
+    && microdnf install nano \
+    && microdnf install iputils \
+    && microdnf install telnet \
+    && microdnf install unixODBC-devel
 
 ENTRYPOINT [ "/totvs/entrypoint.sh" ]
 
