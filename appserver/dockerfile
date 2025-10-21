@@ -1,0 +1,46 @@
+FROM oraclelinux:8-slim
+
+LABEL release="12.1.2310"
+LABEL build="24.3.1.1"
+LABEL dbapi="23.1.1.4"
+LABEL description="TOTVS Aplication Server Protheus" 
+LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
+
+ENV APPSERVER_RPO_CUSTOM="/totvs/protheus/apo/custom.rpo"
+ENV APPSERVER_DBACCESS_DATABASE=MSSQL
+ENV APPSERVER_DBACCESS_SERVER=totvs_dbaccess
+ENV APPSERVER_DBACCESS_PORT=7890
+ENV APPSERVER_DBACCESS_ALIAS=protheus
+ENV APPSERVER_CONSOLEFILE="/totvs/protheus/bin/appserver/appserver.log"
+ENV APPSERVER_MULTIPROTOCOLPORTSECURE=0
+ENV APPSERVER_MULTIPROTOCOLPORT=1
+ENV APPSERVER_LICENSE_SERVER=totvs_licenseserver
+ENV APPSERVER_LICENSE_PORT=5555
+ENV APPSERVER_PORT=1234
+ENV APPSERVER_WEB_PORT=12345
+ENV APPSERVER_REST_PORT=8080
+ENV APPSERVER_WEB_MANAGER=8088
+ENV APPSERVER_ENVIRONMENT_LOCALFILES=SQLITE
+ENV APPSERVER_SQLITE_SERVER=totvs_appsqlite
+ENV APPSERVER_SQLITE_PORT=12346
+ENV APPSERVER_SQLITE_INSTANCES="1,10,1,1"
+ENV APPSERVER_MODE=application
+ENV EXTRACT_RESOURCES=true
+
+COPY ./totvs /totvs
+COPY ./entrypoint.sh /entrypoint.sh
+COPY ./service.sh /service.sh
+
+WORKDIR /
+
+RUN microdnf update -y \
+    && microdnf install gzip iputils nano telnet procps-ng python3 \
+    && microdnf clean all \
+    && pip3 install flask
+
+RUN chmod +x /entrypoint.sh \
+    && chmod +x /service.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+EXPOSE 1234 12345 8080 8088

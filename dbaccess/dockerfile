@@ -1,0 +1,32 @@
+FROM oraclelinux:8-slim
+
+LABEL version="23.1.1.4"
+LABEL description="TOTVS DBAccess" 
+LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
+
+ENV DATABASE_PROFILE=MSSQL
+ENV DATABASE_SERVER=totvs_mssql
+ENV DATABASE_PORT=1433
+ENV DATABASE_ALIAS=protheus
+ENV DATABASE_NAME=protheus
+ENV DATABASE_USERNAME=sa
+ENV DATABASE_PASSWORD=ProtheusDatabasePassword1
+ENV DBACCESS_LICENSE_SERVER=totvs_licenseserver
+ENV DBACCESS_LICENSE_PORT=5555
+ENV DBACCESS_CONSOLEFILE=/totvs/dbaccess/multi/dbconsole.log
+ENV TZ=America/Sao_Paulo
+
+COPY ./totvs /totvs
+COPY ./entrypoint.sh /entrypoint.sh
+COPY ./setup-build.sh /setup-build.sh
+COPY ./setup-database.sh /setup-database.sh
+COPY ./setup-dbaccess.sh /setup-dbaccess.sh
+
+WORKDIR /totvs
+
+RUN chmod +x /entrypoint.sh /setup-build.sh /setup-database.sh /setup-dbaccess.sh \
+    && /setup-build.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+EXPOSE 7890 7891

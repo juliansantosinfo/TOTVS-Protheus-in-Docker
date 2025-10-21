@@ -1,0 +1,201 @@
+#
+# TOTVS Protheus with Microsoft SQL Server
+#
+# To run:
+# 1. Copy .env.example to .env and set your variables
+# 2. docker compose -f docker-compose-mssql.yaml -p totvs up -d
+#
+version: "3.8"
+
+services:
+  mssql:
+    image: juliansantosinfo/totvs_mssql:12.1.2310
+    container_name: totvs_mssql
+    build:
+      context: ./mssql
+      dockerfile: dockerfile
+    user: root # Required by MSSQL setup scripts
+    restart: always
+    ports:
+      - "23433:1433"
+    environment:
+      SA_PASSWORD: ${DATABASE_PASSWORD}
+      ACCEPT_EULA: "Y"
+      TZ: ${TZ}
+    volumes:
+      - totvs_mssql_data:/var/opt/mssql/data
+    networks:
+      - totvs
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${DATABASE_PASSWORD}", "-C", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+  licenseserver:
+    image: juliansantosinfo/totvs_licenseserver:3.6.1
+    container_name: totvs_licenseserver
+    build:
+      context: ./licenseserver
+      dockerfile: dockerfile
+    restart: always
+    # ports:
+    #   - "2234:2234"
+    #   - "5555:5555"
+    #   - "8020:8020"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      LICENSE_TCP_PORT: ${LICENSE_TCP_PORT}
+      LICENSE_CONSOLEFILE: ${LICENSE_CONSOLEFILE}
+      LICENSE_PORT: ${LICENSE_PORT}
+      LICENSE_WEBAPP_PORT: ${LICENSE_WEBAPP_PORT}
+      TZ: ${TZ}
+    networks:
+      - totvs
+
+  dbaccess:
+    image: juliansantosinfo/totvs_dbaccess:23.1.1.4
+    container_name: totvs_dbaccess
+    build:
+      context: ./dbaccess
+      dockerfile: dockerfile
+    restart: always
+    # ports:
+    #   - "7890:7890"
+    #   - "7891:7891"
+    environment:
+      DATABASE_PROFILE: MSSQL
+      DATABASE_SERVER: totvs_mssql
+      DATABASE_PORT: 1433
+      DATABASE_ALIAS: ${DATABASE_ALIAS}
+      DATABASE_NAME: protheus
+      DATABASE_USERNAME: sa
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DBACCESS_LICENSE_SERVER: totvs_licenseserver
+      DBACCESS_LICENSE_PORT: ${LICENSE_PORT}
+      TZ: ${TZ}
+    networks:
+      - totvs
+    depends_on:
+      mssql:
+        condition: service_healthy
+      licenseserver:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "isql", "-b", "${DATABASE_ALIAS}", "sa", "${DATABASE_PASSWORD}"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+  appserver:
+    image: juliansantosinfo/totvs_appserver:12.1.2310
+    container_name: totvs_appserver
+    build:
+      context: ./appserver
+      dockerfile: dockerfile
+    restart: always
+    ports:
+      - "23001:23001" # AppServer Port
+      - "23002:23002" # Web/Smartclient Port
+      - "23080:23080" # Rest Port
+      - "23088:23088" # Web Manager Port
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      APPSERVER_MODE: application
+      APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
+      APPSERVER_DBACCESS_DATABASE: MSSQL
+      APPSERVER_DBACCESS_SERVER: totvs_dbaccess
+      APPSERVER_DBACCESS_PORT: 7890
+      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS}
+      APPSERVER_CONSOLEFILE: /totvs/protheus/bin/appserver/appserver.log
+      APPSERVER_MULTIPROTOCOLPORTSECURE: 0
+      APPSERVER_MULTIPROTOCOLPORT: 1
+      APPSERVER_LICENSE_SERVER: totvs_licenseserver
+      APPSERVER_LICENSE_PORT: ${LICENSE_PORT}
+      APPSERVER_PORT: 23001
+      APPSERVER_WEB_PORT: 23002
+      APPSERVER_REST_PORT: 23080
+      APPSERVER_WEB_MANAGER: 23088
+      EXTRACT_RESOURCES: "true"
+      TZ: ${TZ}
+    networks:
+      - totvs
+    # volumes:
+      # Para utilizar arquivos personalizados de configuração (appserver.ini) e log (appserver.log), 
+      # crie os diretórios e arquivos necessários e descomente as linhas abaixo.
+      # - ./volume/2310/appserver/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
+      # - ./volume/2310/appserver/appserver.log:/totvs/protheus/bin/appserver/appserver.log
+      # - ./volume/2310/appserver/apo:/totvs/protheus/apo
+      # - ./volume/2310/protheus_data:/totvs/protheus_data
+    depends_on:
+      licenseserver:
+        condition: service_started
+      dbaccess:
+        condition: service_healthy
+
+  apprest:
+    image: juliansantosinfo/totvs_appserver:12.1.2310
+    container_name: totvs_apprest
+    build:
+      context: ./appserver
+      dockerfile: dockerfile
+    profiles:
+      - full
+    restart: always
+    ports:
+      - "23101:23101" # AppServer Port
+      - "23102:23102" # Web/Smartclient Port
+      - "23180:23180" # REST Port
+      - "23188:23188" # Web Manager Port
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      APPSERVER_MODE: rest
+      APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
+      APPSERVER_DBACCESS_DATABASE: MSSQL
+      APPSERVER_DBACCESS_SERVER: totvs_dbaccess
+      APPSERVER_DBACCESS_PORT: 7890
+      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS}
+      APPSERVER_CONSOLEFILE: /totvs/protheus/bin/appserver/appserver.log
+      APPSERVER_MULTIPROTOCOLPORTSECURE: 0
+      APPSERVER_MULTIPROTOCOLPORT: 1
+      APPSERVER_LICENSE_SERVER: totvs_licenseserver
+      APPSERVER_LICENSE_PORT: ${LICENSE_PORT}
+      APPSERVER_PORT: 23101
+      APPSERVER_WEB_PORT: 23102
+      APPSERVER_REST_PORT: 23180
+      APPSERVER_WEB_MANAGER: 23188
+      EXTRACT_RESOURCES: "true"
+      TZ: ${TZ}
+    networks:
+      - totvs
+    # volumes:
+      # Para utilizar arquivos personalizados de configuração (appserver.ini) e log (appserver.log), 
+      # crie os diretórios e arquivos necessários e descomente as linhas abaixo.
+      # - ./volume/2310/apprest/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
+      # - ./volume/2310/apprest/appserver.log:/totvs/protheus/bin/appserver/appserver.log
+      # - ./volume/2310/apprest/apo:/totvs/protheus/apo
+      # - ./volume/2310/protheus_data:/totvs/protheus_data
+    depends_on:
+      licenseserver:
+        condition: service_started
+      dbaccess:
+        condition: service_healthy
+
+volumes:
+  totvs_mssql_data:
+    driver: local
+
+networks:
+  totvs:
+    driver: bridge

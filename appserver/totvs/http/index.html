@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>TOTVS AppServer</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Estilo para a barra de status */
+    #statusBar {
+      width: 0%;
+      height: 10px;
+      background-color: #4CAF50;
+      transition: width 0.5s ease-in-out;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row justify-content-center mt-5">
+      <div class="col-md-8">
+        <h1 class="text-center mb-4">TOTVS AppServer</h1>
+        <div class="d-flex justify-content-around mt-3 ">
+          <button type="button" class="btn btn-success btn-block mr-3 mt-3" id="iniciarBtn">Iniciar</button>
+          <button type="button" class="btn btn-danger btn-block mr-3 mt-3" id="pararBtn">Parar</button>
+          <button type="button" class="btn btn-warning btn-block mr-3 mt-3" id="reiniciarBtn">Reiniciar</button>
+          <button type="button" class="btn btn-primary btn-block mt-3" id="iniBtn" data-toggle="modal"
+            data-target="#iniModal">Configurações</button>
+        </div>
+        <div class="d-flex justify-content-around mt-3" id="statusBar"></div>
+        <div class="d-flex justify-content-around mt-3" id="statusMessage"></div>
+      </div>
+      <textarea class="form-control" id="consoleLogTextarea" rows="20"></textarea>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="iniModal" tabindex="-1" aria-labelledby="iniModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="iniModalLabel">appserver.ini</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <textarea class="form-control" id="iniTextarea"
+            rows="20"><!-- O conteúdo do seu arquivo de texto será carregado aqui --></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" onclick="fetchSaveIniFile()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+
+    const iniciarBtn = document.getElementById('iniciarBtn');
+    const pararBtn = document.getElementById('pararBtn');
+    const reiniciarBtn = document.getElementById('reiniciarBtn');
+
+    const statusBar = document.getElementById('statusBar');
+    const statusMessage = document.getElementById('statusMessage');
+
+    let requestIntervalId;
+
+    function enviarRequisicao(endpoint) {
+      statusMessage.textContent = "Processando...";
+      statusBar.style.width = '0%';
+
+      // Simula a barra de progresso
+      let width = 0;
+      requestIntervalId = setInterval(() => {
+        if (width >= 100) {
+          clearInterval(requestIntervalId);
+          return;
+        }
+        width++;
+        statusBar.style.width = width + '%';
+      }, 60);
+
+      fetch(endpoint, { method: 'POST' })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro na requisição.');
+          }
+          return response.text();
+        })
+        .then(message => {
+          clearInterval(requestIntervalId);
+          statusBar.style.width = '100%';
+          statusMessage.textContent = message;
+        })
+        .catch(error => {
+          clearInterval(requestIntervalId);
+          statusMessage.textContent = 'Erro: ' + error;
+        })
+        .finally(() => {
+          verificarStatus();
+          setTimeout(() => {
+            statusMessage.textContent = "";
+          }, 3000);
+        });
+    }
+
+    iniciarBtn.addEventListener('click', function () {
+      enviarRequisicao('/servico/start');
+    });
+
+    pararBtn.addEventListener('click', function () {
+      enviarRequisicao('/servico/stop');
+    });
+
+    reiniciarBtn.addEventListener('click', function () {
+      enviarRequisicao('/servico/restart');
+    });
+
+    async function verificarStatus() {
+      await fetch('/status')
+        .then(response => {
+          if (response.ok) {
+            iniciarBtn.disabled = true;
+            pararBtn.disabled = false;
+            reiniciarBtn.disabled = false
+          } else {
+            iniciarBtn.disabled = false;
+            pararBtn.disabled = true;
+            reiniciarBtn.disabled = true
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao verificar o status do servidor:', error);
+        });
+    }
+
+    async function fetchConsoleLog() {
+      const response = await fetch('/consolelog');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          // break;
+          $('#consoleLogTextarea').val(text + chunk);
+        }
+        const chunk = decoder.decode(value, { stream: true });
+        text = $('#consoleLogTextarea').val();
+        $('#consoleLogTextarea').val(text + chunk);
+        $("#consoleLogTextarea").scrollTop($("#consoleLogTextarea")[0].scrollHeight);
+      }
+    }
+
+    async function fetchIniFile() {
+      try {
+        const response = await fetch('/inifile');
+        const text = await response.text(); // Aguarda a leitura do texto
+        $('#iniTextarea').val(text);
+      } catch (error) {
+        console.error("Erro ao carregar o arquivo INI:", error);
+      }
+    }
+
+    async function fetchSaveIniFile() {
+      // Obtém o conteúdo do textarea com id "iniTextarea"
+      const iniContent = $('#iniTextarea').val();
+
+      try {
+        const response = await fetch('/salvar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain' // Define o tipo de conteúdo como texto puro
+          },
+          body: iniContent // Define o conteúdo do textarea como o corpo da requisição
+        });
+
+        if (response.ok) {
+          // Corpo OK - A requisição foi bem-sucedida
+          console.log('Conteúdo do textarea enviado com sucesso!');
+        } else {
+          // Corpo NO - A requisição falhou
+          console.error('Erro ao enviar o conteúdo do textarea:', response.status);
+        }
+      } catch (error) {
+        console.error('Erro ao enviar o conteúdo do textarea:', error);
+      }
+    }
+
+    verificarStatus()
+    fetchConsoleLog();
+
+    // Carregar o conteúdo ao abrir o modal
+    $('#iniModal').on('shown.bs.modal', function () {
+      fetchIniFile();
+    });
+
+  </script>
+</body>
+
+</html>

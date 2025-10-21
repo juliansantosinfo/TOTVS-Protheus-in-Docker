@@ -1,0 +1,27 @@
+# Imagem base oficial do PostgreSQL 15
+FROM postgres:15
+
+LABEL version="15-protheus-12.1.2310"
+LABEL description="TOTVS PostgreSQL"
+LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
+
+# Copiar scripts e recursos
+COPY ./resources/data.tar.gz /tmp/data.tar.gz
+COPY entrypoint.sh /entrypoint.sh
+
+# Ajustar permissões para entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Variáveis de ambiente padrão
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=ProtheusDatabasePassword1
+ENV POSTGRES_DB=protheus
+ENV POSTGRES_INITDB_ARGS="--locale=pt_BR.ISO-8859-1 -E LATIN1"
+
+# Expor porta
+EXPOSE 5432
+
+# Comando padrão para iniciar o SQL Server
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+CMD [ "postgres" ]

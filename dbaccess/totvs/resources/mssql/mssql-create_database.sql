@@ -1,0 +1,4 @@
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'DATABASE_NAME')
+BEGIN
+    CREATE DATABASE DATABASE_NAME COLLATE latin1_general_bin;
+END;

@@ -1,0 +1,19 @@
+FROM oraclelinux:8-slim
+
+LABEL version="3.6.1"
+LABEL description="TOTVS LicenseServer" 
+LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
+
+ENV LICENSE_TCP_PORT=2234
+ENV LICENSE_CONSOLEFILE=/totvs/licenseserver/bin/appserver/licenseserver.log
+ENV LICENSE_PORT=5555
+ENV LICENSE_WEBAPP_PORT=8020
+
+COPY ./totvs /totvs
+COPY ./entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+EXPOSE 2234 4000 5555 8020
