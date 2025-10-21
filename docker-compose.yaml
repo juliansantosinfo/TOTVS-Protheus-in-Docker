@@ -9,7 +9,7 @@ version: "3.8"
 
 services:
   mssql:
-    image: juliansantosinfo/totvs_mssql:12.1.2410
+    image: juliansantosinfo/totvs_mssql:12.1.2510
     container_name: totvs_mssql
     build:
       context: ./mssql
@@ -17,7 +17,7 @@ services:
     user: root # Required by MSSQL setup scripts
     restart: always
     ports:
-      - "24433:1433"
+      - "25433:1433"
     environment:
       SA_PASSWORD: ${DATABASE_PASSWORD}
       ACCEPT_EULA: "Y"
@@ -34,7 +34,7 @@ services:
       start_period: 10s
 
   licenseserver:
-    image: juliansantosinfo/totvs_licenseserver:3.6.2
+    image: juliansantosinfo/totvs_licenseserver:3.7.0
     container_name: totvs_licenseserver
     build:
       context: ./licenseserver
@@ -58,7 +58,7 @@ services:
       - totvs
 
   dbaccess:
-    image: juliansantosinfo/totvs_dbaccess:24.1.0.0
+    image: juliansantosinfo/totvs_dbaccess:24.1.1.0
     container_name: totvs_dbaccess
     build:
       context: ./dbaccess
@@ -93,17 +93,17 @@ services:
       start_period: 10s
 
   appserver:
-    image: juliansantosinfo/totvs_appserver:12.1.2410
+    image: juliansantosinfo/totvs_appserver:12.1.2510
     container_name: totvs_appserver
     build:
       context: ./appserver
       dockerfile: dockerfile
     restart: always
     ports:
-      - "24001:24001" # AppServer Port
-      - "24002:24002" # Web/Smartclient Port
-      - "24080:24080" # Rest Port
-      - "24088:24088" # Web Manager Port
+      - "25001:25001" # AppServer Port
+      - "25002:25002" # Web/Smartclient Port
+      - "25080:25080" # Rest Port
+      - "25088:25088" # Web Manager Port
     ulimits:
       nofile:
         soft: 65536
@@ -120,10 +120,10 @@ services:
       APPSERVER_MULTIPROTOCOLPORT: 1
       APPSERVER_LICENSE_SERVER: totvs_licenseserver
       APPSERVER_LICENSE_PORT: ${LICENSE_PORT}
-      APPSERVER_PORT: 24001
-      APPSERVER_WEB_PORT: 24002
-      APPSERVER_REST_PORT: 24080
-      APPSERVER_WEB_MANAGER: 24088
+      APPSERVER_PORT: 25001
+      APPSERVER_WEB_PORT: 25002
+      APPSERVER_REST_PORT: 25080
+      APPSERVER_WEB_MANAGER: 25088
       EXTRACT_RESOURCES: "true"
       TZ: ${TZ}
     networks:
@@ -131,10 +131,10 @@ services:
     # volumes:
       # Para utilizar arquivos personalizados de configuração (appserver.ini) e log (appserver.log), 
       # crie os diretórios e arquivos necessários e descomente as linhas abaixo.
-      # - ./volume/2410/appserver/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
-      # - ./volume/2410/appserver/appserver.log:/totvs/protheus/bin/appserver/appserver.log
-      # - ./volume/2410/appserver/apo:/totvs/protheus/apo
-      # - ./volume/2410/protheus_data:/totvs/protheus_data
+      # - ./volume/2510/appserver/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
+      # - ./volume/2510/appserver/appserver.log:/totvs/protheus/bin/appserver/appserver.log
+      # - ./volume/2510/appserver/apo:/totvs/protheus/apo
+      # - ./volume/2510/protheus_data:/totvs/protheus_data
     depends_on:
       licenseserver:
         condition: service_started
@@ -142,7 +142,7 @@ services:
         condition: service_healthy
 
   apprest:
-    image: juliansantosinfo/totvs_appserver:12.1.2410
+    image: juliansantosinfo/totvs_appserver:12.1.2510
     container_name: totvs_apprest
     build:
       context: ./appserver
@@ -151,10 +151,10 @@ services:
       - full
     restart: always
     ports:
-      - "24101:24101" # AppServer Port
-      - "24102:24102" # Web/Smartclient Port
-      - "24180:24180" # REST Port
-      - "24188:24188" # Web Manager Port
+      - "25101:25101" # AppServer Port
+      - "25102:25102" # Web/Smartclient Port
+      - "25180:25180" # REST Port
+      - "25188:25188" # Web Manager Port
     ulimits:
       nofile:
         soft: 65536
@@ -171,10 +171,10 @@ services:
       APPSERVER_MULTIPROTOCOLPORT: 1
       APPSERVER_LICENSE_SERVER: totvs_licenseserver
       APPSERVER_LICENSE_PORT: ${LICENSE_PORT}
-      APPSERVER_PORT: 24101
-      APPSERVER_WEB_PORT: 24102
-      APPSERVER_REST_PORT: 24180
-      APPSERVER_WEB_MANAGER: 24188
+      APPSERVER_PORT: 25101
+      APPSERVER_WEB_PORT: 25102
+      APPSERVER_REST_PORT: 25180
+      APPSERVER_WEB_MANAGER: 25188
       EXTRACT_RESOURCES: "true"
       TZ: ${TZ}
     networks:
@@ -182,10 +182,10 @@ services:
     # volumes:
       # Para utilizar arquivos personalizados de configuração (appserver.ini) e log (appserver.log), 
       # crie os diretórios e arquivos necessários e descomente as linhas abaixo.
-      # - ./volume/2410/apprest/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
-      # - ./volume/2410/apprest/appserver.log:/totvs/protheus/bin/appserver/appserver.log
-      # - ./volume/2410/apprest/apo:/totvs/protheus/apo
-      # - ./volume/2410/protheus_data:/totvs/protheus_data
+      # - ./volume/2510/apprest/appserver.ini:/totvs/protheus/bin/appserver/appserver.ini
+      # - ./volume/2510/apprest/appserver.log:/totvs/protheus/bin/appserver/appserver.log
+      # - ./volume/2510/apprest/apo:/totvs/protheus/apo
+      # - ./volume/2510/protheus_data:/totvs/protheus_data
     depends_on:
       licenseserver:
         condition: service_started

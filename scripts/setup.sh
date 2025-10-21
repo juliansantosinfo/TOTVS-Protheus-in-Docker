@@ -35,7 +35,7 @@ set -e
 GH_OWNER="juliansantosinfo"
 GH_REPO="TOTVS-Protheus-in-Docker-Resources"
 GH_BRANCH="main"
-GH_RELEASE="release2410"
+GH_RELEASE="release2510"
 
 # --- FUNÇÃO: Exibir ajuda ---
 mostrar_ajuda() {

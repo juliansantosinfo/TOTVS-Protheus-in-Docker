@@ -23,7 +23,7 @@ readonly TOTVS_DIR="./totvs"
 # --- Componentes da Docker Tag (Separados para fácil manutenção) ---
 readonly DOCKER_USER="juliansantosinfo"
 readonly DOCKER_IMAGE_NAME="totvs_licenseserver"
-readonly DOCKER_IMAGE_TAG="3.6.2"
+readonly DOCKER_IMAGE_TAG="3.7.0"
 readonly DOCKER_TAG="${DOCKER_USER}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 
 # Argumento 1: Modo de Progresso do Docker Build (padrão: auto)

@@ -72,7 +72,6 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
     case "${DATABASE_PROFILE}" in
         MSSQL)
             echo "⚙️ Configurando MSSQL..."
-            export DATABASE_DEFAULT_ALIAS="MSSQL"
             export DATABASE_DEFAULT_NAME="master"
             export DATABASE_DRIVER=MSSQL18
             export DATABASE_CLIENT_LIBRARY_MSSQL=/usr/lib64/libodbc.so
@@ -83,7 +82,6 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
             
         POSTGRES)
             echo "⚙️ Configurando POSTGRES..."
-            export DATABASE_DEFAULT_ALIAS="PostgreSQL"
             export DATABASE_DEFAULT_NAME="postgres"
             export DATABASE_DRIVER=PostgreSQL
             export DATABASE_CLIENT_LIBRARY_POSTGRES=/usr/lib64/libodbc.so
@@ -155,9 +153,6 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
     check_env_vars "SQL_COMMAND_PASSWORD_UPDATE"
 
     echo "quit;" | isql -v "$DATABASE_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD"
-    if [ ! $? = 0 ]; then
-        echo "quit;" | isql -v "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD"
-    fi
 
     if [ ! $? = 0 ]; then
 
@@ -218,7 +213,7 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
     sed -i "s,DATABASE_NAME,${DATABASE_NAME},g" /tmp/script_base.sql
     sed -i "s,DATABASE_USERNAME,${DATABASE_USERNAME},g" /tmp/script_base.sql
     
-    isql -b "$DATABASE_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD" < /tmp/script_base.sql > /dev/null 2>&1
+    isql -b "$DATABASE_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD" < "$SCRIPT_BASE" > /dev/null 2>&1
 
     if [[ ! $? = 0 ]]; then
         echo "❌ ERRO: Não foi possivel executar os script iniciais."

@@ -140,11 +140,11 @@ if [[ "$execute_push" =~ ^[Ss]$ ]]; then
     echo ">>> 🔄 INICIANDO PUSH PARA DOCKERHUB: <<<"
 
     # Usando a estrutura <USUARIO>/<IMAGEM>:<TAG> para cada serviço.
-    readonly DOCKER_TAG_APPSERVER="juliansantosinfo/totvs_appserver:12.1.2410"
-    readonly DOCKER_TAG_DBACCESS="juliansantosinfo/totvs_dbaccess:24.1.0.0"
-    readonly DOCKER_TAG_LICENSE="juliansantosinfo/totvs_licenseserver:3.6.2"
-    readonly DOCKER_TAG_MSSQL="juliansantosinfo/totvs_mssql:12.1.2410"
-    readonly DOCKER_TAG_POSTGRES="juliansantosinfo/totvs_postgres:12.1.2410"
+    readonly DOCKER_TAG_APPSERVER="juliansantosinfo/totvs_appserver:12.1.2510"
+    readonly DOCKER_TAG_DBACCESS="juliansantosinfo/totvs_dbaccess:24.1.1.0"
+    readonly DOCKER_TAG_LICENSE="juliansantosinfo/totvs_licenseserver:3.7.0"
+    readonly DOCKER_TAG_MSSQL="juliansantosinfo/totvs_mssql:12.1.2510"
+    readonly DOCKER_TAG_POSTGRES="juliansantosinfo/totvs_postgres:12.1.2510"
 
     readonly IMAGES_TO_PUSH=(
         "$DOCKER_TAG_APPSERVER"
