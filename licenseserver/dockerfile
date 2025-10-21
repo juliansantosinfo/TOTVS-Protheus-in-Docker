@@ -1,6 +1,6 @@
 FROM oraclelinux:8-slim
 
-LABEL version="3.6.1"
+LABEL version="3.6.2"
 LABEL description="TOTVS LicenseServer" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 

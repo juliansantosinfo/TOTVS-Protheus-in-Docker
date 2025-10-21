@@ -35,7 +35,7 @@ set -e
 GH_OWNER="juliansantosinfo"
 GH_REPO="TOTVS-Protheus-in-Docker-Resources"
 GH_BRANCH="main"
-GH_RELEASE="release2310"
+GH_RELEASE="release2410"
 
 # --- FUNÇÃO: Exibir ajuda ---
 mostrar_ajuda() {
@@ -132,11 +132,10 @@ processar_modulo() {
     echo ""
     echo "🧩 Verificando partes divididas..."
     for file in "${FILES[@]}"; do
-        # Arquivo protheus_data.tar.gz foi dividido em 2 partes para release 2310 
-        # if [[ "$file" == "protheus_data.tar.gz" ]]; then
-        #     echo "⏭️ Ignorando arquivo ${file}"
-        #     continue
-        # fi
+        if [[ "$file" == "protheus_data.tar.gz" ]]; then
+            echo "⏭️ Ignorando arquivo ${file}"
+            continue
+        fi
         if [[ -f "${DOWNLOAD_DIR}/$file" ]]; then
             echo "⏭️ Ignorando arquivo ${file}"
             continue

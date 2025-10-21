@@ -35,8 +35,8 @@ Esta imagem é versátil e pode operar em dois modos distintos, configurados atr
         docker run -d \
           --name totvs_appserver \
           --network totvs \
-          -p 23001:23001 \
-          -p 23002:23002 \
+          -p 24001:24001 \
+          -p 24002:24002 \
           -e "APPSERVER_MODE=application" \
           juliansantosinfo/totvs_appserver:latest
         ```
@@ -46,7 +46,7 @@ Esta imagem é versátil e pode operar em dois modos distintos, configurados atr
         docker run -d \
           --name totvs_apprest \
           --network totvs \
-          -p 23180:23180 \
+          -p 24180:24180 \
           -e "APPSERVER_MODE=rest" \
           juliansantosinfo/totvs_appserver:latest
         ```
@@ -76,8 +76,8 @@ Caso queira construir a imagem localmente:
 | `APPSERVER_DBACCESS_ALIAS` | Alias da conexão com o banco. | `protheus` |
 | `APPSERVER_LICENSE_SERVER` | Host do License Server. | `totvs_licenseserver` |
 | `APPSERVER_LICENSE_PORT` | Porta do License Server. | `5555` |
-| `APPSERVER_PORT` | Porta principal do AppServer. | `23001` |
-| `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `23002` |
-| `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `23180` |
-| `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `23088` |
+| `APPSERVER_PORT` | Porta principal do AppServer. | `24001` |
+| `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `24002` |
+| `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `24180` |
+| `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `24088` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
