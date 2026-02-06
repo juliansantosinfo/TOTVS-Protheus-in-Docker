@@ -19,23 +19,25 @@
 ######################################################################
 
 DATABASE_DEFAULT_NAME=""
+DATABASE_DEFAULT_ALIAS=""
 DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
 
 #---------------------------------------------------------------------
 
 ## 🚀 FUNÇOES AUXILIARES
 
-    # Define a função de tratamento de erro para variáveis de ambiente
+    # Define a função de impressao do nome e conteudo da variáveis de ambiente
     check_env_vars() {
         local var_name=$1
         if [[ -z "${!var_name}" ]]; then
-            echo "❌ ERRO: A variável de ambiente **${var_name}** não está definida. O script será encerrado."
+            echo "❌ ERRO: A variável de ambiente **${var_name}** não está definida ou está vazia."
             exit 1
         else
-            echo "🔎 **${var_name}**... ✅"
+            # Exibe o nome e o valor (ou apenas um check, se preferir ocultar segredos)
+            echo "🔎 **${var_name}**: ${!var_name} ✅"
         fi
     }
-
+    
 #---------------------------------------------------------------------
 
 ## 🚀 INÍCIO DA VERIFICAÇÃO DE VARIÁVEIS DE AMBIENTE
@@ -82,6 +84,7 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
             
         POSTGRES)
             echo "⚙️ Configurando POSTGRES..."
+            export DATABASE_DEFAULT_ALIAS="POSTGRES"
             export DATABASE_DEFAULT_NAME="postgres"
             export DATABASE_DRIVER=PostgreSQL
             export DATABASE_CLIENT_LIBRARY_POSTGRES=/usr/lib64/libodbc.so
@@ -150,28 +153,30 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
     echo "🔎 Username: $DATABASE_USERNAME"
     echo "🔎 PASSWORD: $DATABASE_PASSWORD"
 
+    check_env_vars "DATABASE_DEFAULT_NAME"
+    check_env_vars "DATABASE_DEFAULT_ALIAS"
     check_env_vars "SQL_COMMAND_PASSWORD_UPDATE"
 
-    echo "quit;" | isql -v "$DATABASE_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD"
+    echo "quit;" | isql -v "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD"
 
     if [ ! $? = 0 ]; then
 
         echo "❌ ERRO: A senha ('$DATABASE_PASSWORD') para o DB ${DATABASE_PROFILE} parece estar incorreta ou o alias é inválido."
         echo "⚠️ Tentando conexão com senha default."
-        echo "quit;" | isql -b "$DATABASE_ALIAS" "$DATABASE_USERNAME" "ProtheusDatabasePassword1"
+        echo "quit;" | isql -b "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_DEFAULT_PASSWORD"
 
         if [ $? = 0 ]; then
 
             echo "✅ Conexão com Banco de Dados ${DATABASE_PROFILE} foi estabelecida."
             echo "🔥 Executando script para atualização de senha"
 
-            echo "$SQL_COMMAND_PASSWORD_UPDATE" | isql -b "$DATABASE_ALIAS" "$DATABASE_USERNAME" "$DATABASE_DEFAULT_PASSWORD" > /dev/null 2>&1
+            echo "$SQL_COMMAND_PASSWORD_UPDATE" | isql -b "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_DEFAULT_PASSWORD" > /dev/null 2>&1
 
             if [ $? -eq 0 ]; then
 
                 echo "🚀 SUCESSO: A senha do usuário '$DATABASE_USERNAME' foi alterada."
                 echo "🔎 Verificando a conexão com a nova senha para confirmar..."
-                echo "quit;" | isql -b "$DATABASE_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD" > /dev/null 2>&1
+                echo "quit;" | isql -b "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD" > /dev/null 2>&1
 
                 if [ $? -eq 0 ]; then
                     echo "✅ Conexão com Banco de Dados ${DATABASE_PROFILE} foi estabelecida."
@@ -208,12 +213,12 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
 
     check_env_vars "SCRIPT_BASE"
 
-    cp "$SCRIPT_BASE" /tmp/script_base.sql
+    sed -i "s,DATABASE_NAME,${DATABASE_NAME},g" "$SCRIPT_BASE"
+    sed -i "s,DATABASE_USERNAME,${DATABASE_USERNAME},g" "$SCRIPT_BASE"
 
-    sed -i "s,DATABASE_NAME,${DATABASE_NAME},g" /tmp/script_base.sql
-    sed -i "s,DATABASE_USERNAME,${DATABASE_USERNAME},g" /tmp/script_base.sql
+    cat "$SCRIPT_BASE"
     
-    isql -b "$DATABASE_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD" < "$SCRIPT_BASE" > /dev/null 2>&1
+    isql -b "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD" < "$SCRIPT_BASE" > /dev/null 2>&1
 
     if [[ ! $? = 0 ]]; then
         echo "❌ ERRO: Não foi possivel executar os script iniciais."
