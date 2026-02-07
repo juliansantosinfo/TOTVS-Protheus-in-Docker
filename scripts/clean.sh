@@ -46,6 +46,9 @@ limpar() {
     postgres)
       remove_item "postgres/resources"
       ;;
+    smartview)
+      remove_item "smartview/totvs/smartview.tar.gz"
+      ;;
     *)
       echo "❌ Erro: diretório inválido '$dir'. Use: appserver, dbaccess, licenseserver, mssql ou postgres."
       exit 1
