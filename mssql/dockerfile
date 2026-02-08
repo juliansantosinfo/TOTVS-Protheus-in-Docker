@@ -20,6 +20,8 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chown -R root:root /entrypoint.sh && \
     chmod -R 770 /entrypoint.sh
 
+USER mssql
+
 # Expor a porta padrão
 EXPOSE 1433
 
