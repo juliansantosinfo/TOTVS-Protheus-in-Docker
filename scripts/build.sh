@@ -24,6 +24,15 @@ set -euo pipefail
 # --- Variáveis de Configuração ---
 # Lista de aplicações válidas no seu projeto.
 readonly VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "smartview")
+
+# --- Carregar Versões Centralizadas ---
+if [ -f "versions.env" ]; then
+    source "versions.env"
+else
+    echo "🚨 Erro: Arquivo 'versions.env' não encontrado. O script deve ser executado na raiz do projeto."
+    exit 1
+fi
+
 # Armazena os nomes das aplicações que serão construídas.
 APPS_TO_BUILD=()
 # Variáveis para repassar os argumentos opcionais (progress).
@@ -140,12 +149,12 @@ if [[ "$execute_push" =~ ^[Ss]$ ]]; then
     echo ">>> 🔄 INICIANDO PUSH PARA DOCKERHUB: <<<"
 
     # Usando a estrutura <USUARIO>/<IMAGEM>:<TAG> para cada serviço.
-    readonly DOCKER_TAG_APPSERVER="juliansantosinfo/totvs_appserver:12.1.2510"
-    readonly DOCKER_TAG_DBACCESS="juliansantosinfo/totvs_dbaccess:24.1.1.0"
-    readonly DOCKER_TAG_LICENSE="juliansantosinfo/totvs_licenseserver:3.7.0"
-    readonly DOCKER_TAG_MSSQL="juliansantosinfo/totvs_mssql:12.1.2510"
-    readonly DOCKER_TAG_POSTGRES="juliansantosinfo/totvs_postgres:12.1.2510"
-    readonly DOCKER_TAG_SMARTVIEW="juliansantosinfo/totvs_smartview:3.9.0.4558336"
+    readonly DOCKER_TAG_APPSERVER="${DOCKER_USER}/${APPSERVER_IMAGE_NAME}:${APPSERVER_VERSION}"
+    readonly DOCKER_TAG_DBACCESS="${DOCKER_USER}/${DBACCESS_IMAGE_NAME}:${DBACCESS_VERSION}"
+    readonly DOCKER_TAG_LICENSE="${DOCKER_USER}/${LICENSESERVER_IMAGE_NAME}:${LICENSESERVER_VERSION}"
+    readonly DOCKER_TAG_MSSQL="${DOCKER_USER}/${MSSQL_IMAGE_NAME}:${MSSQL_VERSION}"
+    readonly DOCKER_TAG_POSTGRES="${DOCKER_USER}/${POSTGRES_IMAGE_NAME}:${POSTGRES_VERSION}"
+    readonly DOCKER_TAG_SMARTVIEW="${DOCKER_USER}/${SMARTVIEW_IMAGE_NAME}:${SMARTVIEW_VERSION}"
 
     readonly IMAGES_TO_PUSH=(
         "$DOCKER_TAG_APPSERVER"

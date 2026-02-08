@@ -4,10 +4,18 @@ set -euo pipefail
 readonly REQUIRED_DIR_NAME="smartview"
 readonly TOTVS_DIR="./totvs"
 
-readonly DOCKER_USER="juliansantosinfo"
-readonly DOCKER_IMAGE_NAME="totvs_smartview"
-readonly DOCKER_IMAGE_TAG="3.9.0.4558336"
-readonly DOCKER_TAG="${DOCKER_USER}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+# --- Carregar Versões Centralizadas ---
+if [ -f "versions.env" ]; then
+    source "versions.env"
+elif [ -f "../versions.env" ]; then
+    source "../versions.env"
+else
+    echo "🚨 Erro: Arquivo 'versions.env' não encontrado."
+    exit 1
+fi
+
+readonly DOCKER_IMAGE_TAG="${SMARTVIEW_VERSION}"
+readonly DOCKER_TAG="${DOCKER_USER}/${SMARTVIEW_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 
 DOCKER_PROGRESS_MODE="${1:-auto}"
 DOCKER_PROGRESS_MODE=$(echo "$DOCKER_PROGRESS_MODE" | tr '[:upper:]' '[:lower:]')
