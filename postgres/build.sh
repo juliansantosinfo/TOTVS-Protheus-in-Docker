@@ -22,11 +22,19 @@ readonly RESOURCES_DIR="./resources"
 readonly DATABASE_FILE="data.tar.gz"
 readonly DATABASE_PATH="${RESOURCES_DIR}/${DATABASE_FILE}"
 
+# --- Carregar Versões Centralizadas ---
+if [ -f "versions.env" ]; then
+    source "versions.env"
+elif [ -f "../versions.env" ]; then
+    source "../versions.env"
+else
+    echo "🚨 Erro: Arquivo 'versions.env' não encontrado."
+    exit 1
+fi
+
 # --- Componentes da Docker Tag (Separados para fácil manutenção) ---
-readonly DOCKER_USER="juliansantosinfo"
-readonly DOCKER_IMAGE_NAME="totvs_postgres"
-readonly DOCKER_IMAGE_TAG="12.1.2410"
-readonly DOCKER_TAG="${DOCKER_USER}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+readonly DOCKER_IMAGE_TAG="${POSTGRES_VERSION}"
+readonly DOCKER_TAG="${DOCKER_USER}/${POSTGRES_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 
 # Argumento 1: Modo de Progresso do Docker Build (padrão: auto)
 # Se não for fornecido, usa 'auto'. Se for fornecido, usa o valor, convertido para minúsculas.
