@@ -61,20 +61,24 @@ Deseja adicionar o **TOTVS TSS** (Nota Fiscal Eletrônica)?
 4.  Configure a comunicação do AppServer principal com o TSS via parâmetros no `appserver.ini`.
 
 ## 5.7. Scripts de Automação e Utilidade
-O diretório `scripts/` contém ferramentas essenciais para a automação, manutenção e garantia de qualidade do projeto.
+O diretório `scripts/` está organizado de forma hierárquica para facilitar a manutenção e a garantia de qualidade.
 
-### Scripts de Ciclo de Vida (Build e Setup)
-*   **`scripts/setup.sh`**: Responsável por baixar os binários oficiais (Protheus, DBAccess, etc) de um repositório externo e organizá-los nas pastas corretas (`appserver/totvs`, etc). É o primeiro script a ser executado.
-*   **`scripts/build.sh`**: Script mestre que orquestra a construção de todas as imagens Docker. Ele pode construir tudo de uma vez ou serviços específicos (ex: `./scripts/build.sh appserver`).
-*   **`scripts/push.sh`**: Envia as imagens construídas para o Docker Hub, criando as tags de versão e `latest`.
-*   **`scripts/clean.sh`**: Remove arquivos temporários e binários baixados para limpar o ambiente de desenvolvimento.
+### 📁 scripts/build/ (Ciclo de Vida)
+*   **`setup.sh`**: Baixa e organiza os binários oficiais. É o primeiro script a ser executado.
+*   **`build.sh`**: Script mestre que orquestra a construção de todas as imagens Docker.
+*   **`push.sh`**: Envia as imagens para o Docker Hub com tags de versão e `latest`.
+*   **`clean.sh`**: Remove arquivos temporários e binários baixados.
 
-### Scripts de Qualidade e Validação (Git Hooks)
-Estes scripts são geralmente executados automaticamente pelos Git Hooks (`pre-commit`), mas podem ser rodados manualmente:
+### 📁 scripts/hooks/ (Git Automation)
+*   **`install.sh`**: Instala e configura os Git Hooks no repositório local.
+*   **`pre-commit.sh`**: Orquestrador que executa todas as validações de qualidade antes de um commit.
+*   **`commit-msg.sh`**: Valida o padrão das mensagens de commit.
 
-*   **`scripts/validate-versions.sh`**: Garante que a versão declarada nos `Dockerfiles` seja idêntica à definida no arquivo `versions.env`. Use `--fix` para corrigir automaticamente.
-*   **`scripts/validate-env.sh`**: Verifica se todas as variáveis criadas no seu `.env` local também constam no `.env.example`, garantindo que a documentação de configuração não fique defasada.
-*   **`scripts/lint-shell.sh`**: Utiliza a ferramenta `shellcheck` para analisar estaticamente todos os scripts `.sh` em busca de erros de sintaxe ou boas práticas.
-*   **`scripts/lint-dockerfile.sh`**: Utiliza `hadolint` para verificar se os Dockerfiles seguem as melhores práticas de construção de imagens.
-*   **`scripts/scan-secrets.sh`**: Varre o código em busca de senhas, chaves de API ou tokens que possam ter sido commitados acidentalmente.
-*   **`scripts/setup-hooks.sh`**: Instala e configura todos os hooks acima no seu repositório Git local (`.git/hooks`). Execute-o uma vez ao clonar o projeto.
+### 📁 scripts/validation/ (Qualidade e Linting)
+Estes scripts garantem que o código siga os padrões estabelecidos:
+*   **`versions.sh`**: Sincroniza versões entre `Dockerfiles` e `versions.env`.
+*   **`env.sh`**: Valida a paridade entre `.env` e `.env.example`.
+*   **`lint-shell.sh`**: Analisa scripts Bash com `shellcheck`.
+*   **`lint-dockerfile.sh`**: Analisa Dockerfiles com `hadolint`.
+*   **`secrets.sh`**: Varre o código em busca de segredos (senhas/tokens) expostos.
+*   **`commit-msg.sh`**: Valida o padrão Conventional Commits.
