@@ -25,6 +25,9 @@ print_header() {
 
 echo "###################################################"
 echo "🚀 Bem-vindo ao Assistente de Inicialização do Protheus Docker"
+echo "💡 DICA: Você também pode usar nosso gerador web para criar seu"
+echo "   arquivo customizado de forma visual e rápida:"
+echo "   👉 https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/"
 echo "###################################################"
 
 # 1. Escolha do Banco de Dados
