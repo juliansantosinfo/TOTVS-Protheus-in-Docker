@@ -57,4 +57,5 @@ Caso queira construir a imagem localmente:
 |---|---|---|
 | `POSTGRES_USER` | Define o nome do superusuário do banco de dados. | `postgres` |
 | `POSTGRES_PASSWORD` | Define a senha para o superusuário. | `ProtheusDatabasePassword1` |
+| `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |

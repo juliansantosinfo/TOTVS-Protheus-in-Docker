@@ -57,4 +57,5 @@ Caso queira construir a imagem localmente:
 |---|---|---|
 | `SA_PASSWORD` | Define a senha para o usuário `sa`. | `ProtheusDatabasePassword1` |
 | `ACCEPT_EULA` | Confirma a aceitação da licença de uso do SQL Server. | `Y` |
+| `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |

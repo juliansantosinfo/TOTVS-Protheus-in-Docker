@@ -1,0 +1,41 @@
+FROM oraclelinux:8-slim
+
+LABEL release="3.9.0.4558336"
+LABEL description="TOTVS SmartView Server" 
+LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
+
+ENV EXTRACT_RESOURCES=true
+ENV TZ=America/Sao_Paulo
+
+COPY ./totvs /totvs
+
+WORKDIR /totvs
+
+# Atualização e instalação de dependências
+# 1. oracle-epel-release-el8: Necessário para o libgdiplus
+# 2. fontconfig: Essencial para o SkiaSharp gerenciar fontes
+# 3. libgdiplus: Necessário para compatibilidade System.Drawing/DevExpress
+RUN microdnf update -y \
+    && microdnf install -y oracle-epel-release-el8 \
+    && microdnf install -y \
+        gzip \
+        iputils \
+        nano \
+        telnet \
+        procps-ng \
+        libicu \
+        fontconfig \
+        libX11 \
+        libgdiplus \
+    && microdnf clean all
+
+# Garante que o cache de fontes seja gerado (evita erro de TypeInitialization no Skia)
+RUN fc-cache -fv
+
+COPY ./entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+EXPOSE 7017 7019

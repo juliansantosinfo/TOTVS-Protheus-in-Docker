@@ -48,7 +48,7 @@ done
 
 # 2. Escolha do Perfil (API REST)
 print_header "2. Iniciar Serviços da API REST?"
-echo "Você deseja incluir os serviços da API REST (perfil 'full')?"
+echo "Você deseja incluir os serviços da API REST e SmartView (perfil 'full')?"
 select profile_choice in "Sim" "Não"; do
     case $profile_choice in
         "Sim")

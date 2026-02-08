@@ -10,6 +10,7 @@ USER root
 # Variáveis obrigatórias de configuração do SQL Server
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=ProtheusDatabasePassword1
+ENV RESTORE_BACKUP=Y
 
 # Copiar o backup compactado para dentro da imagem
 COPY ./resources/data.tar.gz /tmp/data.tar.gz

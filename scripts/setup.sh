@@ -47,6 +47,7 @@ mostrar_ajuda() {
     echo "  licenseserver  - Baixa e extrai os arquivos do License Server"
     echo "  mssql          - Baixa os arquivos do MSSQL"
     echo "  postgres       - Baixa os arquivos do PostgreSQL"
+    echo "  smartview      - Baixa os arquivos do SmartView"
     echo ""
     echo "Se nenhum módulo for informado, todos serão processados."
     echo ""
@@ -87,6 +88,12 @@ processar_modulo() {
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/postgres"
             DEST_DIR="postgres/resources"
             FILES=("data.tar.gz")
+            ;;
+        smartview)
+            GH_PATH="smartview/3.9.0.4558336"
+            DOWNLOAD_DIR="/tmp/smartview"
+            DEST_DIR="smartview/totvs"
+            FILES=("smartview.tar.gz")
             ;;
         *)
             echo "❌ Módulo inválido: $MODULO"
@@ -203,10 +210,10 @@ remove_item() {
 
 # --- EXECUÇÃO PRINCIPAL ---
 if [[ -n "$1" ]]; then
-    echo "⚙️ Nenhum módulo informado — todos serão processados."
-    MODULOS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres")
-else
     MODULOS=("$1")
+else
+    echo "⚙️ Nenhum módulo informado — todos serão processados."
+    MODULOS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "smartview")
 fi
 
 for mod in "${MODULOS[@]}"; do
