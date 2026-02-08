@@ -3,7 +3,7 @@
 #
 # To run:
 # 1. Copy .env.example to .env and set your variables
-# 2. docker compose -f docker-compose-mssql.yaml -p totvs up -d
+# 2. docker compose -f docker-compose.yaml -p totvs up -d
 #
 version: '3.8'
 
@@ -15,10 +15,10 @@ services:
     user: root
     restart: always
     ports:
-      - "25433:1433"
+      - '25433:1433'
     environment:
       SA_PASSWORD: ${DATABASE_PASSWORD}
-      ACCEPT_EULA: "Y"
+      ACCEPT_EULA: 'Y'
       TZ: ${TZ}
     volumes:
       - totvs_mssql_data:/var/opt/mssql/data
@@ -33,7 +33,7 @@ services:
         - '-U'
         - sa
         - '-P'
-        - ProtheusDatabasePassword1
+        - ${DATABASE_PASSWORD}
         - '-C'
         - '-Q'
         - SELECT 1
@@ -51,10 +51,6 @@ services:
     #   - "2234:2234"
     #   - "5555:5555"
     #   - "8020:8020"
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
     environment:
       LICENSE_TCP_PORT: 2234
       LICENSE_CONSOLEFILE: /totvs/licenseserver/bin/appserver/licenseserver.log
@@ -70,8 +66,8 @@ services:
     restart: always
     # Expor portas do DbAccess (útil para monitoramento)
     # ports:
-    #   - "7890:7890"
-    #   - "7891:7891"
+    #   - '7890:7890'
+    #   - '7891:7891'
     environment:
       DATABASE_PROFILE: MSSQL
       DATABASE_SERVER: totvs_mssql
@@ -98,7 +94,7 @@ services:
         - '-b'
         - protheus
         - sa
-        - ProtheusDatabasePassword1
+        - ${DATABASE_PASSWORD}
       interval: 10s
       timeout: 10s
       retries: 10
@@ -109,14 +105,10 @@ services:
     container_name: totvs_appserver
     restart: always
     ports:
-      - "25001:25001" # AppServer Port
-      - "25002:25002" # Web/Smartclient Port
-      - "25080:25080" # Rest Port
-      - "25088:25088" # Web Manager Port
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
+      - '25001:25001' # AppServer Port
+      - '25002:25002' # Web/Smartclient Port
+      - '25080:8080' # Rest Port
+      - '25088:8088' # Web Manager Port
     environment:
       APPSERVER_MODE: application
       APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
@@ -131,9 +123,9 @@ services:
       APPSERVER_LICENSE_PORT: 5555
       APPSERVER_PORT: 25001
       APPSERVER_WEB_PORT: 25002
-      APPSERVER_REST_PORT: 25080
-      APPSERVER_WEB_MANAGER: 25088
-      EXTRACT_RESOURCES: "true"
+      APPSERVER_REST_PORT: 8080
+      APPSERVER_WEB_MANAGER: 8088
+      EXTRACT_RESOURCES: 'true'
       TZ: ${TZ}
     volumes:
       - totvs_protheus_data:/totvs/protheus_data
@@ -152,16 +144,13 @@ services:
     container_name: totvs_apprest
     profiles:
       - full
+      - with-rest
     restart: always
     ports:
-      - "25101:25101" # AppServer Port
-      - "25102:25102" # Web/Smartclient Port
-      - "25180:25180" # REST Port
-      - "25188:25188" # Web Manager Port
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
+      - '25101:25101' # AppServer Port
+      - '25102:25102' # Web/Smartclient Port
+      - '25180:8080' # REST Port
+      - '25188:8088' # Web Manager Port
     environment:
       APPSERVER_MODE: rest
       APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
@@ -176,9 +165,9 @@ services:
       APPSERVER_LICENSE_PORT: 5555
       APPSERVER_PORT: 25101
       APPSERVER_WEB_PORT: 25102
-      APPSERVER_REST_PORT: 25180
-      APPSERVER_WEB_MANAGER: 25188
-      EXTRACT_RESOURCES: "true"
+      APPSERVER_REST_PORT: 8080
+      APPSERVER_WEB_MANAGER: 8088
+      EXTRACT_RESOURCES: 'true'
       TZ: ${TZ}
     volumes:
       - totvs_protheus_data:/totvs/protheus_data
@@ -197,21 +186,19 @@ services:
     container_name: totvs_smartview
     profiles:
       - full
+      - with-smartview
     restart: always
     ports:
       - '7017:7017'
       - '7019:7019'
     environment:
-      SMARTVIEW_REST_SERVER: totvs_apprest
-      SMARTVIEW_REST_PORT: 25180
-      SMARTVIEW_DISCOVERY_URL: http://totvs_apprest:25180/rest/.well-known/treports/security
       EXTRACT_RESOURCES: 'true'
       TZ: ${TZ}
+    volumes:
+      - totvs_smartview_data:/totvs/smartview
     networks:
       - totvs
-    depends_on:
-      apprest:
-        condition: service_started
+
 volumes:
   totvs_mssql_data:
     driver: local
@@ -225,6 +212,9 @@ volumes:
     driver: local
   totvs_appserver_data:
     driver: local
+  totvs_smartview_data:
+    driver: local
+
 networks:
   totvs:
     driver: bridge
