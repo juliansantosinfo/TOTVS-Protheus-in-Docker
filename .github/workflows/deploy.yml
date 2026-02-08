@@ -4,13 +4,15 @@ on:
   push:
     branches: [ "master", "main", "12.1.*" ]
     paths-ignore:
-      - 'README.md'
-      - 'CHANGELOG'
-      - 'LICENSE.txt'
       - 'docs/**'
       - '.vscode/**'
-      - '.gitignore'
       - '.env.example'
+      - '.gitignore'
+      - 'CHANGELOG'
+      - 'docker-compose*'
+      - 'LICENSE.txt'
+      - 'README.md'
+      - 'run.sh'
   workflow_dispatch:
 
 jobs:
