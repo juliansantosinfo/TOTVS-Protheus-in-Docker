@@ -3,6 +3,14 @@ name: Build and Push Docker Images
 on:
   push:
     branches: [ "master", "main" ]
+    paths-ignore:
+      - 'README.md'
+      - 'CHANGELOG'
+      - 'LICENSE.txt'
+      - 'docs/**'
+      - '.vscode/**'
+      - '.gitignore'
+      - '.env.example'
   workflow_dispatch:
 
 jobs:
