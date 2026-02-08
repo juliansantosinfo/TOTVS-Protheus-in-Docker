@@ -32,10 +32,17 @@ echo "Pushing image: $FULL_TAG"
 echo "--------------------------------------------------"
 docker push "$FULL_TAG"
 
-echo "--------------------------------------------------"
-echo "Tagging and pushing: $LATEST_TAG"
-echo "--------------------------------------------------"
-docker tag "$FULL_TAG" "$LATEST_TAG"
-docker push "$LATEST_TAG"
-
-echo "✅ Successfully pushed $FULL_TAG and $LATEST_TAG"
+# 4. Push da tag 'latest' apenas se PUSH_LATEST for true
+# No GitHub Actions, definiremos isso com base na branch.
+# Localmente, o padrão é true para facilitar.
+if [ "${PUSH_LATEST:-true}" = "true" ]; then
+    echo "--------------------------------------------------"
+    echo "Tagging and pushing: $LATEST_TAG"
+    echo "--------------------------------------------------"
+    docker tag "$FULL_TAG" "$LATEST_TAG"
+    docker push "$LATEST_TAG"
+    echo "✅ Successfully pushed $FULL_TAG and $LATEST_TAG"
+else
+    echo "⏭️ Skipping 'latest' tag push (PUSH_LATEST is false)"
+    echo "✅ Successfully pushed $FULL_TAG"
+fi
