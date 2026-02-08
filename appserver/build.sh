@@ -83,7 +83,7 @@ while [ ! -f "./totvs/protheus.tar.gz" ] || [ ! -f "./totvs/protheus_data.tar.gz
     # Executa o setup.sh a partir do diretório onde ele está localizado
     current_directory=$(pwd)
     cd ../
-    ./scripts/setup.sh appserver
+    ./scripts/build/setup.sh appserver
     cd "$current_directory"
     
     # Pequena pausa para evitar loop excessivo

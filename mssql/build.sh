@@ -85,7 +85,7 @@ while [ ! -f "$DATABASE_PATH" ]; do
     # Executa o setup.sh a partir do diretório onde ele está localizado
     current_directory=$(pwd)
     cd ../
-    ./scripts/setup.sh mssql
+    ./scripts/build/setup.sh mssql
     cd "$current_directory"
 
     # Pequena pausa para evitar loop excessivo

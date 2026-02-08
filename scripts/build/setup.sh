@@ -152,7 +152,7 @@ processar_modulo() {
     echo ""
     echo "🧩 Verificando partes divididas..."
     for file in "${FILES[@]}"; do
-        if [[ "$file" == "protheus_data.tar.gz" ]]; then
+        if [[ "$file" == "protheus_data.tar.gz" && "$GH_RELEASE" -ne "release2310" ]]; then
             echo "⏭️ Ignorando arquivo ${file}"
             continue
         fi
