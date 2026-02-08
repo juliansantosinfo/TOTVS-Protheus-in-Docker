@@ -45,7 +45,7 @@ while [ ! -f "./totvs/smartview.tar.gz" ]; do
     
     current_directory=$(pwd)
     cd ../
-    ./scripts/setup.sh smartview
+    ./scripts/build/setup.sh smartview
     cd "$current_directory"
     
     sleep 2
