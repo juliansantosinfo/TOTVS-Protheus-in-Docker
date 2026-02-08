@@ -105,8 +105,8 @@ services:
     container_name: totvs_appserver
     restart: always
     ports:
-      - '23001:25001' # AppServer Port
-      - '23002:25002' # Web/Smartclient Port
+      - '23001:23001' # AppServer Port
+      - '23002:23002' # Web/Smartclient Port
       - '23080:8080' # Rest Port
       - '23088:8088' # Web Manager Port
     environment:
@@ -121,8 +121,8 @@ services:
       APPSERVER_MULTIPROTOCOLPORT: 1
       APPSERVER_LICENSE_SERVER: totvs_licenseserver
       APPSERVER_LICENSE_PORT: 5555
-      APPSERVER_PORT: 25001
-      APPSERVER_WEB_PORT: 25002
+      APPSERVER_PORT: 23001
+      APPSERVER_WEB_PORT: 23002
       APPSERVER_REST_PORT: 8080
       APPSERVER_WEB_MANAGER: 8088
       EXTRACT_RESOURCES: 'true'
@@ -147,8 +147,8 @@ services:
       - with-rest
     restart: always
     ports:
-      - '23101:25101' # AppServer Port
-      - '23102:25102' # Web/Smartclient Port
+      - '23101:23101' # AppServer Port
+      - '23102:23102' # Web/Smartclient Port
       - '23180:8080' # REST Port
       - '23188:8088' # Web Manager Port
     environment:
@@ -163,8 +163,8 @@ services:
       APPSERVER_MULTIPROTOCOLPORT: 1
       APPSERVER_LICENSE_SERVER: totvs_licenseserver
       APPSERVER_LICENSE_PORT: 5555
-      APPSERVER_PORT: 25101
-      APPSERVER_WEB_PORT: 25102
+      APPSERVER_PORT: 23101
+      APPSERVER_WEB_PORT: 23102
       APPSERVER_REST_PORT: 8080
       APPSERVER_WEB_MANAGER: 8088
       EXTRACT_RESOURCES: 'true'
