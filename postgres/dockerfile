@@ -1,7 +1,7 @@
 # Imagem base oficial do PostgreSQL 15
 FROM postgres:15
 
-LABEL version="12.1.2410"
+LABEL version="12.1.2510"
 LABEL description="TOTVS PostgreSQL"
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
@@ -17,6 +17,7 @@ ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=ProtheusDatabasePassword1
 ENV POSTGRES_DB=protheus
 ENV POSTGRES_INITDB_ARGS="--locale=pt_BR.ISO-8859-1 -E LATIN1"
+ENV ENV RESTORE_BACKUP=Y
 
 # Expor porta
 EXPOSE 5432

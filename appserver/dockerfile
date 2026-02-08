@@ -1,8 +1,8 @@
 FROM oraclelinux:8-slim
 
-LABEL release="12.1.2410"
+LABEL release="12.1.2510"
 LABEL build="24.3.1.1"
-LABEL dbapi="24.1.0.0"
+LABEL dbapi="24.1.1.0"
 LABEL description="TOTVS Aplication Server Protheus" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
@@ -34,7 +34,7 @@ COPY ./service.sh /service.sh
 WORKDIR /
 
 RUN microdnf update -y \
-    && microdnf install -y gzip iputils nano telnet procps-ng python3 \
+    && microdnf install -y gzip iputils nano telnet procps-ng python3 dmidecode \
     && microdnf clean all \
     && pip3 install --no-cache-dir flask==2.0.3
 

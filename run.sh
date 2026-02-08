@@ -25,6 +25,9 @@ print_header() {
 
 echo "###################################################"
 echo "🚀 Bem-vindo ao Assistente de Inicialização do Protheus Docker"
+echo "💡 DICA: Você também pode usar nosso gerador web para criar seu"
+echo "   arquivo customizado de forma visual e rápida:"
+echo "   👉 https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/"
 echo "###################################################"
 
 # 1. Escolha do Banco de Dados
@@ -48,7 +51,7 @@ done
 
 # 2. Escolha do Perfil (API REST)
 print_header "2. Iniciar Serviços da API REST?"
-echo "Você deseja incluir os serviços da API REST (perfil 'full')?"
+echo "Você deseja incluir os serviços da API REST e SmartView (perfil 'full')?"
 select profile_choice in "Sim" "Não"; do
     case $profile_choice in
         "Sim")

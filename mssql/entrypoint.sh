@@ -25,6 +25,7 @@ set -e
   DB_DATA_DIR="/var/opt/mssql/data"
   DB_BACKUP_FILE="/tmp/data.tar.gz"
   DB_SERVICE="/opt/mssql/bin/sqlservr"
+  RESTORE_BACKUP="${RESTORE_BACKUP:-Y}"
 
 # ---------------------------------------------------------------------
 
@@ -41,21 +42,25 @@ set -e
 
   # Verifica se o diretório de dados está vazio (primeira execução)
   if [ ! "$(ls -A "${DB_DATA_DIR}")" ]; then
-      echo "⚙️ Diretório de dados vazio. Iniciando extração dos arquivos base..."
+      if [[ "${RESTORE_BACKUP}" =~ ^[SsYy]$ ]]; then
+          echo "⚙️ Diretório de dados vazio. Iniciando extração dos arquivos base..."
 
-      if [ -f "${DB_BACKUP_FILE}" ]; then
-        tar -xzvf "${DB_BACKUP_FILE}" -C /
-        echo "✅ Arquivos base extraídos com sucesso."
+          if [ -f "${DB_BACKUP_FILE}" ]; then
+            tar -xzvf "${DB_BACKUP_FILE}" -C /
+            echo "✅ Arquivos base extraídos com sucesso."
 
-        rm -rfv "${DB_BACKUP_FILE}"
-        echo "🗑️ Arquivo de backup temporário removido."
+            rm -rfv "${DB_BACKUP_FILE}"
+            echo "🗑️ Arquivo de backup temporário removido."
 
-        # Ajusta permissões
-        chown -R root:root /var/opt/mssql
-        chmod -R 770 /var/opt/mssql
-        echo "✅ Permissões ajustadas."
+            # Ajusta permissões
+            chown -R root:root /var/opt/mssql
+            chmod -R 770 /var/opt/mssql
+            echo "✅ Permissões ajustadas."
+          else
+            echo "⚠️ Arquivo de backup **${DB_BACKUP_FILE}** não encontrado. Iniciando com dados vazios."
+          fi
       else
-        echo "⚠️ Arquivo de backup **${DB_BACKUP_FILE}** não encontrado. Iniciando com dados vazios."
+          echo "⏭️ Restauração de backup desabilitada (RESTORE_BACKUP=${RESTORE_BACKUP}). Iniciando com dados vazios."
       fi
   else
     echo "⏭️ Diretório de dados já contém arquivos. Pulando inicialização."

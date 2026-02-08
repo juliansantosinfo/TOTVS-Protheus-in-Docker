@@ -1,7 +1,7 @@
 # Imagem base oficial do SQL Server 2019
 FROM mcr.microsoft.com/mssql/server:2019-CU32-GDR3-ubuntu-20.04
 
-LABEL version="12.1.2410"
+LABEL version="12.1.2510"
 LABEL description="TOTVS MSSQL" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
@@ -10,6 +10,7 @@ USER root
 # Variáveis obrigatórias de configuração do SQL Server
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=ProtheusDatabasePassword1
+ENV RESTORE_BACKUP=Y
 
 # Copiar o backup compactado para dentro da imagem
 COPY ./resources/data.tar.gz /tmp/data.tar.gz

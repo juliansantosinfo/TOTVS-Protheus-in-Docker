@@ -6,6 +6,15 @@ Este repositório contém a implementação da aplicação do ERP TOTVS Protheus
 
 O sistema de ERP Protheus é uma solução de software complexa que requer configurações e dependências específicas. Este projeto visa simplificar drasticamente a instalação, configuração e execução do Protheus para **ambientes de desenvolvimento e teste**.
 
+## 🚀 Gerador de Docker Compose (Recomendado)
+
+Para facilitar a configuração do seu ambiente Protheus em Docker, utilize o **[TOTVS Protheus Compose Generator](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/)**. 
+
+Esta ferramenta web permite que você selecione de forma visual e intuitiva as versões do Protheus (12.1.2310, 12.1.2410, 12.1.2510), o banco de dados (PostgreSQL ou MSSQL) e outros serviços opcionais (como o servidor REST). Ao final, ela gera automaticamente os arquivos `docker-compose.yml` e `.env` customizados para sua necessidade.
+
+*   **Acesse agora:** [https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/)
+*   **Repositório do Gerador:** [juliansantosinfo/TOTVS-Protheus-Compose-Generator](https://github.com/juliansantosinfo/TOTVS-Protheus-Compose-Generator)
+
 * [**Release 12.1.2310**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2310)
 * [**Release 12.1.2410**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2410)
 * [**Release 12.1.2510**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2510)
@@ -43,6 +52,20 @@ Certifique-se de ter os seguintes pré-requisitos instalados em seu sistema:
 
 ## Início Rápido
 
+Você pode configurar o ambiente de duas formas: utilizando o gerador web (mais fácil) ou manualmente seguindo os passos abaixo.
+
+### Opção 1: Usando o Gerador (Recomendado)
+
+1. Acesse o [**TOTVS Protheus Compose Generator**](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/).
+2. Selecione as opções desejadas.
+3. Baixe os arquivos `docker-compose.yml` e `.env`.
+4. Em um terminal, na pasta onde baixou os arquivos, execute:
+   ```bash
+   docker compose up -d
+   ```
+
+### Opção 2: Configuração Manual
+
 1.  Clone este repositório:
     ```bash
     git clone https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker.git
@@ -74,10 +97,10 @@ Certifique-se de ter os seguintes pré-requisitos instalados em seu sistema:
 
 
 4.  Acesse a aplicação:
-    *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:24002>
-    *   **Credenciais (Release 12.1.2410):**
+    *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:25002>
+    *   **Credenciais (Release 12.1.2510):**
         *   **Usuário:** `admin`
-        *   **Senha:** `admin`
+        *   **Senha:** `Docker@123`
 
 ## Build Local das Imagens
 
@@ -143,11 +166,11 @@ Para executar cada contêiner individualmente (sem Docker Compose), siga os pass
         ```
     *   **AppServer (Modo Aplicação):**
         ```bash
-        docker run -d --name totvs_appserver --network totvs -p 24001:24001 -p 24002:24002 -e "APPSERVER_MODE=application" juliansantosinfo/totvs_appserver:latest
+        docker run -d --name totvs_appserver --network totvs -p 25001:25001 -p 25002:25002 -e "APPSERVER_MODE=application" juliansantosinfo/totvs_appserver:latest
         ```
     *   **AppServer (Modo REST):**
         ```bash
-        docker run -d --name totvs_apprest --network totvs -p 24180:24180 -e "APPSERVER_MODE=rest" juliansantosinfo/totvs_appserver:latest
+        docker run -d --name totvs_apprest --network totvs -p 25180:25180 -e "APPSERVER_MODE=rest" juliansantosinfo/totvs_appserver:latest
         ```
 
 ## Perguntas Frequentes (FAQ)
@@ -170,6 +193,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 |---|---|---|
 | `SA_PASSWORD` | Senha para o usuário `sa` (usar `DATABASE_PASSWORD` do `.env`). | `ProtheusDatabasePassword1` |
 | `ACCEPT_EULA` | Confirma a aceitação da licença de uso do SQL Server. | `Y` |
+| `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### Banco de Dados: `postgres`
@@ -180,6 +204,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `POSTGRES_PASSWORD`| Senha para o superusuário (usar `DATABASE_PASSWORD` do `.env`). | `ProtheusDatabasePassword1` |
 | `POSTGRES_DB` | Nome do banco de dados a ser criado na inicialização. | `protheus` |
 | `POSTGRES_INITDB_ARGS`| Argumentos extras para o `initdb`, como `locale`. | `--locale=pt_BR.ISO-8859-1 -E LATIN1` |
+| `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### `licenseserver`
@@ -220,10 +245,10 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `APPSERVER_DBACCESS_ALIAS` | Alias da conexão com o banco. | `protheus` |
 | `APPSERVER_LICENSE_SERVER` | Host do License Server. | `totvs_licenseserver` |
 | `APPSERVER_LICENSE_PORT` | Porta do License Server. | `5555` |
-| `APPSERVER_PORT` | Porta principal do AppServer (modo `application`). | `24001` |
-| `APPSERVER_WEB_PORT` | Porta da interface web/Smartclient (modo `application`). | `24002` |
-| `APPSERVER_REST_PORT` | Porta do serviço REST (modo `rest`). | `24180` |
-| `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `24088` |
+| `APPSERVER_PORT` | Porta principal do AppServer (modo `application`). | `25001` |
+| `APPSERVER_WEB_PORT` | Porta da interface web/Smartclient (modo `application`). | `25002` |
+| `APPSERVER_REST_PORT` | Porta do serviço REST (modo `rest`). | `25180` |
+| `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `25088` |
 | `APPSERVER_CONSOLEFILE`| Caminho do arquivo de log do serviço. | `/totvs/protheus/bin/appserver/appserver.log` |
 | `APPSERVER_RPO_CUSTOM` | Caminho para o RPO customizado. | `/totvs/protheus/apo/custom.rpo` |
 | `APPSERVER_ENVIRONMENT_LOCALFILES`| Tipo de banco para arquivos locais (`SQLite`). | `SQLITE` |
