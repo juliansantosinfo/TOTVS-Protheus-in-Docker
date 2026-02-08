@@ -34,9 +34,9 @@ COPY ./service.sh /service.sh
 WORKDIR /
 
 RUN microdnf update -y \
-    && microdnf install gzip iputils nano telnet procps-ng python3 \
+    && microdnf install -y gzip iputils nano telnet procps-ng python3 \
     && microdnf clean all \
-    && pip3 install flask
+    && pip3 install --no-cache-dir flask==2.0.3
 
 RUN chmod +x /entrypoint.sh \
     && chmod +x /service.sh

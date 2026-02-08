@@ -1,7 +1,7 @@
 # Imagem base oficial do PostgreSQL 15
 FROM postgres:15
 
-LABEL version="15-protheus-12.1.2310"
+LABEL version="12.1.2310"
 LABEL description="TOTVS PostgreSQL"
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 

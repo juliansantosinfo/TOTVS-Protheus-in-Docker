@@ -10,12 +10,12 @@ version: '3.8'
 services:
 
   postgres:
-    image: juliansantosinfo/totvs_postgres:12.1.2510
+    image: juliansantosinfo/totvs_postgres:12.1.2310
     container_name: totvs_postgres
     user: root
     restart: always
     ports:
-      - '25432:5432'
+      - '23432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -36,7 +36,7 @@ services:
       start_period: 10s
 
   licenseserver:
-    image: juliansantosinfo/totvs_licenseserver:3.7.0
+    image: juliansantosinfo/totvs_licenseserver:3.6.1
     container_name: totvs_licenseserver
     restart: always
     # Expor portas do License Server (útil para monitoramento)
@@ -54,7 +54,7 @@ services:
       - totvs
 
   dbaccess:
-    image: juliansantosinfo/totvs_dbaccess:24.1.1.0
+    image: juliansantosinfo/totvs_dbaccess:23.1.1.4
     container_name: totvs_dbaccess
     restart: always
     # Expor portas do DbAccess (útil para monitoramento)
@@ -94,14 +94,14 @@ services:
       start_period: 10s
 
   appserver:
-    image: juliansantosinfo/totvs_appserver:12.1.2510
+    image: juliansantosinfo/totvs_appserver:12.1.2310
     container_name: totvs_appserver
     restart: always
     ports:
-      - '25001:25001' # AppServer Port
-      - '25002:25002' # Web/Smartclient Port
-      - '25080:8080' # Rest Port
-      - '25088:8088' # Web Manager Port
+      - '23001:25001' # AppServer Port
+      - '23002:25002' # Web/Smartclient Port
+      - '23080:8080' # Rest Port
+      - '23088:8088' # Web Manager Port
     environment:
       APPSERVER_MODE: application
       APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
@@ -133,17 +133,17 @@ services:
         condition: service_healthy
 
   apprest:
-    image: juliansantosinfo/totvs_appserver:12.1.2510
+    image: juliansantosinfo/totvs_appserver:12.1.2310
     container_name: totvs_apprest
     profiles:
       - full
       - with-rest
     restart: always
     ports:
-      - '25101:25101' # AppServer Port
-      - '25102:25102' # Web/Smartclient Port
-      - '25180:8080' # REST Port
-      - '25188:8088' # Web Manager Port
+      - '23101:25101' # AppServer Port
+      - '23102:25102' # Web/Smartclient Port
+      - '23180:8080' # REST Port
+      - '23188:8088' # Web Manager Port
     environment:
       APPSERVER_MODE: rest
       APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
