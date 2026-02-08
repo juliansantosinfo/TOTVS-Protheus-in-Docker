@@ -2,7 +2,7 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: [ "master", "main", "12.1.*" ]
     paths-ignore:
       - 'README.md'
       - 'CHANGELOG'
@@ -42,6 +42,8 @@ jobs:
           bash ${{ matrix.service }}/build.sh auto
 
       - name: Push to Docker Hub
+        env:
+          PUSH_LATEST: ${{ github.ref_name == 'master' || github.ref_name == 'main' }}
         run: |
           chmod +x ${{ matrix.service }}/push.sh
           bash ${{ matrix.service }}/push.sh
