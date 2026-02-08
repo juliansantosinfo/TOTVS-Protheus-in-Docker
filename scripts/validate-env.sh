@@ -1,0 +1,29 @@
+#!/bin/bash
+# ==============================================================================
+# SCRIPT: validate-env.sh
+# DESCRIÇÃO: Garante que todas as chaves do .env local estejam no .env.example
+# ==============================================================================
+
+if [ ! -f ".env" ] || [ ! -f ".env.example" ]; then
+    echo "⚠️  Arquivos .env ou .env.example não encontrados. Pulando validação."
+    exit 0
+fi
+
+echo "🔍 Comparando .env com .env.example..."
+
+# Extrai apenas as chaves (antes do =)
+KEYS_ENV=$(grep -oE '^[A-Z0-9_]+=' .env | cut -d= -f1 | sort)
+KEYS_EXAMPLE=$(grep -oE '^[A-Z0-9_]+=' .env.example | cut -d= -f1 | sort)
+
+# Compara usando diff
+DIFF=$(comm -23 <(echo "$KEYS_ENV") <(echo "$KEYS_EXAMPLE"))
+
+if [ -n "$DIFF" ]; then
+    echo "❌ Erro: As seguintes variáveis estão no .env mas FALTAM no .env.example:"
+    echo "$DIFF"
+    echo "💡 Por favor, adicione-as ao .env.example para manter a documentação atualizada."
+    exit 1
+else
+    echo "✅ .env.example está atualizado."
+    exit 0
+fi
