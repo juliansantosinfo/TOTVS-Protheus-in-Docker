@@ -3,6 +3,14 @@ name: Build and Push Docker Images
 on:
   push:
     branches: [ "master", "main" ]
+    paths-ignore:
+      - 'README.md'
+      - 'CHANGELOG'
+      - 'LICENSE.txt'
+      - 'docs/**'
+      - '.vscode/**'
+      - '.gitignore'
+      - '.env.example'
   workflow_dispatch:
 
 jobs:
@@ -31,36 +39,9 @@ jobs:
       - name: Build Image
         run: |
           chmod +x ${{ matrix.service }}/build.sh
-          # Executa o build. O script assume que está rodando da raiz ou entra no dir.
-          # Passamos 'auto' para o modo de progresso.
           bash ${{ matrix.service }}/build.sh auto
 
-      - name: Extract Tag and Push
+      - name: Push to Docker Hub
         run: |
-          # Extrai a tag definida no script de build para garantir consistência
-          # Procura por linhas como: readonly DOCKER_IMAGE_TAG="12.1.2510" e DOCKER_IMAGE_NAME="totvs_appserver"
-          
-          # Lendo variáveis do arquivo
-          BUILD_SCRIPT="${{ matrix.service }}/build.sh"
-          
-          # Extração robusta de variáveis do script bash
-          IMAGE_NAME=$(grep 'readonly DOCKER_IMAGE_NAME=' $BUILD_SCRIPT | cut -d'"' -f2)
-          IMAGE_TAG=$(grep 'readonly DOCKER_IMAGE_TAG=' $BUILD_SCRIPT | cut -d'"' -f2)
-          DOCKER_USER="juliansantosinfo" 
-          
-          FULL_TAG="${DOCKER_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
-          
-          echo "Image identified: $FULL_TAG"
-          
-          # Verifica se a imagem existe localmente
-          if [[ "$(docker images -q $FULL_TAG 2> /dev/null)" == "" ]]; then
-            echo "Error: Image $FULL_TAG was not found after build."
-            exit 1
-          fi
-          
-          echo "Pushing $FULL_TAG to Docker Hub..."
-          docker push "$FULL_TAG"
-          
-          # Opcional: Push da tag 'latest' se desejar
-          # docker tag "$FULL_TAG" "${DOCKER_USER}/${IMAGE_NAME}:latest"
-          # docker push "${DOCKER_USER}/${IMAGE_NAME}:latest"
+          chmod +x ${{ matrix.service }}/push.sh
+          bash ${{ matrix.service }}/push.sh

@@ -12,6 +12,7 @@
 #     - licenseserver
 #     - mssql
 #     - postgres
+#     - smartview
 #
 #   Caso nenhum módulo seja informado, o script processará todos em sequência.
 #
@@ -31,11 +32,23 @@
 
 set -e
 
+# Caminho para o versions.env (assumindo execução da raiz ou de scripts/validation/)
+if [ -f "versions.env" ]; then
+    source "versions.env"
+elif [ -f "../../versions.env" ]; then
+    source "../../versions.env"
+    # Ajusta o path se estiver rodando de dentro de scripts/validation/
+    cd ../..
+else
+    echo "🚨 Erro: Arquivo 'versions.env' não encontrado."
+    exit 1
+fi
+
 # --- CONFIGURAÇÕES GERAIS ---
 GH_OWNER="juliansantosinfo"
 GH_REPO="TOTVS-Protheus-in-Docker-Resources"
 GH_BRANCH="main"
-GH_RELEASE="release2510"
+GH_RELEASE="${RESOURCE_RELEASE:-}"
 
 # --- FUNÇÃO: Exibir ajuda ---
 mostrar_ajuda() {

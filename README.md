@@ -6,6 +6,15 @@ Este repositório contém a implementação da aplicação do ERP TOTVS Protheus
 
 O sistema de ERP Protheus é uma solução de software complexa que requer configurações e dependências específicas. Este projeto visa simplificar drasticamente a instalação, configuração e execução do Protheus para **ambientes de desenvolvimento e teste**.
 
+## 🚀 Gerador de Docker Compose (Recomendado)
+
+Para facilitar a configuração do seu ambiente Protheus em Docker, utilize o **[TOTVS Protheus Compose Generator](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/)**. 
+
+Esta ferramenta web permite que você selecione de forma visual e intuitiva as versões do Protheus (12.1.2310, 12.1.2410, 12.1.2510), o banco de dados (PostgreSQL ou MSSQL) e outros serviços opcionais (como o servidor REST). Ao final, ela gera automaticamente os arquivos `docker-compose.yml` e `.env` customizados para sua necessidade.
+
+*   **Acesse agora:** [https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/)
+*   **Repositório do Gerador:** [juliansantosinfo/TOTVS-Protheus-Compose-Generator](https://github.com/juliansantosinfo/TOTVS-Protheus-Compose-Generator)
+
 * [**Release 12.1.2310**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2310)
 * [**Release 12.1.2410**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2410)
 * [**Release 12.1.2510**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2510)
@@ -42,6 +51,20 @@ Certifique-se de ter os seguintes pré-requisitos instalados em seu sistema:
     1.  **Docker Desktop:** Instale o Docker Desktop para macOS. [Guia de Instalação](https://docs.docker.com/desktop/mac/install/).
 
 ## Início Rápido
+
+Você pode configurar o ambiente de duas formas: utilizando o gerador web (mais fácil) ou manualmente seguindo os passos abaixo.
+
+### Opção 1: Usando o Gerador (Recomendado)
+
+1. Acesse o [**TOTVS Protheus Compose Generator**](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/).
+2. Selecione as opções desejadas.
+3. Baixe os arquivos `docker-compose.yml` e `.env`.
+4. Em um terminal, na pasta onde baixou os arquivos, execute:
+   ```bash
+   docker compose up -d
+   ```
+
+### Opção 2: Configuração Manual
 
 1.  Clone este repositório:
     ```bash
