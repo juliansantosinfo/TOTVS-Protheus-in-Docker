@@ -12,6 +12,7 @@
 #     - licenseserver
 #     - mssql
 #     - postgres
+#     - smartview
 #
 #   Caso nenhum módulo seja informado, o script processará todos em sequência.
 #
@@ -31,11 +32,23 @@
 
 set -e
 
+# Caminho para o versions.env (assumindo execução da raiz ou de scripts/validation/)
+if [ -f "versions.env" ]; then
+    source "versions.env"
+elif [ -f "../../versions.env" ]; then
+    source "../../versions.env"
+    # Ajusta o path se estiver rodando de dentro de scripts/validation/
+    cd ../..
+else
+    echo "🚨 Erro: Arquivo 'versions.env' não encontrado."
+    exit 1
+fi
+
 # --- CONFIGURAÇÕES GERAIS ---
 GH_OWNER="juliansantosinfo"
 GH_REPO="TOTVS-Protheus-in-Docker-Resources"
 GH_BRANCH="main"
-GH_RELEASE="release2310"
+GH_RELEASE="${RESOURCE_RELEASE:-}"
 
 # --- FUNÇÃO: Exibir ajuda ---
 mostrar_ajuda() {
@@ -47,6 +60,7 @@ mostrar_ajuda() {
     echo "  licenseserver  - Baixa e extrai os arquivos do License Server"
     echo "  mssql          - Baixa os arquivos do MSSQL"
     echo "  postgres       - Baixa os arquivos do PostgreSQL"
+    echo "  smartview      - Baixa os arquivos do SmartView"
     echo ""
     echo "Se nenhum módulo for informado, todos serão processados."
     echo ""
@@ -87,6 +101,12 @@ processar_modulo() {
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/postgres"
             DEST_DIR="postgres/resources"
             FILES=("data.tar.gz")
+            ;;
+        smartview)
+            GH_PATH="smartview/3.9.0.4558336"
+            DOWNLOAD_DIR="/tmp/smartview"
+            DEST_DIR="smartview/totvs"
+            FILES=("smartview.tar.gz")
             ;;
         *)
             echo "❌ Módulo inválido: $MODULO"
@@ -132,11 +152,10 @@ processar_modulo() {
     echo ""
     echo "🧩 Verificando partes divididas..."
     for file in "${FILES[@]}"; do
-        # Arquivo protheus_data.tar.gz foi dividido em 2 partes para release 2310 
-        # if [[ "$file" == "protheus_data.tar.gz" ]]; then
-        #     echo "⏭️ Ignorando arquivo ${file}"
-        #     continue
-        # fi
+        if [[ "$file" == "protheus_data.tar.gz" ]]; then
+            echo "⏭️ Ignorando arquivo ${file}"
+            continue
+        fi
         if [[ -f "${DOWNLOAD_DIR}/$file" ]]; then
             echo "⏭️ Ignorando arquivo ${file}"
             continue
@@ -204,10 +223,10 @@ remove_item() {
 
 # --- EXECUÇÃO PRINCIPAL ---
 if [[ -n "$1" ]]; then
-    echo "⚙️ Nenhum módulo informado — todos serão processados."
-    MODULOS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres")
-else
     MODULOS=("$1")
+else
+    echo "⚙️ Nenhum módulo informado — todos serão processados."
+    MODULOS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "smartview")
 fi
 
 for mod in "${MODULOS[@]}"; do
