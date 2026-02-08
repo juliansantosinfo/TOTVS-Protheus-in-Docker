@@ -33,8 +33,8 @@ jobs:
 
       - name: Setup Resources (Download Binaries)
         run: |
-          chmod +x scripts/setup.sh
-          ./scripts/setup.sh ${{ matrix.service }}
+          chmod +x scripts/build/setup.sh
+          ./scripts/build/setup.sh ${{ matrix.service }}
 
       - name: Build Image
         run: |
