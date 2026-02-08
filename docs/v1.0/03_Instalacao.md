@@ -35,13 +35,19 @@ O projeto utiliza um arquivo `.env` para centralizar configurações sensíveis 
 
 ### 3.3.2. Download de Recursos (Binários e RPO)
 O projeto não inclui os binários no git para manter o repositório leve.
-Você deve fornecer os arquivos ou usar o script de setup que tenta baixar de uma fonte de recursos (se configurado/disponível).
+Você deve fornecer os arquivos ou usar o script de setup que baixa "snapshots" de um ambiente pré-configurado.
 
-O script `scripts/setup.sh` é responsável por preparar a "cozinha" antes do build.
+O script `scripts/build/setup.sh` é responsável por preparar a "cozinha" antes do build.
 ```bash
-./scripts/setup.sh
+./scripts/build/setup.sh
 ```
-*O que ele faz?* Baixa artefatos como `protheus.tar.gz`, `protheus_data.tar.gz`, drivers ODBC, etc., e os coloca nas pastas `resources` dentro de cada diretório de serviço (`appserver/totvs`, `dbaccess/totvs`, etc.).
+*O que ele faz?*
+Ao contrário de instaladores tradicionais, este script baixa **sistemas de arquivos completos e pré-instalados**:
+*   **AppServer:** Baixa binários (`protheus.tar.gz`) e a estrutura de dados inicial (`protheus_data.tar.gz`) separadamente.
+*   **Bancos de Dados:** Baixa os arquivos de dados físicos (`data.tar.gz`) contendo um banco Protheus vazio mas já inicializado (dicionários criados).
+*   **SmartView/DBAccess:** Baixa as aplicações prontas para execução.
+
+Isso garante que, ao subir os containers, o sistema já esteja pronto para uso imediato, sem necessidade de rodar wizards de instalação.
 
 ## 3.4. Construção das Imagens (Build)
 Embora as imagens possam estar disponíveis no Docker Hub, é altamente recomendável saber como construí-las localmente para customizações.

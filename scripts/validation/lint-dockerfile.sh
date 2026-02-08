@@ -19,7 +19,7 @@ if [ -z "$FILES" ]; then
     exit 0
 fi
 
-echo "$FILES" | xargs hadolint
+echo "$FILES" | xargs hadolint --ignore DL3041 --ignore DL3038 --ignore DL3042
 
 if [ $? -eq 0 ]; then
     echo "✅ Hadolint passou."

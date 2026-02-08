@@ -96,3 +96,27 @@ O Docker é efêmero por natureza (arquivos somem se o container for deletado). 
 *   **`apprest_apo`**: Persiste o RPO específico para o serviço REST.
 *   **`apprest_data`**: Persiste a pasta do binário do serviço REST.
 *   **`smartview_data`**: Persiste as configurações e metadados do servidor de relatórios SmartView.
+
+## 2.5. Estratégia de Distribuição de Recursos (Data Pre-loading)
+Uma das maiores inovações deste projeto é a estratégia de **Pré-carregamento de Dados**. Em vez de rodar assistentes de instalação (wizards) que consomem horas compilando dicionários e criando tabelas, as imagens Docker são construídas a partir de artefatos ("snapshots") prontos para uso.
+
+### Estrutura dos Pacotes de Recursos
+Os arquivos baixados pelo `setup.sh` não são instaladores, mas sim sistemas de arquivos compactados (`.tar.gz`) que são extraídos diretamente para dentro dos containers ou volumes.
+
+#### 1. AppServer (`appserver/totvs/`)
+A aplicação é dividida em dois pacotes distintos para separar o que é "estático" (binários) do que é "variável" (dados do sistema).
+*   **`protheus.tar.gz` (Stateless):** Contém exclusivamente os binários de execução (`appsrvlinux`, bibliotecas `.so`), certificados e configurações base (`appserver.ini`). Este pacote é imutável durante a operação.
+*   **`protheus_data.tar.gz` (Stateful):** Contém a estrutura de dados do sistema ERP:
+    *   `system/`: Arquivos de controle de concorrência e numeração (`*.xnu`, semáforos).
+    *   `systemload/`: Dicionários de dados e arquivos de help.
+    *   `data/`: Logs e arquivos temporários.
+    *   *Nota:* Esta separação facilita a persistência, pois o diretório `protheus_data` é o candidato ideal para ser montado em um volume.
+
+#### 2. Bancos de Dados (`mssql/resources/` e `postgres/resources/`)
+Para garantir que o Protheus inicie "pronto para logar" (`admin/admin`), os containers de banco de dados não rodam scripts SQL (`CREATE TABLE...`). Eles restauram uma estrutura física de banco já existente.
+*   **`data.tar.gz`**: Contém os arquivos de dados físicos do banco (`.mdf/.ldf` para MSSQL ou o diretório `PGDATA` completo para PostgreSQL).
+*   **Vantagem:** O tempo de inicialização do banco cai de horas (criação de milhares de tabelas do ERP) para segundos (apenas o start do serviço de banco).
+
+#### 3. SmartView (`smartview/totvs/`)
+*   **`smartview.tar.gz`**: Contém a aplicação .NET Core completa e autocontida (DLLs, executável `smartview`). Por ser uma aplicação moderna e autocontida, não exige a mesma complexidade de separação de pastas do AppServer legado.
+
