@@ -41,6 +41,62 @@ A arquitetura do projeto é dividida nos seguintes serviços:
 [AppRest] <------------------------------- [SmartView]
 ```
 
+### Fluxo de Comunicação
+
+O diagrama abaixo ilustra como os serviços interagem dentro da rede Docker e como são acessados externamente:
+
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart TB
+ subgraph Host["Host Machine (Linux/WSL2/Windows)"]
+        Browser["Navegador / SmartClient"]
+        ExternalAPI["Sistemas Externos / APIs"]
+  end
+ subgraph Databases["Camada de Dados"]
+        DB[("SQL Server / PostgreSQL")]
+  end
+ subgraph Middleware["Middleware & Licenças"]
+        DBA["DBAccess"]
+        LIC["License Server"]
+  end
+ subgraph Application["Camada de Aplicação"]
+        APP["AppServer (Application)"]
+        REST["AppServer (REST)"]
+        SmartView["SmartView"]
+  end
+ subgraph DockerNetwork["Rede Docker: totvs"]
+        Databases
+        Middleware
+        Application
+  end
+    Browser -- HTTP: 25002 --> APP
+    Browser -- SmartClient: 25001 --> APP
+    Browser -- HTTP: 7017 --> SmartView
+    ExternalAPI -- HTTP: 25180 --> REST
+    APP -- TCP: 7890 --> DBA
+    REST -- TCP: 7890 --> DBA
+    SmartView -- API --> REST
+    APP -- TCP: 5555 --> LIC
+    REST -- TCP: 5555 --> LIC
+    DBA -- TCP: 5555 --> LIC
+    DBA -- TCP: 1433/5432 --> DB
+
+     Browser:::host
+     ExternalAPI:::host
+     DB:::db
+     DBA:::container
+     LIC:::container
+     APP:::container
+     REST:::container
+     SmartView:::container
+    classDef container fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef db fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+    classDef host fill:#f5f5f5,stroke:#9e9e9e,stroke-width:2px,stroke-dasharray: 5 5
+```
+
 ---
 
 ## Aviso Legal e Instruções de Uso
@@ -66,6 +122,20 @@ Certifique-se de ter os seguintes pré-requisitos instalados em seu sistema:
 ---
 
 ## Início Rápido
+
+Você pode configurar o ambiente de duas formas: utilizando o gerador web (mais fácil) ou manualmente seguindo os passos abaixo.
+
+### Opção 1: Usando o Gerador (Recomendado)
+
+1. Acesse o [**TOTVS Protheus Compose Generator**](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/).
+2. Selecione as opções desejadas.
+3. Baixe os arquivos `docker-compose.yml` e `.env`.
+4. Em um terminal, na pasta onde baixou os arquivos, execute:
+   ```bash
+   docker compose up -d
+   ```
+
+### Opção 2: Configuração Manual
 
 1.  Clone este repositório:
     ```bash
@@ -102,10 +172,10 @@ docker compose -f docker-compose-postgresql.yaml --profile full -p totvs up -d
 ```
 
 4.  Acesse a aplicação:
-    *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:23002>
-    *   **Credenciais (Release 12.1.2310):**
+    *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:25002>
+    *   **Credenciais (Release 12.1.2510):**
         *   **Usuário:** `admin`
-        *   **Senha:** ` `
+        *   **Senha:** `Docker@123`
 
 ---
 
@@ -185,11 +255,11 @@ Para executar cada contêiner individualmente (sem Docker Compose), siga os pass
         ```
     *   **AppServer (Modo Aplicação):**
         ```bash
-        docker run -d --name totvs_appserver --network totvs -p 23001:23001 -p 23002:23002 -e "APPSERVER_MODE=application" juliansantosinfo/totvs_appserver:latest
+        docker run -d --name totvs_appserver --network totvs -p 25001:25001 -p 25002:25002 -e "APPSERVER_MODE=application" juliansantosinfo/totvs_appserver:latest
         ```
     *   **AppServer (Modo REST):**
         ```bash
-        docker run -d --name totvs_apprest --network totvs -p 23180:23180 -e "APPSERVER_MODE=rest" juliansantosinfo/totvs_appserver:latest
+        docker run -d --name totvs_apprest --network totvs -p 25180:25180 -e "APPSERVER_MODE=rest" juliansantosinfo/totvs_appserver:latest
         ```
     *   **SmartView:**
         ```bash
@@ -220,6 +290,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 |---|---|---|
 | `SA_PASSWORD` | Senha para o usuário `sa` (usar `DATABASE_PASSWORD` do `.env`). | `ProtheusDatabasePassword1` |
 | `ACCEPT_EULA` | Confirma a aceitação da licença de uso do SQL Server. | `Y` |
+| `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### Banco de Dados: `postgres`
@@ -230,6 +301,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `POSTGRES_PASSWORD`| Senha para o superusuário (usar `DATABASE_PASSWORD` do `.env`). | `ProtheusDatabasePassword1` |
 | `POSTGRES_DB` | Nome do banco de dados a ser criado na inicialização. | `protheus` |
 | `POSTGRES_INITDB_ARGS`| Argumentos extras para o `initdb`, como `locale`. | `--locale=pt_BR.ISO-8859-1 -E LATIN1` |
+| `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### `licenseserver`
@@ -270,10 +342,10 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `APPSERVER_DBACCESS_ALIAS` | Alias da conexão com o banco. | `protheus` |
 | `APPSERVER_LICENSE_SERVER` | Host do License Server. | `totvs_licenseserver` |
 | `APPSERVER_LICENSE_PORT` | Porta do License Server. | `5555` |
-| `APPSERVER_PORT` | Porta principal do AppServer (modo `application`). | `23001` |
-| `APPSERVER_WEB_PORT` | Porta da interface web/Smartclient (modo `application`). | `23002` |
-| `APPSERVER_REST_PORT` | Porta do serviço REST (modo `rest`). | `23180` |
-| `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `23088` |
+| `APPSERVER_PORT` | Porta principal do AppServer (modo `application`). | `25001` |
+| `APPSERVER_WEB_PORT` | Porta da interface web/Smartclient (modo `application`). | `25002` |
+| `APPSERVER_REST_PORT` | Porta do serviço REST (modo `rest`). | `25180` |
+| `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `25088` |
 | `APPSERVER_CONSOLEFILE`| Caminho do arquivo de log do serviço. | `/totvs/protheus/bin/appserver/appserver.log` |
 | `APPSERVER_RPO_CUSTOM` | Caminho para o RPO customizado. | `/totvs/protheus/apo/custom.rpo` |
 | `APPSERVER_ENVIRONMENT_LOCALFILES`| Tipo de banco para arquivos locais (`SQLite`). | `SQLITE` |
