@@ -6,28 +6,50 @@ Este repositório contém a implementação da aplicação do ERP TOTVS Protheus
 
 O sistema de ERP Protheus é uma solução de software complexa que requer configurações e dependências específicas. Este projeto visa simplificar drasticamente a instalação, configuração e execução do Protheus para **ambientes de desenvolvimento e teste**.
 
+---
+
+## 🚀 Ferramentas de Apoio (Recomendado)
+
+*   **[TOTVS Protheus Compose Generator](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/):** Configure seu ambiente visualmente e baixe o `docker-compose.yml` e `.env` customizados.
+*   **[TOTVS Protheus Dockerfile Generator](https://juliansantosinfo.github.io/TOTVS-Protheus-Dockerfile-Generator/):** Gere Dockerfiles customizados para builds específicos.
+
+---
+
+## Branchs disponíveis
+
 * [**Release 12.1.2310**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2310)
 * [**Release 12.1.2410**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2410)
 * [**Release 12.1.2510**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2510)
 
-## Componentes
+## 🏗️ Arquitetura e Componentes
 
 A arquitetura do projeto é dividida nos seguintes serviços:
 
-1.  **`appserver`**: O servidor de aplicação Protheus. Esta é uma imagem versátil que pode operar em dois modos, definidos pela variável de ambiente `APPSERVER_MODE`:
+1.  **`appserver`**: O servidor de aplicação Protheus. Esta é uma imagem versátil que pode operar em três modos, definidos pela variável de ambiente `APPSERVER_MODE`:
     *   `application` (padrão): Executa o servidor de aplicação principal, permitindo acesso via Smartclient.
     *   `rest`: Executa o servidor para atender requisições da API REST.
+    *   `sqlite`: Executa como um servidor SQLite para evitar problemas de concorrência no acesso aos arquivos por múltiplos serviços.
 2.  **`dbaccess`**: O serviço intermediário que gerencia e fornece o acesso ao banco de dados.
 3.  **`licenseserver`**: O serviço de gerenciamento de licenças da TOTVS.
-4.  **Banco de Dados**: Você pode escolher entre duas opções de banco de dados:
-    *   **`mssql`**: Microsoft SQL Server.
-    *   **`postgres`**: PostgreSQL.
+4.  **`smartview`**: Servidor de Business Intelligence e Analytics (TReports).
+5.  **Banco de Dados**: Suporte nativo a **Microsoft SQL Server** (`mssql`) e **PostgreSQL** (`postgres`).
+
+### Fluxo de Dependência
+```text
+[DB (Postgres/MSSQL)] <--- [DBAccess] <--- [AppServer / AppRest]
+[License Server] <----------------------- [AppServer / AppRest / DBAccess]
+[AppRest] <------------------------------- [SmartView]
+```
+
+---
 
 ## Aviso Legal e Instruções de Uso
 
 Este repositório é um projeto independente e não possui qualquer afiliação com a TOTVS S/A. O código e as imagens aqui disponibilizados são destinados **exclusivamente para fins de desenvolvimento e testes**. **Não utilize este projeto em ambiente de produção.**
 
 Ao utilizar este repositório, você concorda com os termos da licença MIT.
+
+---
 
 ## Requisitos de Sistema
 
@@ -40,6 +62,8 @@ Certifique-se de ter os seguintes pré-requisitos instalados em seu sistema:
     1.  **Docker e Docker Compose:** Instale as versões mais recentes. Consulte a documentação oficial para sua distribuição.
 *   **Mac:**
     1.  **Docker Desktop:** Instale o Docker Desktop para macOS. [Guia de Instalação](https://docs.docker.com/desktop/mac/install/).
+
+---
 
 ## Início Rápido
 
@@ -65,19 +89,37 @@ Certifique-se de ter os seguintes pré-requisitos instalados em seu sistema:
         ```bash
         docker compose -f docker-compose-mssql.yaml -p totvs up -d
         ```
-    
-    O perfil `full` inclui o serviço `apprest` (servidor REST). Para iniciá-lo junto com os outros serviços:
-    ```bash
-    # Exemplo com PostgreSQL
-    docker compose -f docker-compose-postgresql.yaml --profile full -p totvs up -d
-    ```
 
+### 💡 Perfis de Inicialização (Profiles)
+Você pode subir serviços opcionais (REST e SmartView) usando a flag `--profile`:
+*   `full`: Sobe toda a stack.
+*   `with-rest`: Stack básica + AppRest.
+*   `with-smartview`: Stack básica + SmartView.
+
+**Exemplo:**
+```bash
+docker compose -f docker-compose-postgresql.yaml --profile full -p totvs up -d
+```
 
 4.  Acesse a aplicação:
     *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:23002>
     *   **Credenciais (Release 12.1.2310):**
         *   **Usuário:** `admin`
         *   **Senha:** ` `
+
+---
+
+## 📦 Persistência e Volumes
+
+O projeto utiliza volumes nomeados para garantir a persistência dos dados e facilitar a customização:
+
+| Volume | Descrição |
+|---|---|
+| `totvs_protheus_data` | Dados do Protheus (`protheus_data`). **Essencial.** |
+| `totvs_appserver_apo` | Repositório de Objetos (`APO`). Use para mapear seu `custom.rpo`. |
+| `totvs_postgres_data` / `totvs_mssql_data` | Dados brutos do banco de dados. |
+
+---
 
 ## Build Local das Imagens
 
@@ -149,6 +191,12 @@ Para executar cada contêiner individualmente (sem Docker Compose), siga os pass
         ```bash
         docker run -d --name totvs_apprest --network totvs -p 23180:23180 -e "APPSERVER_MODE=rest" juliansantosinfo/totvs_appserver:latest
         ```
+    *   **SmartView:**
+        ```bash
+        docker run -d --name totvs_smartview --network totvs -p 7017:7017 -p 7019:7019 juliansantosinfo/totvs_smartview:latest
+        ```
+
+---
 
 ## Perguntas Frequentes (FAQ)
 
@@ -159,6 +207,8 @@ Para executar cada contêiner individualmente (sem Docker Compose), siga os pass
 1.  Verifique o limite atual: `cat /proc/sys/fs/file-max`
 2.  Se o valor for excessivamente alto, ajuste-o temporariamente: `sudo sysctl -w fs.file-max=65535`
 3.  Para tornar a alteração permanente, adicione `fs.file-max = 65535` ao arquivo `/etc/sysctl.conf` e execute `sudo sysctl -p`.
+
+---
 
 ## Variáveis de Ambiente
 
@@ -233,6 +283,15 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `APPSERVER_MULTIPROTOCOLPORTSECURE`| Porta segura para múltiplos protocolos (0 para desativar). | `0` |
 | `APPSERVER_MULTIPROTOCOLPORT`| Porta para múltiplos protocolos. | `1` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
+
+#### `smartview`
+
+| Variável | Descrição | Padrão |
+|---|---|---|
+| `EXTRACT_RESOURCES` | Extrai `smartview.tar.gz` na inicialização (`true`/`false`). | `true` |
+| `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
+
+---
 
 ### Licença
 
