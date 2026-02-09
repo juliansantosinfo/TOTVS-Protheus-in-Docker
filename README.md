@@ -46,55 +46,55 @@ A arquitetura do projeto é dividida nos seguintes serviços:
 O diagrama abaixo ilustra como os serviços interagem dentro da rede Docker e como são acessados externamente:
 
 ```mermaid
-graph TD
-    subgraph Host["Host Machine (Linux/WSL2/Windows)"]
-        Browser[Navegador / SmartClient]
-        ExternalAPI[Sistemas Externos / APIs]
-    end
+---
+config:
+  layout: elk
+---
+flowchart TB
+ subgraph Host["Host Machine (Linux/WSL2/Windows)"]
+        Browser["Navegador / SmartClient"]
+        ExternalAPI["Sistemas Externos / APIs"]
+  end
+ subgraph Databases["Camada de Dados"]
+        DB[("SQL Server / PostgreSQL")]
+  end
+ subgraph Middleware["Middleware & Licenças"]
+        DBA["DBAccess"]
+        LIC["License Server"]
+  end
+ subgraph Application["Camada de Aplicação"]
+        APP["AppServer (Application)"]
+        REST["AppServer (REST)"]
+        SmartView["SmartView"]
+  end
+ subgraph DockerNetwork["Rede Docker: totvs"]
+        Databases
+        Middleware
+        Application
+  end
+    Browser -- HTTP: 25002 --> APP
+    Browser -- SmartClient: 25001 --> APP
+    Browser -- HTTP: 7017 --> SmartView
+    ExternalAPI -- HTTP: 25180 --> REST
+    APP -- TCP: 7890 --> DBA
+    REST -- TCP: 7890 --> DBA
+    SmartView -- API --> REST
+    APP -- TCP: 5555 --> LIC
+    REST -- TCP: 5555 --> LIC
+    DBA -- TCP: 5555 --> LIC
+    DBA -- TCP: 1433/5432 --> DB
 
-    subgraph DockerNetwork["Rede Docker: totvs"]
-        
-        subgraph Databases["Camada de Dados"]
-            DB[(SQL Server / PostgreSQL)]
-        end
-
-        subgraph Middleware["Middleware & Licenças"]
-            DBA[DBAccess]
-            LIC[License Server]
-        end
-
-        subgraph Application["Camada de Aplicação"]
-            APP[AppServer (Application)]
-            REST[AppServer (REST)]
-            SmartView[SmartView]
-        end
-    end
-
-    %% Conexões Externas
-    Browser -->|HTTP: 25002| APP
-    Browser -->|SmartClient: 25001| APP
-    Browser -->|HTTP: 7017| SmartView
-    ExternalAPI -->|HTTP: 25180| REST
-
-    %% Conexões Internas
-    APP -->|TCP: 7890| DBA
-    REST -->|TCP: 7890| DBA
-    SmartView -->|API| REST
-
-    APP -->|TCP: 5555| LIC
-    REST -->|TCP: 5555| LIC
-    DBA -->|TCP: 5555| LIC
-
-    DBA -->|TCP: 1433/5432| DB
-
-    %% Estilos
-    classDef container fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
-    classDef db fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
-    classDef host fill:#f5f5f5,stroke:#9e9e9e,stroke-width:2px,stroke-dasharray: 5 5;
-
-    class APP,REST,DBA,LIC,SmartView container;
-    class DB db;
-    class Browser,ExternalAPI host;
+     Browser:::host
+     ExternalAPI:::host
+     DB:::db
+     DBA:::container
+     LIC:::container
+     APP:::container
+     REST:::container
+     SmartView:::container
+    classDef container fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef db fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+    classDef host fill:#f5f5f5,stroke:#9e9e9e,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
 ---
