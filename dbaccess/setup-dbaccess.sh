@@ -95,6 +95,7 @@ export LD_LIBRARY_PATH="${pathbin}:${LD_LIBRARY_PATH}"
     sed -i "s,DBACCESS_CONSOLEFILE,${DBACCESS_CONSOLEFILE},g" "$inifile"
     sed -i "s,DATABASE_CLIENT_LIBRARY_MSSQL,${DATABASE_CLIENT_LIBRARY_MSSQL},g" "$inifile"
     sed -i "s,DATABASE_CLIENT_LIBRARY_POSTGRES,${DATABASE_CLIENT_LIBRARY_POSTGRES},g" "$inifile"
+    sed -i "s,DATABASE_CLIENT_LIBRARY_ORACLE,${DATABASE_CLIENT_LIBRARY_ORACLE},g" "$inifile"
     
     echo "✅ Variáveis substituídas no $inifile."
 
@@ -133,6 +134,16 @@ export LD_LIBRARY_PATH="${pathbin}:${LD_LIBRARY_PATH}"
                 echo "✅ Configuração PostgreSQL do DBAccess concluída para o alias **${DATABASE_ALIAS}**."
             else
                 echo "❌ ERRO ao configurar PostgreSQL com dbaccesscfg. O script será encerrado."
+                exit 1
+            fi
+            ;;
+        ORACLE)
+            echo "⚙️ Executando dbaccesscfg para ORACLE..."
+            /totvs/dbaccess/tools/dbaccesscfg -u "${DATABASE_USERNAME}" -p "${DATABASE_PASSWORD}" -d oracle -a "${DATABASE_ALIAS}"
+            if [ $? -eq 0 ]; then
+                echo "✅ Configuração ORACLE do DBAccess concluída para o alias **${DATABASE_ALIAS}**."
+            else
+                echo "❌ ERRO ao configurar ORACLE com dbaccesscfg. O script será encerrado."
                 exit 1
             fi
             ;;

@@ -103,5 +103,5 @@ docker compose -p totvs ps
 Todos os estados devem estar como `Up` ou `Healthy`.
 
 Acesse a interface Web do Protheus (Webapp) para validar:
-*   URL: `http://localhost:25002`
+*   URL: `http://localhost:24002`
 *   Login Padrão: `admin` / `admin` (ou conforme configurado no seu banco de dados restaurado).

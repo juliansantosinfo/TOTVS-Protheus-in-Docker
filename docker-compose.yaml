@@ -5,7 +5,6 @@
 # 1. Copy .env.example to .env and set your variables
 # 2. docker compose -f docker-compose.yaml -p totvs up -d
 #
-version: '3.8'
 
 services:
 
@@ -31,7 +30,7 @@ services:
         - '-S'
         - localhost
         - '-U'
-        - sa
+        - ${DATABASE_USERNAME:-sa}
         - '-P'
         - ${DATABASE_PASSWORD}
         - '-C'
@@ -72,9 +71,9 @@ services:
       DATABASE_PROFILE: MSSQL
       DATABASE_SERVER: totvs_mssql
       DATABASE_PORT: 1433
-      DATABASE_ALIAS: ${DATABASE_ALIAS}
-      DATABASE_NAME: protheus
-      DATABASE_USERNAME: sa
+      DATABASE_ALIAS: ${DATABASE_ALIAS:-protheus}
+      DATABASE_NAME: ${DATABASE_NAME:-protheus}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-sa}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DBACCESS_LICENSE_SERVER: totvs_licenseserver
       DBACCESS_LICENSE_PORT: 5555
@@ -92,8 +91,8 @@ services:
         - CMD
         - isql
         - '-b'
-        - protheus
-        - sa
+        - ${DATABASE_ALIAS:-protheus}
+        - ${DATABASE_USERNAME:-sa}
         - ${DATABASE_PASSWORD}
       interval: 10s
       timeout: 10s
@@ -115,7 +114,7 @@ services:
       APPSERVER_DBACCESS_DATABASE: MSSQL
       APPSERVER_DBACCESS_SERVER: totvs_dbaccess
       APPSERVER_DBACCESS_PORT: 7890
-      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS}
+      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS:-protheus}
       APPSERVER_CONSOLEFILE: /totvs/protheus/bin/appserver/appserver.log
       APPSERVER_MULTIPROTOCOLPORTSECURE: 0
       APPSERVER_MULTIPROTOCOLPORT: 1
@@ -156,7 +155,7 @@ services:
       APPSERVER_DBACCESS_DATABASE: MSSQL
       APPSERVER_DBACCESS_SERVER: totvs_dbaccess
       APPSERVER_DBACCESS_PORT: 7890
-      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS}
+      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS:-protheus}
       APPSERVER_CONSOLEFILE: /totvs/protheus/bin/appserver/appserver.log
       APPSERVER_MULTIPROTOCOLPORTSECURE: 0
       APPSERVER_MULTIPROTOCOLPORT: 1

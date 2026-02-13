@@ -1,7 +1,7 @@
 # Imagem base oficial do SQL Server 2019
 FROM mcr.microsoft.com/mssql/server:2019-CU32-GDR3-ubuntu-20.04
 
-LABEL version="12.1.2510"
+LABEL version="12.1.2410"
 LABEL description="TOTVS MSSQL" 
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 

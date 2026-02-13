@@ -83,6 +83,7 @@ validate_service "dbaccess" "DBACCESS_VERSION"
 validate_service "licenseserver" "LICENSESERVER_VERSION"
 validate_service "mssql" "MSSQL_VERSION"
 validate_service "postgres" "POSTGRES_VERSION"
+validate_service "oracle" "ORACLE_VERSION"
 validate_service "smartview" "SMARTVIEW_VERSION"
 
 echo "-----------------------------------"

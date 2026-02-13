@@ -42,7 +42,7 @@ Este projeto está equipado com automação via GitHub Actions para garantir que
 6.  **Push:** Envia para o Docker Hub (`juliansantosinfo/...`).
 
 ### Como atualizar a versão do projeto?
-Para lançar uma nova versão (ex: mudar de 12.1.2510 para 12.1.2610):
+Para lançar uma nova versão (ex: mudar de 12.1.2410 para 12.1.2610):
 1.  Edite o arquivo `versions.env` na raiz (se implementado conforme recomendações) ou os cabeçalhos dos scripts `build.sh` individuais.
 2.  Atualize os binários no repositório de recursos externos.
 3.  Faça o commit. O CI/CD cuidará do resto.

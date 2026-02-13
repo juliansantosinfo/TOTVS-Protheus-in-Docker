@@ -20,8 +20,8 @@ flowchart TB
         License["Container: LicenseServer"]
         Database[("Container: Banco de Dados<br>PostgreSQL ou MSSQL")]
   end
-    Client["SmartClient / Browser"] -- Porta 25001/25002 --> AppServer
-    ExtSystem["Sistemas Externos"] -- Porta 25180 --> AppRest
+    Client["SmartClient / Browser"] -- Porta 24001/24002 --> AppServer
+    ExtSystem["Sistemas Externos"] -- Porta 24180 --> AppRest
     AppServer -- TCP --> DBAccess & License
     AppRest -- TCP --> DBAccess & License
     SmartView -- REST --> AppRest
@@ -62,12 +62,12 @@ Este é o coração do processamento. O projeto utiliza uma abordagem inteligent
 
 *   **Papel 1: Application Server (Standard)**
     *   **Modo:** `application`
-    *   **Portas:** 25001 (TCP SmartClient), 25002 (Web SmartClient).
+    *   **Portas:** 24001 (TCP SmartClient), 24002 (Web SmartClient).
     *   **Uso:** É onde os usuários se conectam para operar o sistema. Executa as interfaces de tela, rotinas de cadastro, processos, etc.
     
 *   **Papel 2: REST Server**
     *   **Modo:** `rest`
-    *   **Portas:** 25180 (HTTP REST).
+    *   **Portas:** 24180 (HTTP REST).
     *   **Uso:** Dedicado a servir APIs para integrações e para o SmartView. Separar este serviço garante que cargas pesadas de API não travem a interface do usuário.
 
 *   **Papel 3: SQLite Server (Local Database)**
@@ -84,7 +84,7 @@ Este é o coração do processamento. O projeto utiliza uma abordagem inteligent
 ## 2.3. Rede e Comunicação
 Todos os containers são colocados em uma rede virtual Docker privada (`totvs`).
 *   **Comunicação Interna:** Os containers conversam entre si usando seus nomes de serviço como DNS (ex: o AppServer conecta no `dbaccess` usando o hostname `dbaccess`, não IP).
-*   **Exposição Externa:** Apenas as portas necessárias para o usuário (ex: 25002 para Web, 1433 para SQL Management Studio) são mapeadas para o `localhost` da máquina hospedeira.
+*   **Exposição Externa:** Apenas as portas necessárias para o usuário (ex: 24002 para Web, 1433 para SQL Management Studio) são mapeadas para o `localhost` da máquina hospedeira.
 
 ## 2.4. Volumes e Persistência de Dados
 O Docker é efêmero por natureza (arquivos somem se o container for deletado). Para evitar perda de dados, utilizamos Volumes Docker:

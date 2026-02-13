@@ -1,6 +1,6 @@
 FROM oraclelinux:8-slim
 
-LABEL release="12.1.2510"
+LABEL release="12.1.2410"
 LABEL build="24.3.1.1"
 LABEL dbapi="24.1.1.0"
 LABEL description="TOTVS Aplication Server Protheus" 
