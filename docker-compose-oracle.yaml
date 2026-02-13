@@ -1,0 +1,209 @@
+#
+# TOTVS Protheus with Oracle Database
+#
+# To run:
+# 1. Copy .env.example to .env and set your variables
+# 2. docker compose -f docker-compose-oracle.yaml -p totvs up -d
+#
+
+services:
+
+  oracle:
+    image: juliansantosinfo/totvs_oracle:12.1.2310
+    container_name: totvs_oracle
+    user: oracle
+    restart: always
+    ports:
+      - '23521:1521'
+    environment:
+      ORACLE_PASSWORD: ${DATABASE_PASSWORD}
+      TZ: ${TZ}
+    volumes:
+      - totvs_oracle_data:/opt/oracle/oradata
+    networks:
+      - totvs
+    healthcheck:
+      test: 
+        - CMD-SHELL 
+        - ./healthcheck.sh
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+  licenseserver:
+    image: juliansantosinfo/totvs_licenseserver:3.7.0
+    container_name: totvs_licenseserver
+    restart: always
+    # Expor portas do License Server (útil para monitoramento)
+    # ports:
+    #   - "2234:2234"
+    #   - "5555:5555"
+    #   - "8020:8020"
+    environment:
+      LICENSE_TCP_PORT: 2234
+      LICENSE_CONSOLEFILE: /totvs/licenseserver/bin/appserver/licenseserver.log
+      LICENSE_PORT: 5555
+      LICENSE_WEBAPP_PORT: 8020
+      TZ: ${TZ}
+    networks:
+      - totvs
+
+  dbaccess:
+    image: juliansantosinfo/totvs_dbaccess:24.1.1.0
+    container_name: totvs_dbaccess
+    restart: always
+    # Expor portas do DbAccess (útil para monitoramento)
+    # ports:
+    #   - '7890:7890'
+    #   - '7891:7891'
+    environment:
+      DATABASE_PROFILE: ORACLE
+      DATABASE_SERVER: totvs_oracle
+      DATABASE_PORT: 1521
+      DATABASE_ALIAS: ${DATABASE_ALIAS:-protheus}
+      DATABASE_NAME: ${DATABASE_NAME:-protheus}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-system}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DBACCESS_LICENSE_SERVER: totvs_licenseserver
+      DBACCESS_LICENSE_PORT: 5555
+      DBACCESS_CONSOLEFILE: /totvs/dbaccess/multi/dbconsole.log
+      TZ: ${TZ}
+    networks:
+      - totvs
+    depends_on:
+      oracle:
+        condition: service_healthy
+      licenseserver:
+        condition: service_started
+    healthcheck:
+      test:
+        - CMD
+        - isql
+        - '-b'
+        - ${DATABASE_ALIAS:-protheus}
+        - ${DATABASE_USERNAME:-system}
+        - ${DATABASE_PASSWORD}
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+  appserver:
+    image: juliansantosinfo/totvs_appserver:12.1.2310
+    container_name: totvs_appserver
+    restart: always
+    ports:
+      - '23001:23001' # AppServer Port
+      - '23002:23002' # Web/Smartclient Port
+      - '23080:8080' # Rest Port
+      - '23088:8088' # Web Manager Port
+    environment:
+      APPSERVER_MODE: application
+      APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
+      APPSERVER_DBACCESS_DATABASE: ORACLE
+      APPSERVER_DBACCESS_SERVER: totvs_dbaccess
+      APPSERVER_DBACCESS_PORT: 7890
+      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS:-protheus}
+      APPSERVER_CONSOLEFILE: /totvs/protheus/bin/appserver/appserver.log
+      APPSERVER_MULTIPROTOCOLPORTSECURE: 0
+      APPSERVER_MULTIPROTOCOLPORT: 1
+      APPSERVER_LICENSE_SERVER: totvs_licenseserver
+      APPSERVER_LICENSE_PORT: 5555
+      APPSERVER_PORT: 23001
+      APPSERVER_WEB_PORT: 23002
+      APPSERVER_REST_PORT: 8080
+      APPSERVER_WEB_MANAGER: 8088
+      EXTRACT_RESOURCES: 'true'
+      TZ: ${TZ}
+    volumes:
+      - totvs_protheus_data:/totvs/protheus_data
+      - totvs_appserver_apo:/totvs/protheus/apo
+      - totvs_appserver_data:/totvs/protheus/bin/appserver
+    networks:
+      - totvs
+    depends_on:
+      licenseserver:
+        condition: service_started
+      dbaccess:
+        condition: service_healthy
+
+  apprest:
+    image: juliansantosinfo/totvs_appserver:12.1.2310
+    container_name: totvs_apprest
+    profiles:
+      - full
+      - with-rest
+    restart: always
+    ports:
+      - '23101:23101' # AppServer Port
+      - '23102:23102' # Web/Smartclient Port
+      - '23180:8080' # REST Port
+      - '23188:8088' # Web Manager Port
+    environment:
+      APPSERVER_MODE: rest
+      APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
+      APPSERVER_DBACCESS_DATABASE: ORACLE
+      APPSERVER_DBACCESS_SERVER: totvs_dbaccess
+      APPSERVER_DBACCESS_PORT: 7890
+      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS:-protheus}
+      APPSERVER_CONSOLEFILE: /totvs/protheus/bin/appserver/appserver.log
+      APPSERVER_MULTIPROTOCOLPORTSECURE: 0
+      APPSERVER_MULTIPROTOCOLPORT: 1
+      APPSERVER_LICENSE_SERVER: totvs_licenseserver
+      APPSERVER_LICENSE_PORT: 5555
+      APPSERVER_PORT: 23101
+      APPSERVER_WEB_PORT: 23102
+      APPSERVER_REST_PORT: 8080
+      APPSERVER_WEB_MANAGER: 8088
+      EXTRACT_RESOURCES: 'true'
+      TZ: ${TZ}
+    volumes:
+      - totvs_protheus_data:/totvs/protheus_data
+      - totvs_apprest_apo:/totvs/protheus/apo
+      - totvs_apprest_data:/totvs/protheus/bin/appserver
+    networks:
+      - totvs
+    depends_on:
+      licenseserver:
+        condition: service_started
+      dbaccess:
+        condition: service_healthy
+
+  smartview:
+    image: juliansantosinfo/totvs_smartview:3.9.0.4558336
+    container_name: totvs_smartview
+    profiles:
+      - full
+      - with-smartview
+    restart: always
+    ports:
+      - '7017:7017'
+      - '7019:7019'
+    environment:
+      EXTRACT_RESOURCES: 'true'
+      TZ: ${TZ}
+    volumes:
+      - totvs_smartview_data:/totvs/smartview
+    networks:
+      - totvs
+
+volumes:
+  totvs_oracle_data:
+    driver: local
+  totvs_protheus_data:
+    driver: local
+  totvs_apprest_apo:
+    driver: local
+  totvs_apprest_data:
+    driver: local
+  totvs_appserver_apo:
+    driver: local
+  totvs_appserver_data:
+    driver: local
+  totvs_smartview_data:
+    driver: local
+
+networks:
+  totvs:
+    driver: bridge

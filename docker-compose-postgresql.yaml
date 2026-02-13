@@ -5,7 +5,6 @@
 # 1. Copy .env.example to .env and set your variables
 # 2. docker compose -f docker-compose-postgresql.yaml -p totvs up -d
 #
-version: '3.8'
 
 services:
 
@@ -17,9 +16,9 @@ services:
     ports:
       - '23432:5432'
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ${DATABASE_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: protheus
+      POSTGRES_DB: ${DATABASE_NAME:-protheus}
       POSTGRES_INITDB_ARGS: '--locale=pt_BR.ISO-8859-1 -E LATIN1'
       TZ: ${TZ}
     volumes:
@@ -29,7 +28,7 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - pg_isready -U postgres -d protheus
+        - pg_isready -U ${DATABASE_USERNAME:-postgres} -d ${DATABASE_NAME:-protheus}
       interval: 10s
       timeout: 10s
       retries: 10
@@ -65,9 +64,9 @@ services:
       DATABASE_PROFILE: POSTGRES
       DATABASE_SERVER: totvs_postgres
       DATABASE_PORT: 5432
-      DATABASE_ALIAS: ${DATABASE_ALIAS}
-      DATABASE_NAME: protheus
-      DATABASE_USERNAME: postgres
+      DATABASE_ALIAS: ${DATABASE_ALIAS:-protheus}
+      DATABASE_NAME: ${DATABASE_NAME:-protheus}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-postgres}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DBACCESS_LICENSE_SERVER: totvs_licenseserver
       DBACCESS_LICENSE_PORT: 5555
@@ -85,8 +84,8 @@ services:
         - CMD
         - isql
         - '-b'
-        - protheus
-        - postgres
+        - ${DATABASE_ALIAS:-protheus}
+        - ${DATABASE_USERNAME:-postgres}
         - ${DATABASE_PASSWORD}
       interval: 10s
       timeout: 10s
@@ -108,7 +107,7 @@ services:
       APPSERVER_DBACCESS_DATABASE: POSTGRES
       APPSERVER_DBACCESS_SERVER: totvs_dbaccess
       APPSERVER_DBACCESS_PORT: 7890
-      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS}
+      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS:-protheus}
       APPSERVER_CONSOLEFILE: /totvs/protheus/bin/appserver/appserver.log
       APPSERVER_MULTIPROTOCOLPORTSECURE: 0
       APPSERVER_MULTIPROTOCOLPORT: 1
@@ -150,7 +149,7 @@ services:
       APPSERVER_DBACCESS_DATABASE: POSTGRES
       APPSERVER_DBACCESS_SERVER: totvs_dbaccess
       APPSERVER_DBACCESS_PORT: 7890
-      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS}
+      APPSERVER_DBACCESS_ALIAS: ${DATABASE_ALIAS:-protheus}
       APPSERVER_CONSOLEFILE: /totvs/protheus/bin/appserver/appserver.log
       APPSERVER_MULTIPROTOCOLPORTSECURE: 0
       APPSERVER_MULTIPROTOCOLPORT: 1

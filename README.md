@@ -32,13 +32,13 @@ A arquitetura do projeto é dividida nos seguintes serviços:
 2.  **`dbaccess`**: O serviço intermediário que gerencia e fornece o acesso ao banco de dados.
 3.  **`licenseserver`**: O serviço de gerenciamento de licenças da TOTVS.
 4.  **`smartview`**: Servidor de Business Intelligence e Analytics (TReports).
-5.  **Banco de Dados**: Suporte nativo a **Microsoft SQL Server** (`mssql`) e **PostgreSQL** (`postgres`).
+5.  **Banco de Dados**: Suporte nativo a **Microsoft SQL Server** (`mssql`), **PostgreSQL** (`postgres`) e **Oracle Database** (`oracle`).
 
 ### Fluxo de Dependência
 ```text
-[DB (Postgres/MSSQL)] <--- [DBAccess] <--- [AppServer / AppRest]
-[License Server] <----------------------- [AppServer / AppRest / DBAccess]
-[AppRest] <------------------------------- [SmartView]
+[DB (Postgres/MSSQL/Oracle)] <--- [DBAccess] <--- [AppServer / AppRest]
+[License Server] <-------------------------- [AppServer / AppRest / DBAccess]
+[AppRest] <--------------------------------- [SmartView]
 ```
 
 ### Fluxo de Comunicação
@@ -56,7 +56,7 @@ flowchart TB
         ExternalAPI["Sistemas Externos / APIs"]
   end
  subgraph Databases["Camada de Dados"]
-        DB[("SQL Server / PostgreSQL")]
+        DB[("SQL Server / PostgreSQL / Oracle")]
   end
  subgraph Middleware["Middleware & Licenças"]
         DBA["DBAccess"]
@@ -160,16 +160,52 @@ Você pode configurar o ambiente de duas formas: utilizando o gerador web (mais 
         docker compose -f docker-compose-mssql.yaml -p totvs up -d
         ```
 
-### 💡 Perfis de Inicialização (Profiles)
-Você pode subir serviços opcionais (REST e SmartView) usando a flag `--profile`:
-*   `full`: Sobe toda a stack.
-*   `with-rest`: Stack básica + AppRest.
-*   `with-smartview`: Stack básica + SmartView.
+    *   **Para usar Oracle Database:**
+        ```bash
+        docker compose -f docker-compose-oracle.yaml -p totvs up -d
+        ```
 
-**Exemplo:**
+### 💡 Perfis de Inicialização (Profiles)
+
+Os serviços opcionais **AppRest** (servidor REST) e **SmartView** (BI/Analytics) podem ser iniciados usando perfis do Docker Compose.
+
+#### Perfis Disponíveis:
+
+| Perfil | Serviços Incluídos | Descrição |
+|--------|-------------------|-----------|
+| *(padrão)* | `postgres/mssql/oracle`, `licenseserver`, `dbaccess`, `appserver` | Stack básica para uso com SmartClient |
+| `full` | Stack básica + `apprest` + `smartview` | Stack completa com todos os serviços |
+| `with-rest` | Stack básica + `apprest` | Adiciona apenas o servidor REST/API |
+| `with-smartview` | Stack básica + `smartview` | Adiciona apenas o servidor de BI |
+
+#### Exemplos de Uso:
+
+**Stack básica (sem perfil):**
+```bash
+docker compose -f docker-compose-postgresql.yaml -p totvs up -d
+```
+
+**Stack completa (REST + SmartView):**
 ```bash
 docker compose -f docker-compose-postgresql.yaml --profile full -p totvs up -d
 ```
+
+**Apenas com REST:**
+```bash
+docker compose -f docker-compose-postgresql.yaml --profile with-rest -p totvs up -d
+```
+
+**Apenas com SmartView:**
+```bash
+docker compose -f docker-compose-postgresql.yaml --profile with-smartview -p totvs up -d
+```
+
+**Múltiplos perfis (REST + SmartView separadamente):**
+```bash
+docker compose -f docker-compose-postgresql.yaml --profile with-rest --profile with-smartview -p totvs up -d
+```
+
+> **Nota:** Os perfis funcionam da mesma forma para todos os bancos de dados (PostgreSQL, MSSQL e Oracle).
 
 4.  Acesse a aplicação:
     *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:23002>
@@ -220,6 +256,11 @@ Se preferir construir as imagens Docker localmente em vez de usar as do Docker H
 
     # Construir a imagem do PostgreSQL (se for usar)
     cd postgres/
+    ./build.sh
+    cd ..
+
+    # Construir a imagem do Oracle (se for usar)
+    cd oracle/
     ./build.sh
     cd ..
     ```
@@ -304,6 +345,14 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
+#### Banco de Dados: `oracle`
+
+| Variável | Descrição | Padrão |
+|---|---|---|
+| `ORACLE_PASSWORD` | Senha para os usuários `SYS`, `SYSTEM` e `PDBADMIN`. | `ProtheusDatabasePassword1` |
+| `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
+| `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
+
 #### `licenseserver`
 
 | Variável | Descrição | Padrão |
@@ -318,12 +367,12 @@ Abaixo estão as principais variáveis para configurar os serviços.
 
 | Variável | Descrição | Padrão |
 |---|---|---|
-| `DATABASE_PROFILE` | Tipo do banco de dados (`POSTGRES` ou `MSSQL`). | `MSSQL` |
-| `DATABASE_SERVER` | Host do servidor de banco de dados. | `totvs_mssql` |
-| `DATABASE_PORT` | Porta do servidor de banco de dados. | `1433` |
+| `DATABASE_PROFILE` | Tipo do banco de dados (`POSTGRES`, `MSSQL` ou `ORACLE`). | `MSSQL` |
+| `DATABASE_SERVER` | Host do servidor de banco de dados. | `totvs_mssql` / `totvs_postgres` / `totvs_oracle` |
+| `DATABASE_PORT` | Porta do servidor de banco de dados. | `1433` / `5432` / `1521` |
 | `DATABASE_ALIAS` | Alias da base de dados no DBAccess. | `protheus` |
 | `DATABASE_NAME` | Nome da base de dados. | `protheus` |
-| `DATABASE_USERNAME` | Usuário de acesso ao banco. | `sa` |
+| `DATABASE_USERNAME` | Usuário de acesso ao banco. | `sa` / `postgres` / `system` |
 | `DATABASE_PASSWORD` | Senha de acesso ao banco (usar `DATABASE_PASSWORD` do `.env`). | `ProtheusDatabasePassword1` |
 | `DBACCESS_LICENSE_SERVER`| Host do License Server. | `totvs_licenseserver` |
 | `DBACCESS_LICENSE_PORT`| Porta do License Server. | `5555` |
@@ -336,7 +385,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 |---|---|---|
 | `APPSERVER_MODE` | Modo de operação: `application` ou `rest`. | `application` |
 | `EXTRACT_RESOURCES`| Extrai `protheus.tar.gz` na inicialização (`true`/`false`). | `true` |
-| `APPSERVER_DBACCESS_DATABASE` | Tipo do banco de dados (`POSTGRES` ou `MSSQL`). | `MSSQL` |
+| `APPSERVER_DBACCESS_DATABASE` | Tipo do banco de dados (`POSTGRES`, `MSSQL` ou `ORACLE`). | `MSSQL` |
 | `APPSERVER_DBACCESS_SERVER` | Host do serviço DBAccess. | `totvs_dbaccess` |
 | `APPSERVER_DBACCESS_PORT` | Porta do serviço DBAccess. | `7890` |
 | `APPSERVER_DBACCESS_ALIAS` | Alias da conexão com o banco. | `protheus` |
