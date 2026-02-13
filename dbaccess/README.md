@@ -8,7 +8,7 @@ Este serviço atua como um intermediário de comunicação entre os servidores d
 
 ### Outros Componentes Necessários
 
-*   **Banco de Dados**: `mssql` ou `postgres`.
+*   **Banco de Dados**: `mssql`, `postgres` ou `oracle`.
 *   **licenseserver**: O serviço de gerenciamento de licenças.
 *   **appserver**: O servidor de aplicação Protheus.
 
@@ -55,12 +55,12 @@ Caso queira construir a imagem localmente:
 
 | Variável | Descrição | Padrão |
 |---|---|---|
-| `DATABASE_PROFILE` | Tipo do banco de dados. | `POSTGRES` ou `MSSQL` |
-| `DATABASE_SERVER` | Host do servidor de banco de dados. | `totvs_postgres` / `totvs_mssql` |
-| `DATABASE_PORT` | Porta do servidor de banco de dados. | `5432` / `1433` |
+| `DATABASE_PROFILE` | Tipo do banco de dados. | `POSTGRES`, `MSSQL` ou `ORACLE` |
+| `DATABASE_SERVER` | Host do servidor de banco de dados. | `totvs_postgres` / `totvs_mssql` / `totvs_oracle` |
+| `DATABASE_PORT` | Porta do servidor de banco de dados. | `5432` / `1433` / `1521` |
 | `DATABASE_ALIAS` | Alias da base de dados no DBAccess. | `protheus` |
 | `DATABASE_NAME` | Nome da base de dados. | `protheus` |
-| `DATABASE_USERNAME` | Usuário de acesso ao banco. | `postgres` / `sa` |
+| `DATABASE_USERNAME` | Usuário de acesso ao banco. | `postgres` / `sa` / `protheus` |
 | `DATABASE_PASSWORD` | Senha de acesso ao banco. | `ProtheusDatabasePassword1` |
 | `DBACCESS_LICENSE_SERVER`| Host do License Server. | `totvs_licenseserver` |
 | `DBACCESS_LICENSE_PORT`| Porta do License Server. | `5555` |

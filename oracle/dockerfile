@@ -1,0 +1,28 @@
+# Imagem base do Oracle XE 21c (versão slim para dev/test)
+FROM gvenzl/oracle-xe:21.3.0-slim-faststart
+
+LABEL version="12.1.2510"
+LABEL description="TOTVS Oracle"
+LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
+
+USER root
+
+# Variáveis de ambiente
+ENV ORACLE_PASSWORD=ProtheusDatabasePassword1
+ENV RESTORE_BACKUP=Y
+
+# Copiar scripts e recursos
+COPY ./resources/data.tar.gz /tmp/data.tar.gz
+COPY entrypoint.sh /entrypoint.sh
+
+# Ajustar permissões
+RUN chown -R oracle:root /entrypoint.sh \ 
+    && chmod -R 770 /entrypoint.sh
+
+USER oracle
+
+# Expor portas (1521 é a padrão)
+EXPOSE 1521
+
+# Comando padrão
+ENTRYPOINT [ "/entrypoint.sh" ]

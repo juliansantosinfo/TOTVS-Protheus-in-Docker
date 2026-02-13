@@ -92,7 +92,7 @@ set -e  # Encerra o script em caso de erro
 
     echo ""
     echo "------------------------------------------------------"
-    echo "📝 FIGURAÇÃO DE DRIVES ODBC PARA MSSQL"
+    echo "📝 CONFIGURAÇÃO DE DRIVES ODBC PARA MSSQL"
     echo "------------------------------------------------------"
     
     if [[ ! -f /totvs/resources/mssql/mssql-setup.sh ]]; then
@@ -122,11 +122,11 @@ set -e  # Encerra o script em caso de erro
 
 #---------------------------------------------------------------------
 
-## 🚀 CONFIGURAÇÃO DE DRIVES ODBC PARA MSSQL
+## 🚀 CONFIGURAÇÃO DE DRIVES ODBC PARA POSTGRESQL
 
     echo ""
     echo "------------------------------------------------------"
-    echo "📝 FIGURAÇÃO DE DRIVES ODBC PARA POSTGRESQL"
+    echo "📝 CONFIGURAÇÃO DE DRIVES ODBC PARA POSTGRESQL"
     echo "------------------------------------------------------"
 
     if [[ ! -f /totvs/resources/postgresql/postgresql-setup.sh ]]; then
@@ -152,6 +152,36 @@ set -e  # Encerra o script em caso de erro
 
 #---------------------------------------------------------------------
 
+## 🚀 CONFIGURAÇÃO DE DRIVES ODBC PARA ORACLE
+
+    echo ""
+    echo "------------------------------------------------------"
+    echo "📝 CONFIGURAÇÃO DE DRIVES ODBC PARA ORACLE"
+    echo "------------------------------------------------------"
+
+    if [[ ! -f /totvs/resources/oracle/oracle-setup.sh ]]; then
+        echo "❌ Erro: Script de setup do Oracle não encontrado em /totvs/resources/oracle/oracle-setup.sh"
+        exit 1
+    fi
+
+    chmod +x /totvs/resources/oracle/oracle-setup.sh
+
+    if [[ ! -f /usr/lib64/oracle/21/client64/lib/libsqora.so.21.1 ]]; then
+        echo "⚙️ Biblioteca Oracle ODBC não encontrada. Executando setup..."
+        /totvs/resources/oracle/oracle-setup.sh
+        
+        if [ $? -ne 0 ]; then
+            echo "❌ Erro ao configurar Oracle."
+            exit 1
+        fi
+    else
+        echo "✅ Biblioteca Oracle ODBC já existe. Setup ignorado."
+    fi
+
+    echo "✅ Oracle Drive ODBC configurado com sucesso."
+
+#---------------------------------------------------------------------
+
 ## 🚀 CONFIGURAÇÃO DE PERMISSÕES DE EXECUÇÃO
 
     echo ""
@@ -169,6 +199,9 @@ set -e  # Encerra o script em caso de erro
     
     chmod +x /totvs/resources/postgresql/postgresql-setup.sh
     echo "✅ Permissão aplicada a /totvs/resources/postgresql/postgresql-setup.sh"
+
+    chmod +x /totvs/resources/oracle/oracle-setup.sh
+    echo "✅ Permissão aplicada a /totvs/resources/oracle/oracle-setup.sh"
 
 #---------------------------------------------------------------------
 

@@ -22,6 +22,10 @@ DATABASE_DEFAULT_NAME=""
 DATABASE_DEFAULT_ALIAS=""
 DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
 
+TNS_ADMIN=/usr/lib/oracle/21/client64/lib/network/admin
+TNS_FILE="$TNS_ADMIN"/tnsnames.ora
+TNS_FILE_RESOURCE=/totvs/resources/settings/tnsnames.ora
+
 #---------------------------------------------------------------------
 
 ## 🚀 FUNÇOES AUXILIARES
@@ -94,6 +98,17 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
             echo "✅ PostgreSQL configurado com sucesso."
             ;;
             
+        ORACLE)
+            echo "⚙️ Configurando ORACLE..."
+            export DATABASE_DEFAULT_ALIAS="ORACLE"
+            export DATABASE_DEFAULT_NAME="XE"
+            export DATABASE_DRIVER=Oracle21
+            export DATABASE_CLIENT_LIBRARY_ORACLE=/usr/lib64/libodbc.so
+            export SQL_COMMAND_PASSWORD_UPDATE="ALTER USER $DATABASE_USERNAME IDENTIFIED BY \"${DATABASE_PASSWORD}\";"
+            export SCRIPT_BASE="/totvs/resources/oracle/oracle-create_database.sql"
+            echo "✅ ORACLE configurado com sucesso."
+            ;;
+            
         *)
             echo "❌ Erro: Profile de banco de dados inválido (**${DATABASE_PROFILE}**) ou não suportado (apenas MSSQL ou POSTGRES)."
             exit 1
@@ -133,13 +148,57 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
 
     sed -i "s,DATABASE_ALIAS,${DATABASE_ALIAS},g" "$ODBC_PATH"
     sed -i "s,DATABASE_DRIVER,${DATABASE_DRIVER},g" "$ODBC_PATH"
-    sed -i "s,DATABASE_SERVER,${DATABASE_SERVER},g" "$ODBC_PATH"
+
+    # Quando utilizado o banco de dados ORACLE o arquivo de configuração
+    # odbc.ini deve ser confirado para que a propriedade ServerName aponte
+    # para o nome do TNS configurado no arquivo tnsnames.ora
+    if [[ "${DATABASE_PROFILE}" == "ORACLE" ]]; then
+        sed -i "s,DATABASE_SERVER,ORACLE,g" "$ODBC_PATH"
+    else
+        sed -i "s,DATABASE_SERVER,${DATABASE_SERVER},g" "$ODBC_PATH"
+    fi
+    
     sed -i "s,DATABASE_PORT,${DATABASE_PORT},g" "$ODBC_PATH"
     sed -i "s,DATABASE_NAME,${DATABASE_NAME},g" "$ODBC_PATH"
     sed -i "s,DATABASE_USERNAME,${DATABASE_USERNAME},g" "$ODBC_PATH"
     sed -i "s,DATABASE_PASSWORD,${DATABASE_PASSWORD},g" "$ODBC_PATH"
 
     echo "✅ Fim da configuração do ODBC."
+
+#---------------------------------------------------------------------
+
+## 🚀 PARA O BANCO DE DADOS `ORACLE` ATUALIZA TNS
+
+    if [[ "${DATABASE_PROFILE}" == "ORACLE" ]]; then
+        
+        echo "------------------------------------------------------"
+        echo "🚀 INÍCIO CONFIGURAÇÃO DO TNSNAMES.ORA PARA ORACLE"
+        echo "------------------------------------------------------"
+        
+        echo "🔎 Verificando arquivo base localizado em $TNS_FILE_RESOURCE..."
+
+        if [[ ! -f "$TNS_FILE_RESOURCE" ]]; then
+            echo "❌ ERRO: O arquivo $TNS_FILE_RESOURCE não foi encontrado."
+            exit 1
+        else
+            echo "✅ Arquivo base localizado em $TNS_FILE_RESOURCE."
+        fi
+
+        echo "⚙️ Copiando arquivo base para $TNS_FILE..."
+        cp -f "$TNS_FILE_RESOURCE" "$TNS_FILE"
+
+        if [[ ! -f "$TNS_FILE" ]]; then
+            echo "❌ ERRO: O arquivo $TNS_FILE não foi encontrado."
+            exit 1
+        else
+            echo "✅ Arquivo base copiado para **$TNS_FILE**."
+        fi
+
+        cp -f /totvs/resources/settings/dbaccess.ini "$inifile"
+
+        sed -i "s,DATABASE_SERVER,${DATABASE_SERVER},g" "$TNS_FILE"
+        sed -i "s,DATABASE_PORT,${DATABASE_PORT},g" "$TNS_FILE"
+    fi
 
 #---------------------------------------------------------------------
 
@@ -159,6 +218,8 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
     check_env_vars "SQL_COMMAND_PASSWORD_UPDATE"
 
     echo "quit;" | isql -v "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD"
+
+    cat "$ODBC_PATH"
 
     if [ ! $? = 0 ]; then
 
@@ -219,7 +280,11 @@ DATABASE_DEFAULT_PASSWORD="ProtheusDatabasePassword1"
 
     cat "$SCRIPT_BASE"
     
-    isql -b "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD" < "$SCRIPT_BASE" > /dev/null 2>&1
+    if [[ "$DATABASE_PROFILE" == "ORACLE" ]]; then
+        sqlplus "$DATABASE_USERNAME"/"$DATABASE_PASSWORD"@ORACLE @"$SCRIPT_BASE"
+    else
+        isql -b "$DATABASE_DEFAULT_ALIAS" "$DATABASE_USERNAME" "$DATABASE_PASSWORD" < "$SCRIPT_BASE" > /dev/null 2>&1
+    fi
 
     if [[ ! $? = 0 ]]; then
         echo "❌ ERRO: Não foi possivel executar os script iniciais."

@@ -23,7 +23,7 @@ set -euo pipefail
 
 # --- Variáveis de Configuração ---
 # Lista de aplicações válidas no seu projeto.
-readonly VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "smartview")
+readonly VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
 
 # --- Carregar Versões Centralizadas ---
 if [ -f "versions.env" ]; then
@@ -154,6 +154,7 @@ if [[ "$execute_push" =~ ^[Ss]$ ]]; then
     readonly DOCKER_TAG_LICENSE="${DOCKER_USER}/${LICENSESERVER_IMAGE_NAME}:${LICENSESERVER_VERSION}"
     readonly DOCKER_TAG_MSSQL="${DOCKER_USER}/${MSSQL_IMAGE_NAME}:${MSSQL_VERSION}"
     readonly DOCKER_TAG_POSTGRES="${DOCKER_USER}/${POSTGRES_IMAGE_NAME}:${POSTGRES_VERSION}"
+    readonly DOCKER_TAG_ORACLE="${DOCKER_USER}/${ORACLE_IMAGE_NAME}:${ORACLE_VERSION}"
     readonly DOCKER_TAG_SMARTVIEW="${DOCKER_USER}/${SMARTVIEW_IMAGE_NAME}:${SMARTVIEW_VERSION}"
 
     readonly IMAGES_TO_PUSH=(
@@ -162,6 +163,7 @@ if [[ "$execute_push" =~ ^[Ss]$ ]]; then
         "$DOCKER_TAG_LICENSE"
         "$DOCKER_TAG_MSSQL"
         "$DOCKER_TAG_POSTGRES"
+        "$DOCKER_TAG_ORACLE"
         "$DOCKER_TAG_SMARTVIEW"
     )
     
