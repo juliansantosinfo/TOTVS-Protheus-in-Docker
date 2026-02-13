@@ -119,7 +119,7 @@ services:
     volumes:
       - totvs_protheus_data:/totvs/protheus_data
       - totvs_appserver_apo:/totvs/protheus/apo
-      - totvs_appserver_data:/totvs/protheus/bin/appserver
+      # - totvs_appserver_data:/totvs/protheus/bin/appserver
     networks:
       - totvs
     depends_on:
@@ -161,7 +161,7 @@ services:
     volumes:
       - totvs_protheus_data:/totvs/protheus_data
       - totvs_apprest_apo:/totvs/protheus/apo
-      - totvs_apprest_data:/totvs/protheus/bin/appserver
+      # - totvs_apprest_data:/totvs/protheus/bin/appserver
     networks:
       - totvs
     depends_on:
@@ -195,12 +195,12 @@ volumes:
     driver: local
   totvs_apprest_apo:
     driver: local
-  totvs_apprest_data:
-    driver: local
+  # totvs_apprest_data:
+  #   driver: local
   totvs_appserver_apo:
     driver: local
-  totvs_appserver_data:
-    driver: local
+  # totvs_appserver_data:
+  #   driver: local
   totvs_smartview_data:
     driver: local
 
