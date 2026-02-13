@@ -60,6 +60,7 @@ mostrar_ajuda() {
     echo "  licenseserver  - Baixa e extrai os arquivos do License Server"
     echo "  mssql          - Baixa os arquivos do MSSQL"
     echo "  postgres       - Baixa os arquivos do PostgreSQL"
+    echo "  oracle         - Baixa os arquivos do Oracle"
     echo "  smartview      - Baixa os arquivos do SmartView"
     echo ""
     echo "Se nenhum módulo for informado, todos serão processados."
@@ -100,6 +101,12 @@ processar_modulo() {
             GH_PATH="${GH_RELEASE}/postgres"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/postgres"
             DEST_DIR="postgres/resources"
+            FILES=("data.tar.gz")
+            ;;
+        oracle)
+            GH_PATH="${GH_RELEASE}/oracle"
+            DOWNLOAD_DIR="/tmp/${GH_RELEASE}/oracle"
+            DEST_DIR="oracle/resources"
             FILES=("data.tar.gz")
             ;;
         smartview)
@@ -226,7 +233,7 @@ if [[ -n "$1" ]]; then
     MODULOS=("$1")
 else
     echo "⚙️ Nenhum módulo informado — todos serão processados."
-    MODULOS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "smartview")
+    MODULOS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
 fi
 
 for mod in "${MODULOS[@]}"; do

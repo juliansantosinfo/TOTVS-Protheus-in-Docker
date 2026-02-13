@@ -33,7 +33,7 @@ echo "###################################################"
 # 1. Escolha do Banco de Dados
 print_header "1. Escolha do Banco de Dados"
 echo "Qual banco de dados você gostaria de usar?"
-select db_choice in "PostgreSQL (Recomendado)" "Microsoft SQL Server"; do
+select db_choice in "PostgreSQL (Recomendado)" "Microsoft SQL Server" "Oracle SQL Server"; do
     case $db_choice in
         "PostgreSQL (Recomendado)")
             COMPOSE_FILE="docker-compose-postgresql.yaml"
@@ -41,6 +41,10 @@ select db_choice in "PostgreSQL (Recomendado)" "Microsoft SQL Server"; do
             ;;
         "Microsoft SQL Server")
             COMPOSE_FILE="docker-compose-mssql.yaml"
+            break
+            ;;
+        "Oracle SQL Server")
+            COMPOSE_FILE="docker-compose-oracle.yaml"
             break
             ;;
         *)
