@@ -332,6 +332,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `SA_PASSWORD` | Senha para o usuário `sa` (usar `DATABASE_PASSWORD` do `.env`). | `ProtheusDatabasePassword1` |
 | `ACCEPT_EULA` | Confirma a aceitação da licença de uso do SQL Server. | `Y` |
 | `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### Banco de Dados: `postgres`
@@ -343,6 +344,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `POSTGRES_DB` | Nome do banco de dados a ser criado na inicialização. | `protheus` |
 | `POSTGRES_INITDB_ARGS`| Argumentos extras para o `initdb`, como `locale`. | `--locale=pt_BR.ISO-8859-1 -E LATIN1` |
 | `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### Banco de Dados: `oracle`
@@ -351,6 +353,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 |---|---|---|
 | `ORACLE_PASSWORD` | Senha para os usuários `SYS`, `SYSTEM` e `PDBADMIN`. | `ProtheusDatabasePassword1` |
 | `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### `licenseserver`
@@ -361,6 +364,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `LICENSE_PORT` | Porta principal do serviço. | `5555` |
 | `LICENSE_WEBAPP_PORT`| Porta da interface web de monitoramento. | `8020` |
 | `LICENSE_CONSOLEFILE`| Caminho do arquivo de log do serviço. | `/totvs/licenseserver/bin/appserver/licenseserver.log` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### `dbaccess`
@@ -408,6 +412,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `APPSERVER_SQLITE_INSTANCES`| Configuração de instâncias do `SQLite`. | `1,10,1,1` |
 | `APPSERVER_MULTIPROTOCOLPORTSECURE`| Porta segura para múltiplos protocolos (0 para desativar). | `0` |
 | `APPSERVER_MULTIPROTOCOLPORT`| Porta para múltiplos protocolos. | `1` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 #### `smartview`
@@ -415,6 +420,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | Variável | Descrição | Padrão |
 |---|---|---|
 | `EXTRACT_RESOURCES` | Extrai `smartview.tar.gz` na inicialização (`true`/`false`). | `true` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
 ---

@@ -8,7 +8,7 @@ O SmartView é o servidor de Business Intelligence (BI) e Analytics do Protheus,
 
 ### Outros Componentes Necessários
 
-*   **Banco de Dados**: `mssql` ou `postgres`.
+*   **Banco de Dados**: `mssql`, `postgres` ou `oracle`.
 *   **dbaccess**: O serviço de acesso ao banco de dados.
 *   **licenseserver**: O serviço de gerenciamento de licenças.
 
@@ -55,4 +55,5 @@ Caso queira construir a imagem localmente:
 | Variável | Descrição | Padrão |
 |---|---|---|
 | `EXTRACT_RESOURCES` | Extrai `smartview.tar.gz` na inicialização (`true`/`false`). | `true` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
