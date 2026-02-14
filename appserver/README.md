@@ -80,4 +80,5 @@ Caso queira construir a imagem localmente:
 | `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `25002` |
 | `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `25180` |
 | `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `25088` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
