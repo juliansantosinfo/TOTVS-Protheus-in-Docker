@@ -62,6 +62,11 @@ Caso queira construir a imagem localmente:
 | `DATABASE_NAME` | Nome da base de dados. | `protheus` |
 | `DATABASE_USERNAME` | Usuário de acesso ao banco. | `postgres` / `sa` / `protheus` |
 | `DATABASE_PASSWORD` | Senha de acesso ao banco. | `ProtheusDatabasePassword1` |
+| `DATABASE_WAIT_RETRIES` | Número de tentativas de conexão com o banco. | `30` |
+| `DATABASE_WAIT_INTERVAL` | Intervalo em segundos entre tentativas. | `2` |
 | `DBACCESS_LICENSE_SERVER`| Host do License Server. | `totvs_licenseserver` |
 | `DBACCESS_LICENSE_PORT`| Porta do License Server. | `5555` |
+| `LICENSE_WAIT_RETRIES` | Número de tentativas de conexão com o License Server. | `30` |
+| `LICENSE_WAIT_INTERVAL` | Intervalo em segundos entre tentativas. | `2` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |

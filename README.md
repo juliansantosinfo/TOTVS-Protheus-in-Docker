@@ -374,8 +374,13 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `DATABASE_NAME` | Nome da base de dados. | `protheus` |
 | `DATABASE_USERNAME` | Usuário de acesso ao banco. | `sa` / `postgres` / `system` |
 | `DATABASE_PASSWORD` | Senha de acesso ao banco (usar `DATABASE_PASSWORD` do `.env`). | `ProtheusDatabasePassword1` |
+| `DATABASE_WAIT_RETRIES` | Número de tentativas de conexão com o banco. | `30` |
+| `DATABASE_WAIT_INTERVAL` | Intervalo em segundos entre tentativas de banco. | `2` |
 | `DBACCESS_LICENSE_SERVER`| Host do License Server. | `totvs_licenseserver` |
 | `DBACCESS_LICENSE_PORT`| Porta do License Server. | `5555` |
+| `LICENSE_WAIT_RETRIES` | Número de tentativas de conexão com o License Server. | `30` |
+| `LICENSE_WAIT_INTERVAL` | Intervalo em segundos entre tentativas de licença. | `2` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `DBACCESS_CONSOLEFILE`| Caminho do arquivo de log do serviço. | `/totvs/dbaccess/multi/dbconsole.log` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 

@@ -70,7 +70,7 @@ O projeto inclui um script `run.sh` que guia o usuário:
 ./run.sh
 ```
 Ele perguntará:
-1.  Qual banco de dados usar (Postgres ou MSSQL).
+1.  Qual banco de dados usar (Postgres, MSSQL ou Oracle).
 2.  Se deseja ativar o perfil completo (com REST e SmartView).
 E então executará o comando Docker Compose correto.
 
@@ -85,6 +85,11 @@ docker compose -f docker-compose-postgresql.yaml -p totvs up -d
 **Para SQL Server:**
 ```bash
 docker compose -f docker-compose-mssql.yaml -p totvs up -d
+```
+
+**Para Oracle:**
+```bash
+docker compose -f docker-compose-oracle.yaml -p totvs up -d
 ```
 
 **Adicionando serviços extras (AppRest + SmartView):**
