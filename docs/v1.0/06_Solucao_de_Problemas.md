@@ -10,6 +10,12 @@ Antes de qualquer ação complexa, verifique os "sinais vitais":
 2.  **O que os logs dizem?**
     `docker compose -p totvs logs --tail=100 appserver`
     *Procure por:* "Connection refused", "File not found", "License limit exceeded".
+    *No DBAccess, observe se ele está em loop de espera:* "Banco ainda não responde. Aguardando 2s...". Isso indica que a porta do banco não está acessível na rede Docker.
+
+### Ativando Modo de Depuração (Verbose)
+Se você estiver enfrentando problemas misteriosos na inicialização do DBAccess, pode ativar o modo de depuração para ver exatamente quais comandos estão sendo executados.
+**Solução:**
+Defina a variável `DEBUG_SCRIPT=true` no seu arquivo `.env` ou `docker-compose.yaml`. Isso ativará o `set -x` nos scripts de inicialização, imprimindo cada comando executado no log do container.
 
 ## 6.2. Problemas Comuns e Soluções
 
@@ -17,7 +23,7 @@ Antes de qualquer ação complexa, verifique os "sinais vitais":
 **Sintoma:** O AppServer falha ao iniciar com uma mensagem gritante sobre limites operacionais.
 **Causa:** O Protheus abre milhares de arquivos simultâneos. O limite padrão do Linux (1024) é muito baixo.
 **Solução:**
-No host (sua máquina Linux/WSL):
+O projeto já define limites adequados na seção `ulimits` dos arquivos `docker-compose-*.yaml`. No entanto, se o erro persistir, você deve aumentar o limite no host (sua máquina Linux/WSL):
 ```bash
 sudo sysctl -w fs.file-max=65535
 ```

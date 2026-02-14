@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
+if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
+    set -x
+fi
+
 ######################################################################
 # SCRIPT:      setup-dbaccess.sh
 # DESCRIÇÃO:   Inicializa e configura o serviço TOTVS DBAccess.
@@ -46,7 +51,11 @@ export LD_LIBRARY_PATH="${pathbin}:${LD_LIBRARY_PATH}"
     echo "🚀 INÍCIO DA VERIFICAÇÃO DE VÁRIAVEIS DE AMBIENTE"
     echo "------------------------------------------------------"
 
-    echo "🔎 Verificando váriaveis de ambiente requeridas..."
+    # Aplica padrões para License Server se estiverem vazios
+    export DBACCESS_LICENSE_SERVER="${DBACCESS_LICENSE_SERVER:-totvs_licenseserver}"
+    export DBACCESS_LICENSE_PORT="${DBACCESS_LICENSE_PORT:-5555}"
+
+    echo "🔎 Verificando variáveis de ambiente requeridas..."
 
     check_env_vars "DATABASE_PROFILE"
     echo "🔎 DATABASE_PROFILE... ✅"
@@ -70,6 +79,34 @@ export LD_LIBRARY_PATH="${pathbin}:${LD_LIBRARY_PATH}"
     echo "🔎 DATABASE_PASSWORD... ✅"
 
     echo "✅ Todas as variáveis de ambiente requeridas verificadas com sucesso."
+
+#---------------------------------------------------------------------
+
+## 🚀 AGUARDANDO DISPONIBILIDADE DO LICENSE SERVER (NETWORK CHECK)
+
+    echo ""
+    echo "------------------------------------------------------"
+    echo "⏳ AGUARDANDO DISPONIBILIDADE DO LICENSE SERVER (TCP CHECK)"
+    echo "------------------------------------------------------"
+
+    RETRIES=0
+    MAX_RETRIES="${LICENSE_WAIT_RETRIES:-30}"
+    INTERVAL="${LICENSE_WAIT_INTERVAL:-2}"
+
+    echo "🔍 Verificando conectividade com $DBACCESS_LICENSE_SERVER:$DBACCESS_LICENSE_PORT..."
+
+    until timeout 1 bash -c "echo > /dev/tcp/$DBACCESS_LICENSE_SERVER/$DBACCESS_LICENSE_PORT" > /dev/null 2>&1; do
+        RETRIES=$((RETRIES + 1))
+        if [ $RETRIES -ge "$MAX_RETRIES" ]; then
+            echo "❌ ERRO: O License Server em $DBACCESS_LICENSE_SERVER:$DBACCESS_LICENSE_PORT não ficou disponível após $MAX_RETRIES tentativas."
+            echo "🛑 Abortando inicialização."
+            exit 1
+        fi
+        echo "  - [$RETRIES/$MAX_RETRIES] License Server ainda não responde. Aguardando ${INTERVAL}s..."
+        sleep "$INTERVAL"
+    done
+
+    echo "✅ Conexão TCP estabelecida com o License Server!"
 
 #---------------------------------------------------------------------
 

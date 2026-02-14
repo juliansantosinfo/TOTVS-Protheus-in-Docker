@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
+if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
+    set -x
+fi
+
 ######################################################################
 # SCRIPT:      entrypoint.sh
 # DESCRIÇÃO:   Ponto de entrada principal. Executa a configuração do
@@ -13,6 +18,26 @@
 # Variáveis de path para os scripts de configuração
 SETUP_DATABASE_SCRIPT="/setup-database.sh"
 SETUP_DBACCESS_SCRIPT="/setup-dbaccess.sh"
+
+#---------------------------------------------------------------------
+
+## 🚀 VALIDAÇÃO DE VARIÁVEIS OBRIGATÓRIAS
+
+    echo "🔍 Validando variáveis mínimas para inicialização..."
+    MANDATORY_VARS=("DATABASE_PROFILE" "DATABASE_SERVER" "DATABASE_PASSWORD")
+    
+    MISSING_VARS=0
+    for var in "${MANDATORY_VARS[@]}"; do
+        if [[ -z "${!var}" ]]; then
+            echo "❌ ERRO: A variável de ambiente $var NÃO está definida."
+            MISSING_VARS=$((MISSING_VARS + 1))
+        fi
+    done
+
+    if [[ $MISSING_VARS -gt 0 ]]; then
+        echo "🛑 Falha na inicialização: Variáveis obrigatórias ausentes."
+        exit 1
+    fi
 
 #---------------------------------------------------------------------
 

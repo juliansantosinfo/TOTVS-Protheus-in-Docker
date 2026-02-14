@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
+if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
+    set -x
+fi
+
 ######################################################################
 # SCRIPT:      setup-database.sh
 # DESCRIÇÃO:   Configura o banco de dados, ambiente e as bibliotecas de 
@@ -44,15 +49,33 @@ TNS_FILE_RESOURCE=/totvs/resources/settings/tnsnames.ora
     
 #---------------------------------------------------------------------
 
-## 🚀 INÍCIO DA VERIFICAÇÃO DE VARIÁVEIS DE AMBIENTE
+## 🚀 DEFINIÇÃO DE VALORES PADRÃO E VALIDAÇÃO
 
-    echo ""
     echo "------------------------------------------------------"
-    echo "🚀 INÍCIO DA VERIFICAÇÃO DE VÁRIAVEIS DE AMBIENTE"
+    echo "🚀 DEFINIÇÃO DE VALORES PADRÃO E VALIDAÇÃO"
     echo "------------------------------------------------------"
 
-    echo "🔎 Verificando váriaveis de ambiente..."
+    # 1. Padrões Globais
+    export DATABASE_ALIAS="${DATABASE_ALIAS:-protheus}"
+    export DATABASE_NAME="${DATABASE_NAME:-protheus}"
 
+    # 2. Padrões por Perfil
+    case "$(echo "$DATABASE_PROFILE" | tr '[:upper:]' '[:lower:]')" in
+        mssql)
+            export DATABASE_PORT="${DATABASE_PORT:-1433}"
+            export DATABASE_USERNAME="${DATABASE_USERNAME:-sa}"
+            ;;
+        postgres|postgresql)
+            export DATABASE_PORT="${DATABASE_PORT:-5432}"
+            export DATABASE_USERNAME="${DATABASE_USERNAME:-postgres}"
+            ;;
+        oracle)
+            export DATABASE_PORT="${DATABASE_PORT:-1521}"
+            export DATABASE_USERNAME="${DATABASE_USERNAME:-protheus}"
+            ;;
+    esac
+
+    echo "🔎 Verificando variáveis de ambiente finais..."
     check_env_vars "DATABASE_PROFILE"
     check_env_vars "DATABASE_ALIAS"
     check_env_vars "DATABASE_SERVER"
@@ -61,7 +84,35 @@ TNS_FILE_RESOURCE=/totvs/resources/settings/tnsnames.ora
     check_env_vars "DATABASE_USERNAME"
     check_env_vars "DATABASE_PASSWORD"
     
-    echo "✅ Todas as variáveis de ambiente requeridas verificadas com sucesso."
+    echo "✅ Todas as variáveis de ambiente preparadas com sucesso."
+
+#---------------------------------------------------------------------
+
+## 🚀 AGUARDANDO DISPONIBILIDADE DO BANCO (NETWORK CHECK)
+
+    echo ""
+    echo "------------------------------------------------------"
+    echo "⏳ AGUARDANDO DISPONIBILIDADE DO BANCO (TCP CHECK)"
+    echo "------------------------------------------------------"
+
+    RETRIES=0
+    MAX_RETRIES="${DATABASE_WAIT_RETRIES:-30}"
+    INTERVAL="${DATABASE_WAIT_INTERVAL:-2}"
+
+    echo "🔍 Verificando conectividade com $DATABASE_SERVER:$DATABASE_PORT..."
+
+    until timeout 1 bash -c "echo > /dev/tcp/$DATABASE_SERVER/$DATABASE_PORT" > /dev/null 2>&1; do
+        RETRIES=$((RETRIES + 1))
+        if [ $RETRIES -ge "$MAX_RETRIES" ]; then
+            echo "❌ ERRO: O banco de dados em $DATABASE_SERVER:$DATABASE_PORT não ficou disponível após $MAX_RETRIES tentativas."
+            echo "🛑 Abortando inicialização."
+            exit 1
+        fi
+        echo "  - [$RETRIES/$MAX_RETRIES] Banco ainda não responde. Aguardando ${INTERVAL}s..."
+        sleep "$INTERVAL"
+    done
+
+    echo "✅ Conexão TCP estabelecida com o servidor de banco de dados!"
 
 #---------------------------------------------------------------------
 
@@ -194,8 +245,6 @@ TNS_FILE_RESOURCE=/totvs/resources/settings/tnsnames.ora
             echo "✅ Arquivo base copiado para **$TNS_FILE**."
         fi
 
-        cp -f /totvs/resources/settings/dbaccess.ini "$inifile"
-
         sed -i "s,DATABASE_SERVER,${DATABASE_SERVER},g" "$TNS_FILE"
         sed -i "s,DATABASE_PORT,${DATABASE_PORT},g" "$TNS_FILE"
     fi
@@ -277,8 +326,6 @@ TNS_FILE_RESOURCE=/totvs/resources/settings/tnsnames.ora
 
     sed -i "s,DATABASE_NAME,${DATABASE_NAME},g" "$SCRIPT_BASE"
     sed -i "s,DATABASE_USERNAME,${DATABASE_USERNAME},g" "$SCRIPT_BASE"
-
-    cat "$SCRIPT_BASE"
     
     if [[ "$DATABASE_PROFILE" == "ORACLE" ]]; then
         sqlplus "$DATABASE_USERNAME"/"$DATABASE_PASSWORD"@ORACLE @"$SCRIPT_BASE"
@@ -288,6 +335,11 @@ TNS_FILE_RESOURCE=/totvs/resources/settings/tnsnames.ora
 
     if [[ ! $? = 0 ]]; then
         echo "❌ ERRO: Não foi possivel executar os script iniciais."
+        echo "------------------------------------------------------"
+        echo "🔎 CONTEUDO DO SCRIPT: $SCRIPT_BASE"
+        echo "------------------------------------------------------"
+        cat "$SCRIPT_BASE"
+        echo "------------------------------------------------------"
         exit 1
     else
         echo "✅ Scripts executados com sucesso!"

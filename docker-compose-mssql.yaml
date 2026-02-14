@@ -45,6 +45,10 @@ services:
     image: juliansantosinfo/totvs_licenseserver:3.6.1
     container_name: totvs_licenseserver
     restart: always
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     # Expor portas do License Server (útil para monitoramento)
     # ports:
     #   - "2234:2234"
@@ -103,6 +107,10 @@ services:
     image: juliansantosinfo/totvs_appserver:12.1.2310
     container_name: totvs_appserver
     restart: always
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - '23001:23001' # AppServer Port
       - '23002:23002' # Web/Smartclient Port
@@ -141,10 +149,11 @@ services:
   apprest:
     image: juliansantosinfo/totvs_appserver:12.1.2310
     container_name: totvs_apprest
-    profiles:
-      - full
-      - with-rest
     restart: always
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - '23101:23101' # AppServer Port
       - '23102:23102' # Web/Smartclient Port
@@ -179,13 +188,13 @@ services:
         condition: service_started
       dbaccess:
         condition: service_healthy
+    profiles:
+      - full
+      - with-rest
 
   smartview:
     image: juliansantosinfo/totvs_smartview:3.9.0.4558336
     container_name: totvs_smartview
-    profiles:
-      - full
-      - with-smartview
     restart: always
     ports:
       - '7017:7017'
@@ -197,19 +206,21 @@ services:
       - totvs_smartview_data:/totvs/smartview
     networks:
       - totvs
-
+    profiles:
+      - full
+      - with-smartview
 volumes:
   totvs_mssql_data:
     driver: local
   totvs_protheus_data:
     driver: local
-  totvs_apprest_apo:
-    driver: local
-  # totvs_apprest_data:
-  #   driver: local
   totvs_appserver_apo:
     driver: local
   # totvs_appserver_data:
+  #   driver: local
+  totvs_apprest_apo:
+    driver: local
+  # totvs_apprest_data:
   #   driver: local
   totvs_smartview_data:
     driver: local

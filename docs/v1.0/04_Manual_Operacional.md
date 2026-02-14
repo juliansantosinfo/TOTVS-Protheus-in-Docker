@@ -43,6 +43,7 @@ Acompanhar os logs é essencial para diagnosticar erros de compilação, falhas 
 | **License** | 5555 | 5555 | Comunicação de Licença |
 | **PostgreSQL**| 5432 | 5432 | Acesso SQL direto (DBeaver, pgAdmin) |
 | **MSSQL** | 1433 | 1433 | Acesso SQL direto (SSMS) |
+| **Oracle** | 1521 | 21521 | Acesso SQL direto (SQL Developer, DBeaver) |
 
 ## 4.3. Manutenção de Dados (Backup e Restore)
 
@@ -62,6 +63,13 @@ docker exec -t totvs_postgres_1 pg_dumpall -c -U postgres > dump_$(date +%Y%m%d)
 docker exec totvs_mssql_1 /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "SuaSenha" -Q "BACKUP DATABASE protheus TO DISK = '/var/opt/mssql/data/protheus.bak'"
 # 2. Copiar para o host
 docker cp totvs_mssql_1:/var/opt/mssql/data/protheus.bak ./backup_protheus.bak
+```
+
+**Oracle:**
+O Oracle XE permite exportação via `expdp` ou dump simples via `sqlplus`.
+```bash
+# Exportando via expdp (Data Pump)
+docker exec -it totvs_oracle expdp system/SuaSenha@localhost:1521/XE schemas=protheus directory=DATA_PUMP_DIR dumpfile=protheus.dmp
 ```
 
 ## 4.4. Atualização de Binários e RPO

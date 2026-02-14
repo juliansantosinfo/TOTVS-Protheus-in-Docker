@@ -18,7 +18,7 @@ flowchart TB
         SmartView["Container: SmartView<br>Relatórios"]
         DBAccess["Container: DBAccess<br>Middleware"]
         License["Container: LicenseServer"]
-        Database[("Container: Banco de Dados<br>PostgreSQL ou MSSQL")]
+        Database[("Container: Banco de Dados<br>PostgreSQL, MSSQL ou Oracle")]
   end
     Client["SmartClient / Browser"] -- Porta 23001/23002 --> AppServer
     ExtSystem["Sistemas Externos"] -- Porta 23180 --> AppRest
@@ -31,7 +31,7 @@ flowchart TB
 ## 2.2. Detalhamento dos Componentes
 
 ### 2.2.1. Serviço de Banco de Dados (Database Layer)
-O alicerce do sistema. O projeto suporta nativamente dois "sabores" de banco de dados, definidos através de arquivos Compose distintos.
+O alicerce do sistema. O projeto suporta nativamente três "sabores" de banco de dados, definidos através de arquivos Compose distintos.
 
 *   **Opção A: PostgreSQL (Recomendado)**
     *   **Imagem Base:** `postgres:15`
@@ -44,12 +44,19 @@ O alicerce do sistema. O projeto suporta nativamente dois "sabores" de banco de 
     *   **Função:** Alternativa robusta e tradicional para ambientes que espelham produção Windows.
     *   **Particularidades:** Exige aceitação de EULA. O script de inicialização é capaz de restaurar backups `.bak` automaticamente.
 
+*   **Opção C: Oracle Database (XE/Free)**
+    *   **Imagem Base:** `gvenzl/oracle-xe:21-slim`
+    *   **Função:** Suporte para ambientes que utilizam a tecnologia Oracle.
+    *   **Particularidades:** Configuração automatizada de usuário e schema Protheus no boot.
+
 ### 2.2.2. Middleware de Banco de Dados (DBAccess)
 *   **Imagem:** `totvs_dbaccess`
 *   **Função:** Atua como tradutor entre o AppServer (código ADVPL) e o Banco de Dados (SQL).
+*   **Inteligência de Inicialização:**
+    *   **Wait-for-Network:** O container agora possui mecanismos nativos de retentativa para aguardar a disponibilidade TCP do Banco de Dados e do License Server antes de iniciar, evitando falhas em cascata durante o boot frio da stack.
 *   **Configuração Dinâmica:**
-    *   No boot, o script `entrypoint.sh` detecta qual banco está sendo usado (Postgres ou MSSQL) através de variáveis de ambiente.
-    *   Ele configura automaticamente os drivers ODBC (`odbc.ini`) e o arquivo de configuração do serviço (`dbaccess.ini`).
+    *   No boot, o script `entrypoint.sh` detecta qual banco está sendo usado (Postgres, MSSQL ou Oracle) através de variáveis de ambiente.
+    *   Ele configura automaticamente os drivers ODBC (`odbc.ini`), o gerenciador de drivers (`odbcinst.ini`) e o arquivo de configuração do serviço (`dbaccess.ini`).
     *   Isso permite que a **mesma imagem Docker** sirva para conectar em qualquer banco suportado.
 
 ### 2.2.3. Servidor de Licenças (License Server)
@@ -89,7 +96,7 @@ Todos os containers são colocados em uma rede virtual Docker privada (`totvs`).
 ## 2.4. Volumes e Persistência de Dados
 O Docker é efêmero por natureza (arquivos somem se o container for deletado). Para evitar perda de dados, utilizamos Volumes Docker:
 
-*   **`postgres_data` / `mssql_data`:** Garante que o banco de dados não seja apagado.
+*   **`postgres_data` / `mssql_data` / `oracle_data`:** Garante que o banco de dados não seja apagado.
 *   **`protheus_data`:** Armazena o `protheus_data` para que atualizações persistam ou possam ser gerenciadas externamente.
 *   **`appserver_apo`**: Persiste o Repositório de Objetos (RPO).
 *   **`appserver_data`**: Persiste a pasta do binário do servidor de aplicação.
@@ -112,9 +119,9 @@ A aplicação é dividida em dois pacotes distintos para separar o que é "está
     *   `data/`: Logs e arquivos temporários.
     *   *Nota:* Esta separação facilita a persistência, pois o diretório `protheus_data` é o candidato ideal para ser montado em um volume.
 
-#### 2. Bancos de Dados (`mssql/resources/` e `postgres/resources/`)
+#### 2. Bancos de Dados (`mssql/resources/`, `postgres/resources/` e `oracle/resources/`)
 Para garantir que o Protheus inicie "pronto para logar" (`admin/admin`), os containers de banco de dados não rodam scripts SQL (`CREATE TABLE...`). Eles restauram uma estrutura física de banco já existente.
-*   **`data.tar.gz`**: Contém os arquivos de dados físicos do banco (`.mdf/.ldf` para MSSQL ou o diretório `PGDATA` completo para PostgreSQL).
+*   **`data.tar.gz`**: Contém os arquivos de dados físicos do banco (`.mdf/.ldf` para MSSQL, o diretório `PGDATA` completo para PostgreSQL ou o diretório `oradata` completo para Oracle).
 *   **Vantagem:** O tempo de inicialização do banco cai de horas (criação de milhares de tabelas do ERP) para segundos (apenas o start do serviço de banco).
 
 #### 3. SmartView (`smartview/totvs/`)
