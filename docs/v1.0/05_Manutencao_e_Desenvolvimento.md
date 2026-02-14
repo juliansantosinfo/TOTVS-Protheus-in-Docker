@@ -21,6 +21,12 @@ Se você precisar instalar dependências de SO adicionais (ex: bibliotecas Pytho
 ## 5.3. Entendendo os Entrypoints (Scripts de Inicialização)
 A inteligência de adaptabilidade do ambiente reside nos arquivos `entrypoint.sh`.
 
+**Validação e Padrões Inteligentes (DBAccess):**
+O projeto adota uma filosofia de "Fail Fast" com padrões sensatos:
+*   **Variáveis Obrigatórias:** `DATABASE_PROFILE`, `DATABASE_SERVER` e `DATABASE_PASSWORD`. Se não informadas, o container aborta a inicialização com erro explícito.
+*   **Defaults por Perfil:** Se `DATABASE_PORT` ou `DATABASE_USERNAME` não forem informados, o script detecta o perfil (MSSQL, Postgres ou Oracle) e aplica os valores padrão de mercado para cada tecnologia.
+*   **Resiliência:** Utiliza checks TCP via `/dev/tcp` para garantir conectividade antes de configurar arquivos `.ini`.
+
 **Exemplo: Como o DBAccess sabe o IP do banco?**
 No `dbaccess/entrypoint.sh`, existe uma lógica que lê a variável de ambiente `DATABASE_SERVER` (definida no docker-compose) e usa o comando `sed` (Stream Editor) para substituir um placeholder no arquivo `odbc.ini`.
 
