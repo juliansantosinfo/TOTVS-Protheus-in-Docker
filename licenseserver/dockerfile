@@ -8,6 +8,8 @@ ENV LICENSE_TCP_PORT=2234
 ENV LICENSE_CONSOLEFILE=/totvs/licenseserver/bin/appserver/licenseserver.log
 ENV LICENSE_PORT=5555
 ENV LICENSE_WEBAPP_PORT=8020
+ENV DEBUG_SCRIPT=false
+ENV TZ=America/Sao_Paulo
 
 COPY ./totvs /totvs
 COPY ./entrypoint.sh /entrypoint.sh

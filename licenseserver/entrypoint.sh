@@ -1,5 +1,10 @@
 #! /bin/bash
 
+# Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
+if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
+    set -x
+fi
+
 ######################################################################
 # SCRIPT:      entrypoint.sh
 # DESCRIÇÃO:   Ponto de entrada do container TOTVS License Server.

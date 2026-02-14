@@ -59,4 +59,5 @@ Caso queira construir a imagem localmente:
 | `LICENSE_TCP_PORT` | Porta TCP de comunicação. | `2234` |
 | `LICENSE_PORT` | Porta principal do serviço. | `5555` |
 | `LICENSE_WEBAPP_PORT`| Porta da interface web de monitoramento. | `8020` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |

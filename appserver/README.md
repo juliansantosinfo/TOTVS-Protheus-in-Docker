@@ -78,6 +78,8 @@ Caso queira construir a imagem localmente:
 | `APPSERVER_LICENSE_PORT` | Porta do License Server. | `5555` |
 | `APPSERVER_PORT` | Porta principal do AppServer. | `24001` |
 | `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `24002` |
-| `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `8080` |
+| `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `24180` |
 | `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `8088` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
+
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |

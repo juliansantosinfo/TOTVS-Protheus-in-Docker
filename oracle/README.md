@@ -55,4 +55,6 @@ Caso queira construir a imagem localmente:
 | Variável de Ambiente | Descrição | Conteúdo Padrão |
 |---|---|---|
 | `ORACLE_PASSWORD` | Senha para os usuários `SYS`, `SYSTEM`. | `ProtheusDatabasePassword1` |
+| `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
+| `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
