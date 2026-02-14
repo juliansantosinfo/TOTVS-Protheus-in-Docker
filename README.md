@@ -393,7 +393,6 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | Variável | Descrição | Padrão |
 |---|---|---|
 | `APPSERVER_MODE` | Modo de operação: `application` ou `rest`. | `application` |
-| `EXTRACT_RESOURCES`| Extrai `protheus.tar.gz` na inicialização (`true`/`false`). | `true` |
 | `APPSERVER_DBACCESS_DATABASE` | Tipo do banco de dados (`POSTGRES`, `MSSQL` ou `ORACLE`). | `MSSQL` |
 | `APPSERVER_DBACCESS_SERVER` | Host do serviço DBAccess. | `totvs_dbaccess` |
 | `APPSERVER_DBACCESS_PORT` | Porta do serviço DBAccess. | `7890` |
@@ -412,6 +411,11 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `APPSERVER_SQLITE_INSTANCES`| Configuração de instâncias do `SQLite`. | `1,10,1,1` |
 | `APPSERVER_MULTIPROTOCOLPORTSECURE`| Porta segura para múltiplos protocolos (0 para desativar). | `0` |
 | `APPSERVER_MULTIPROTOCOLPORT`| Porta para múltiplos protocolos. | `1` |
+| `LICENSE_WAIT_RETRIES` | Número de tentativas de conexão com o License Server. | `30` |
+| `LICENSE_WAIT_INTERVAL` | Intervalo em segundos entre tentativas. | `2` |
+| `DBACCESS_WAIT_RETRIES` | Número de tentativas de conexão com o DBAccess. | `30` |
+| `DBACCESS_WAIT_INTERVAL` | Intervalo em segundos entre tentativas. | `2` |
+| `EXTRACT_RESOURCES`| Extrai `protheus.tar.gz` na inicialização (`true`/`false`). | `true` |
 | `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
 
