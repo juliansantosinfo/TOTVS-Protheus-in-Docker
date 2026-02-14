@@ -10,6 +10,8 @@ USER root
 # Variáveis de ambiente
 ENV ORACLE_PASSWORD=ProtheusDatabasePassword1
 ENV RESTORE_BACKUP=Y
+ENV DEBUG_SCRIPT=false
+ENV TZ=America/Sao_Paulo
 
 # Copiar scripts e recursos
 COPY ./resources/data.tar.gz /tmp/data.tar.gz

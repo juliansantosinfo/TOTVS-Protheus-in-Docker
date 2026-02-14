@@ -5,6 +5,7 @@ LABEL description="TOTVS SmartView Server"
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
 ENV EXTRACT_RESOURCES=true
+ENV DEBUG_SCRIPT=false
 ENV TZ=America/Sao_Paulo
 
 COPY ./totvs /totvs

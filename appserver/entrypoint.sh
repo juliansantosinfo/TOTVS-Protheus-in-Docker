@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+# Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
+if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
+    set -x
+fi
+
 # set -euo pipefail
 
 ######################################################################
