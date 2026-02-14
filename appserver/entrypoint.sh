@@ -5,6 +5,51 @@ if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
     set -x
 fi
 
+#---------------------------------------------------------------------
+
+## 🚀 AGUARDANDO DISPONIBILIDADE DA INFRAESTRUTURA (NETWORK CHECK)
+
+    echo ""
+    echo "------------------------------------------------------"
+    echo "⏳ AGUARDANDO DISPONIBILIDADE DA INFRAESTRUTURA"
+    echo "------------------------------------------------------"
+
+    # 1. Validando License Server
+    RETRIES_LIC=0
+    MAX_RETRIES_LIC="${LICENSE_WAIT_RETRIES:-30}"
+    INTERVAL_LIC="${LICENSE_WAIT_INTERVAL:-2}"
+
+    echo "🔍 Verificando conectividade com License Server ($APPSERVER_LICENSE_SERVER:$APPSERVER_LICENSE_PORT)..."
+    until timeout 1 bash -c "echo > /dev/tcp/$APPSERVER_LICENSE_SERVER/$APPSERVER_LICENSE_PORT" > /dev/null 2>&1; do
+        RETRIES_LIC=$((RETRIES_LIC + 1))
+        if [ $RETRIES_LIC -ge "$MAX_RETRIES_LIC" ]; then
+            echo "❌ ERRO: O License Server em $APPSERVER_LICENSE_SERVER:$APPSERVER_LICENSE_PORT não ficou disponível após $MAX_RETRIES_LIC tentativas."
+            exit 1
+        fi
+        echo "  - [$RETRIES_LIC/$MAX_RETRIES_LIC] License Server ainda não responde. Aguardando ${INTERVAL_LIC}s..."
+        sleep "$INTERVAL_LIC"
+    done
+    echo "✅ Conexão TCP estabelecida com o License Server!"
+
+    # 2. Validando DBAccess
+    RETRIES_DBA=0
+    MAX_RETRIES_DBA="${DBACCESS_WAIT_RETRIES:-30}"
+    INTERVAL_DBA="${DBACCESS_WAIT_INTERVAL:-2}"
+
+    echo "🔍 Verificando conectividade com DBAccess ($APPSERVER_DBACCESS_SERVER:$APPSERVER_DBACCESS_PORT)..."
+    until timeout 1 bash -c "echo > /dev/tcp/$APPSERVER_DBACCESS_SERVER/$APPSERVER_DBACCESS_PORT" > /dev/null 2>&1; do
+        RETRIES_DBA=$((RETRIES_DBA + 1))
+        if [ $RETRIES_DBA -ge "$MAX_RETRIES_DBA" ]; then
+            echo "❌ ERRO: O DBAccess em $APPSERVER_DBACCESS_SERVER:$APPSERVER_DBACCESS_PORT não ficou disponível após $MAX_RETRIES_DBA tentativas."
+            exit 1
+        fi
+        echo "  - [$RETRIES_DBA/$MAX_RETRIES_DBA] DBAccess ainda não responde. Aguardando ${INTERVAL_DBA}s..."
+        sleep "$INTERVAL_DBA"
+    done
+    echo "✅ Conexão TCP estabelecida com o DBAccess!"
+
+#---------------------------------------------------------------------
+
 # set -euo pipefail
 
 ######################################################################

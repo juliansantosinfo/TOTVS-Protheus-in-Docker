@@ -80,6 +80,10 @@ Caso queira construir a imagem localmente:
 | `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `24002` |
 | `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `24180` |
 | `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `8088` |
+| `LICENSE_WAIT_RETRIES` | Número de tentativas de conexão com o License Server. | `30` |
+| `LICENSE_WAIT_INTERVAL` | Intervalo em segundos entre tentativas. | `2` |
+| `DBACCESS_WAIT_RETRIES` | Número de tentativas de conexão com o DBAccess. | `30` |
+| `DBACCESS_WAIT_INTERVAL` | Intervalo em segundos entre tentativas. | `2` |
 | `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
 
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
