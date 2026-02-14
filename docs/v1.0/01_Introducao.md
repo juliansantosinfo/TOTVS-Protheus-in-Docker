@@ -21,7 +21,7 @@ A principal filosofia adotada é a de **"Infraestrutura como Código" (IaC)**, o
 1.  **Padronização:** Elimina o problema de "funciona na minha máquina". Todos os desenvolvedores e ambientes de teste rodam exatamente as mesmas versões de binários e configurações.
 2.  **Agilidade:** A criação de um novo ambiente completo, que antes levava horas ou dias, é reduzida para minutos (ou segundos, após o primeiro build).
 3.  **Isolamento:** Cada componente roda em seu próprio container, evitando conflitos de dependências (DLLs, bibliotecas do sistema operacional, portas).
-4.  **Facilidade de Teste:** Permite testar diferentes versões do Protheus (RPO, binários) ou bancos de dados (MSSQL vs PostgreSQL) simplesmente alterando uma variável de ambiente.
+4.  **Facilidade de Teste:** Permite testar diferentes versões do Protheus (RPO, binários) ou bancos de dados (MSSQL, PostgreSQL ou Oracle) simplesmente alterando uma variável de ambiente.
 
 ## 1.3. Escopo e Limitações
 Este projeto foca em **ambientes de Desenvolvimento, Homologação e Testes**.
