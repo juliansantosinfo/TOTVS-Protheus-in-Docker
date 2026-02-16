@@ -10,5 +10,6 @@ appserver/totvs/protheus_data.tar.gz
 dbaccess/totvs/dbaccess
 licenseserver/totvs/licenseserver
 mssql/resources/data.tar.gz
+oracle/resources/data.tar.gz
 postgres/resources/data.tar.gz
 smartview/totvs/smartview.tar.gz
