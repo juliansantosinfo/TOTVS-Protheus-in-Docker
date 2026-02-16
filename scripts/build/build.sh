@@ -134,60 +134,6 @@ for APP_NAME in "${APPS_TO_BUILD[@]}"; do
 done
 
 # ----------------------------------------------------
-#               PUSH DE IMAGENS PARA DOCKERHUB
-# ----------------------------------------------------
-
-echo ""
-echo "--- Etapa: Publicação no DockerHub ---"
-
-# Lembrete de Login: Garante que o usuário esteja autenticado.
-echo "⚠️ Certifique-se de estar logado no Docker Hub: (docker login)"
-read -p "Deseja enviar TODAS as imagens criadas para o DockerHub? (s/n) " execute_push
-
-if [[ "$execute_push" =~ ^[Ss]$ ]]; then
-
-    echo ">>> 🔄 INICIANDO PUSH PARA DOCKERHUB: <<<"
-
-    # Usando a estrutura <USUARIO>/<IMAGEM>:<TAG> para cada serviço.
-    readonly DOCKER_TAG_APPSERVER="${DOCKER_USER}/${APPSERVER_IMAGE_NAME}:${APPSERVER_VERSION}"
-    readonly DOCKER_TAG_DBACCESS="${DOCKER_USER}/${DBACCESS_IMAGE_NAME}:${DBACCESS_VERSION}"
-    readonly DOCKER_TAG_LICENSE="${DOCKER_USER}/${LICENSESERVER_IMAGE_NAME}:${LICENSESERVER_VERSION}"
-    readonly DOCKER_TAG_MSSQL="${DOCKER_USER}/${MSSQL_IMAGE_NAME}:${MSSQL_VERSION}"
-    readonly DOCKER_TAG_POSTGRES="${DOCKER_USER}/${POSTGRES_IMAGE_NAME}:${POSTGRES_VERSION}"
-    readonly DOCKER_TAG_ORACLE="${DOCKER_USER}/${ORACLE_IMAGE_NAME}:${ORACLE_VERSION}"
-    readonly DOCKER_TAG_SMARTVIEW="${DOCKER_USER}/${SMARTVIEW_IMAGE_NAME}:${SMARTVIEW_VERSION}"
-
-    readonly IMAGES_TO_PUSH=(
-        "$DOCKER_TAG_APPSERVER"
-        "$DOCKER_TAG_DBACCESS"
-        "$DOCKER_TAG_LICENSE"
-        "$DOCKER_TAG_MSSQL"
-        "$DOCKER_TAG_POSTGRES"
-        "$DOCKER_TAG_ORACLE"
-        "$DOCKER_TAG_SMARTVIEW"
-    )
-    
-    # Itera sobre o array de tags e envia uma por uma.
-    for tag in "${IMAGES_TO_PUSH[@]}"; do
-        echo "➡️ Enviando imagem: $tag"
-        # O 'set -e' no início do script garantirá que ele pare se qualquer 'docker push' falhar.
-        if docker push "$tag"; then
-            echo "✅ Push de '$tag' concluído."
-        else
-            echo "❌ Falha ao enviar '$tag'. Continuar ou abortar?" >&2
-            # Se você quiser que o script pare na falha, não precisa do 'if/else',
-            # o 'set -e' já cuida disso. Mantive o 'if' para melhor feedback.
-        fi
-    done
-    
-    echo "🎉 Processo de Push finalizado."
-    echo ">>> FIM DO PUSH PARA DOCKERHUB <<<"
-    echo ""
-else
-    echo "⏭️ Push para DockerHub ignorado."
-fi
-
-# ----------------------------------------------------
 #               FINALIZAÇÃO
 # ----------------------------------------------------
 
