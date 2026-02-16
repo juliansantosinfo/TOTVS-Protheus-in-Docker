@@ -1,21 +1,18 @@
 #!/bin/bash
-
-######################################################################
-# SCRIPT:      setup-build.sh
-# DESCRIÇÃO:   Instala dependências para container TOTVS DbAccess no 
-#              Oracle Linux 8-slim, com microdnf.
-# AUTOR:       Julian de Almeida Santos
-# DATA:        2025-10-18
 #
-# OBJETIVOS:
-# - Atualizar pacotes do sistema
-# - Instalar dependências básicas (unixODBC, wget, etc.)
-# - Copiar arquivos de configuração ODBC
-# - Configurar permissões de execução para scripts de entrypoint e setup
-#
-######################################################################
+# ==============================================================================
+# SCRIPT: setup-build.sh
+# DESCRIÇÃO: Instala dependências para container TOTVS DbAccess no 
+#            Oracle Linux 8-slim, com microdnf.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-18
+# USO: ./setup-build.sh
+# ==============================================================================
 
-set -e  # Encerra o script em caso de erro
+# Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
+if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
+    set -x
+fi
 
 #---------------------------------------------------------------------
 

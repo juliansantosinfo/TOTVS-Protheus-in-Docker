@@ -1,4 +1,19 @@
 #!/bin/bash
+#
+# ==============================================================================
+# SCRIPT: build.sh
+# DESCRIÇÃO: Responsável por realizar o build da imagem Docker para o serviço 
+#            TOTVS SmartView.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-02-05
+# USO: ./build.sh [plain | auto | tty]
+#      - Argumento 1 (progress): Controla o formato do output do Docker (padrão: auto).
+# ==============================================================================
+
+# --- Configuração de Robustez (Boas Práticas Bash) ---
+# -e: Sai imediatamente se um comando falhar.
+# -u: Trata variáveis não definidas como erro.
+# -o pipefail: Garante que um pipeline (ex: cat | tar) falhe se qualquer comando falhar.
 set -euo pipefail
 
 readonly REQUIRED_DIR_NAME="smartview"

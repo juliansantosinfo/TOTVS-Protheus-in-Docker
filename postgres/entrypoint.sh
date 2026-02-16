@@ -1,5 +1,14 @@
 #!/bin/bash
-# entrypoint.sh
+#
+# ==============================================================================
+# SCRIPT: entrypoint.sh
+# DESCRIÇÃO: Ponto de entrada do container PostgreSQL. Configura localização 
+#            (locale), inicializa a estrutura de dados e delega para o 
+#            entrypoint oficial do PostgreSQL.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-19
+# USO: ./entrypoint.sh
+# ==============================================================================
 
 # Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
@@ -8,17 +17,6 @@ fi
 
 # Garante que o script será encerrado em caso de erro
 set -e
-
-######################################################################
-# SCRIPT:      entrypoint.sh
-# DESCRIÇÃO:   Ponto de entrada do container PostgreSQL.
-#              Configurações de localização (locale), inicialização 
-#              da estrutura de dados do banco e delega para o 
-#              entrypoint oficial do PostgreSQL.
-# AUTOR:       Julian de Almeida Santos
-# DATA:        2025-10-19
-#
-######################################################################
 
 # ---------------------------------------------------------------------
 

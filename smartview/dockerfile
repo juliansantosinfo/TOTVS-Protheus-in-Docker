@@ -34,8 +34,9 @@ RUN microdnf update -y \
 RUN fc-cache -fv
 
 COPY ./entrypoint.sh /entrypoint.sh
+COPY ./healthcheck.sh /healthcheck.sh
 
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh /healthcheck.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 

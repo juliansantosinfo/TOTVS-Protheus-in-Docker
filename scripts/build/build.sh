@@ -1,19 +1,19 @@
 #!/bin/bash
 #
 # ==============================================================================
-# SCRIPT: master-build.sh
+# SCRIPT: build.sh
 # DESCRIÇÃO: Script mestre para automatizar o processo de build de múltiplas
 #            aplicações Docker (appserver, dbaccess, etc.) a partir da raiz do projeto.
 #            Se nenhuma aplicação for especificada, todas serão construídas.
-# AUTOR: Julian de Almeidad Santos
+# AUTOR: Julian de Almeida Santos
 # DATA: 2025-10-12
-# USO: ./master-build.sh [<app1> [app2] [...]] [plain | auto | tty]
+# USO: ./scripts/build/build.sh [<app1> [app2] [...]] [plain | auto | tty]
 #
-# Exemplo 1: ./master-build.sh # Constrói TODAS as aplicações
-# Exemplo 2: ./master-build.sh appserver dbaccess
-# Exemplo 3: ./master-build.sh licenseserver plain
+# Exemplo 1: ./scripts/build/build.sh # Constrói TODAS as aplicações
+# Exemplo 2: ./scripts/build/build.sh appserver dbaccess
+# Exemplo 3: ./scripts/build/build.sh licenseserver plain
 #
-# Argumentos obrigatórios (se fornecidos): Nomes das aplicações (appserver, dbaccess, licenseserver, mssql, postgres, smartview).
+# Argumentos obrigatórios (se fornecidos): Nomes das aplicações (appserver, dbaccess, licenseserver, mssql, postgres, oracle, smartview).
 # Argumentos opcionais (devem vir por último):
 #   - Modo de Progress (Argumento 1): 'plain', 'auto', ou 'tty' (Opcional, padrão no script filho).
 # ==============================================================================

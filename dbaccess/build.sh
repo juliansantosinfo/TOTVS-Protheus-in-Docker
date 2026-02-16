@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # ==============================================================================
-# SCRIPT: build.sh (Versão Final e Completa)
+# SCRIPT: build.sh
 # DESCRIÇÃO: Responsável por realizar o build da imagem Docker para o serviço DBAccess
 #            TOTVS e restaurar ou atualizar dependências da aplicação.
 # AUTOR: Julian de Almeida Santos

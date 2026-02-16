@@ -7,26 +7,21 @@ LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 
 USER root
 
-# Variáveis obrigatórias de configuração do SQL Server
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=ProtheusDatabasePassword1
 ENV RESTORE_BACKUP=Y
 ENV DEBUG_SCRIPT=false
 ENV TZ=America/Sao_Paulo
 
-
-# Copiar o backup compactado para dentro da imagem
 COPY ./resources/data.tar.gz /tmp/data.tar.gz
 COPY entrypoint.sh /entrypoint.sh
+COPY healthcheck.sh /healthcheck.sh
 
-# Ajustar permissões para entrypoint.sh
-RUN chown -R root:root /entrypoint.sh && \
-    chmod -R 770 /entrypoint.sh
+RUN chown -R mssql:root /entrypoint.sh /healthcheck.sh && \
+    chmod -R 770 /entrypoint.sh /healthcheck.sh
 
 USER mssql
 
-# Expor a porta padrão
 EXPOSE 1433
 
-# Comando padrão para iniciar o SQL Server
 CMD ["/entrypoint.sh"]

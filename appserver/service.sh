@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
-if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
-    set -x
-fi
-
 ######################################################################
 # SCRIPT:      service.sh
 # DESCRIÇÃO:   Inicia, para ou reinicia o serviço TOTVS Protheus (AppServer).
@@ -15,6 +10,11 @@ fi
 #                       que são passadas para o arquivo appserver.ini.
 #
 ######################################################################
+
+# Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
+if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
+    set -x
+fi
 
 # Define variáveis de controle de fluxo
 start=false

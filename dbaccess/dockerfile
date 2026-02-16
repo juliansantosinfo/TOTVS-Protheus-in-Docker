@@ -23,13 +23,14 @@ ENV TZ=America/Sao_Paulo
 
 COPY ./totvs /totvs
 COPY ./entrypoint.sh /entrypoint.sh
+COPY ./healthcheck.sh /healthcheck.sh
 COPY ./setup-build.sh /setup-build.sh
 COPY ./setup-database.sh /setup-database.sh
 COPY ./setup-dbaccess.sh /setup-dbaccess.sh
 
 WORKDIR /totvs
 
-RUN chmod +x /entrypoint.sh /setup-build.sh /setup-database.sh /setup-dbaccess.sh \
+RUN chmod +x /entrypoint.sh /healthcheck.sh /setup-build.sh /setup-database.sh /setup-dbaccess.sh \
     && /setup-build.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]

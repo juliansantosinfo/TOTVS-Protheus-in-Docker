@@ -1,7 +1,11 @@
 #!/bin/bash
+#
 # ==============================================================================
-# SCRIPT: validate-commit-msg.sh
+# SCRIPT: commit-msg.sh
 # DESCRIÇÃO: Valida se a mensagem do commit segue o padrão Conventional Commits.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./scripts/validation/commit-msg.sh <arquivo_da_mensagem>
 # ==============================================================================
 
 COMMIT_MSG_FILE=$1

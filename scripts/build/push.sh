@@ -1,13 +1,18 @@
 #!/bin/bash
+#
 # ==============================================================================
-# SCRIPT: scripts/push.sh
-# DESCRIPTION: Master script to push all Docker images to Docker Hub.
-#              Calls the individual push.sh script in each service directory.
+# SCRIPT: push.sh
+# DESCRIÇÃO: Script mestre para enviar todas as imagens Docker para o Docker Hub.
+#            Chama o script push.sh individual de cada serviço.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./scripts/build/push.sh
 # ==============================================================================
 
+# --- Configuração de Robustez (Boas Práticas Bash) ---
 set -euo pipefail
 
-readonly VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "smartview")
+readonly VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
 APPS_TO_PUSH=("${VALID_APPS[@]}")
 
 echo "=========================================================="

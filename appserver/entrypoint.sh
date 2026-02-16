@@ -1,4 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/bash
+#
+# ==============================================================================
+# SCRIPT: entrypoint.sh
+# DESCRIÇÃO: Ponto de entrada do container AppServer. Realiza validações de rede,
+#            extração de recursos e inicialização do servidor Protheus.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./entrypoint.sh
+# ==============================================================================
 
 # Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then

@@ -26,5 +26,9 @@ if [ $? -ne 0 ]; then exit 1; fi
 ./scripts/validation/lint-dockerfile.sh
 if [ $? -ne 0 ]; then exit 1; fi
 
+# 6. Validação de Sintaxe Docker Compose
+./scripts/validation/lint-compose.sh
+if [ $? -ne 0 ]; then exit 1; fi
+
 echo "✅ Todas as validações passaram!"
 exit 0

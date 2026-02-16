@@ -1,7 +1,11 @@
 #!/bin/bash
+#
 # ==============================================================================
-# SCRIPT: scan-secrets.sh
+# SCRIPT: secrets.sh
 # DESCRIÇÃO: Verifica se há possíveis segredos expostos nos arquivos estagiados.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./scripts/validation/secrets.sh
 # ==============================================================================
 
 echo "🔍 Verificando segredos em arquivos estagiados..."
