@@ -14,7 +14,7 @@ services:
     user: root
     restart: always
     ports:
-      - '25432:5432'
+      - '5432:5432'
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -103,10 +103,8 @@ services:
         soft: 65536
         hard: 65536
     ports:
-      - '25001:25001' # AppServer Port
-      - '25002:25002' # Web/Smartclient Port
-      - '25080:8080' # Rest Port
-      - '25088:8088' # Web Manager Port
+      - '1234:1234' # AppServer Port
+      - '12345:12345' # Web/Smartclient Port
     environment:
       APPSERVER_MODE: application
       APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
@@ -119,10 +117,8 @@ services:
       APPSERVER_MULTIPROTOCOLPORT: 1
       APPSERVER_LICENSE_SERVER: totvs_licenseserver
       APPSERVER_LICENSE_PORT: 5555
-      APPSERVER_PORT: 25001
-      APPSERVER_WEB_PORT: 25002
-      APPSERVER_REST_PORT: 8080
-      APPSERVER_WEB_MANAGER: 8088
+      APPSERVER_PORT: 1234
+      APPSERVER_WEB_PORT: 12345
       EXTRACT_RESOURCES: 'true'
       TZ: ${TZ}
     volumes:
@@ -152,10 +148,9 @@ services:
         soft: 65536
         hard: 65536
     ports:
-      - '25101:25101' # AppServer Port
-      - '25102:25102' # Web/Smartclient Port
-      - '25180:8080' # REST Port
-      - '25188:8088' # Web Manager Port
+      - '3234:3234' # AppServer Port
+      - '32345:32345' # Web/Smartclient Port
+      - '8080:8080' # REST Port
     environment:
       APPSERVER_MODE: rest
       APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
@@ -168,10 +163,9 @@ services:
       APPSERVER_MULTIPROTOCOLPORT: 1
       APPSERVER_LICENSE_SERVER: totvs_licenseserver
       APPSERVER_LICENSE_PORT: 5555
-      APPSERVER_PORT: 25101
-      APPSERVER_WEB_PORT: 25102
+      APPSERVER_PORT: 3234
+      APPSERVER_WEB_PORT: 32345
       APPSERVER_REST_PORT: 8080
-      APPSERVER_WEB_MANAGER: 8088
       EXTRACT_RESOURCES: 'true'
       TZ: ${TZ}
     volumes:
