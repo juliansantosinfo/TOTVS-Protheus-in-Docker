@@ -1,7 +1,11 @@
 #!/bin/bash
+#
 # ==============================================================================
-# SCRIPT: validate-env.sh
-# DESCRIÇÃO: Garante que todas as chaves do .env local estejam no .env.example
+# SCRIPT: env.sh
+# DESCRIÇÃO: Garante que todas as chaves do .env local estejam no .env.example.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./scripts/validation/env.sh
 # ==============================================================================
 
 if [ -f ".env" ] && [ -f ".env.example" ]; then

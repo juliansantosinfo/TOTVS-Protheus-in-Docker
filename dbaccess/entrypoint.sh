@@ -1,19 +1,18 @@
 #!/bin/bash
+#
+# ==============================================================================
+# SCRIPT: entrypoint.sh
+# DESCRIÇÃO: Ponto de entrada do container DBAccess. Realiza a configuração do
+#              Banco de Dados e a inicialização do serviço TOTVS DBAccess.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-18
+# USO: ./entrypoint.sh
+# ==============================================================================
 
 # Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
     set -x
 fi
-
-######################################################################
-# SCRIPT:      entrypoint.sh
-# DESCRIÇÃO:   Ponto de entrada principal. Executa a configuração do
-#              Banco de Dados e, em seguida, a configuração e 
-#              inicialização do serviço TOTVS DBAccess.
-# AUTOR:       Julian de Almeida Santos
-# DATA:        2025-10-18
-#
-######################################################################
 
 # Variáveis de path para os scripts de configuração
 SETUP_DATABASE_SCRIPT="/setup-database.sh"

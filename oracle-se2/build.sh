@@ -239,12 +239,35 @@ echo "$DOCKERFILE"
 
 # Oracle Database image Name
 # If provided using -t build option then use it; Otherwise, create with version and edition
-if [ -z "${IMAGE_NAME}" ]; then
-  IMAGE_NAME="oracle/database:${VERSION}-${EDITION}"
-  if [ ${BASE_ONLY} -eq 1 ]; then
-    IMAGE_NAME="oracle/database:${VERSION}-base"
-  fi
-fi;
+# --- Carregar Versões Centralizadas ---
+
+# -------------------------------------------
+# --- Define tag e versão da imagem       ---
+# --- Start - By Julian de Almeida Santos ---
+# -------------------------------------------
+if [ -f "versions.env" ]; then
+    source "versions.env"
+elif [ -f "../versions.env" ]; then
+    source "../versions.env"
+else
+    echo "🚨 Erro: Arquivo 'versions.env' não encontrado."
+    exit 1
+fi
+# --- Componentes da Docker Tag (Separados para fácil manutenção) ---
+readonly DOCKER_IMAGE_TAG="${ORACLE_SE2_VERSION}"
+readonly DOCKER_TAG="${DOCKER_USER}/${ORACLE_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+IMAGE_NAME="$DOCKER_TAG"
+# -------------------------------------------
+# --- Define tag e versão da imagem       ---
+# --- End - By Julian de Almeida Santos   ---
+# -------------------------------------------
+
+# if [ -z "${IMAGE_NAME}" ]; then
+#   IMAGE_NAME="oracle/database:${VERSION}-${EDITION}"
+#   if [ ${BASE_ONLY} -eq 1 ]; then
+#     IMAGE_NAME="oracle/database:${VERSION}-base"
+#   fi
+# fi;
 
 if [ ${BASE_ONLY} -eq 0 ] && [ ! "${SKIPMD5}" -eq 1 ]; then
   checksumPackages

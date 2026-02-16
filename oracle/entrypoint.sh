@@ -1,5 +1,13 @@
 #!/bin/bash
-# entrypoint.sh
+#
+# ==============================================================================
+# SCRIPT: entrypoint.sh
+# DESCRIÇÃO: Ponto de entrada do container Oracle. Inicializa a estrutura de 
+#            dados se necessário e inicia o serviço Oracle.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-19
+# USO: ./entrypoint.sh
+# ==============================================================================
 
 # Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
@@ -8,15 +16,6 @@ fi
 
 # Garante que o script será encerrado em caso de erro
 set -e
-
-######################################################################
-# SCRIPT:      entrypoint.sh
-# DESCRIÇÃO:   Ponto de entrada do container Oracle.
-#              Inicializa a estrutura de dados se necessário
-#              e inicia o serviço Oracle.
-# AUTOR:       Julian de Almeida Santos
-# DATA:        2025-10-19
-######################################################################
 
 # ---------------------------------------------------------------------
 

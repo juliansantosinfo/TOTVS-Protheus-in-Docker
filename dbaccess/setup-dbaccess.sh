@@ -1,26 +1,19 @@
 #!/bin/bash
+#
+# ==============================================================================
+# SCRIPT: setup-dbaccess.sh
+# DESCRIÇÃO: Inicializa e configura o serviço TOTVS DBAccess. Realiza validações
+#            de variáveis de ambiente, verificação de rede (License Server) e
+#            configuração do arquivo INI.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-18
+# USO: ./setup-dbaccess.sh
+# ==============================================================================
 
 # Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
     set -x
 fi
-
-######################################################################
-# SCRIPT:      setup-dbaccess.sh
-# DESCRIÇÃO:   Inicializa e configura o serviço TOTVS DBAccess.
-# AUTOR:       Julian de Almeida Santos
-# DATA:        2025-10-18
-#
-# VARIAVEIS DE AMBIENTE REQUERIDAS:
-# - DATABASE_PROFILE....: Define o SGBD a ser configurado (MSSQL ou POSTGRES).
-# - DATABASE_ALIAS      : Define Alias ODBC.
-# - DATABASE_SERVER     : Define host para o Servidor de Banco de Dados.
-# - DATABASE_PORT       : Define porta para o Servidor de Banco de Dados.
-# - DATABASE_NAME       : Define nome do Banco de Dados.
-# - DATABASE_USERNAME   : Define usuário para o Servidor de Banco de Dados.
-# - DATABASE_PASSWORD   : Define senha para o Servidor de Banco de Dados.
-#
-######################################################################
 
 title="TOTVS DBAccess 23.1.1.4"
 prog="dbaccess64"
