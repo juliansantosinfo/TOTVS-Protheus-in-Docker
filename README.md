@@ -72,10 +72,10 @@ flowchart TB
         Middleware
         Application
   end
-    Browser -- HTTP: 23002 --> APP
-    Browser -- SmartClient: 23001 --> APP
+    Browser -- HTTP: 12345 --> APP
+    Browser -- SmartClient: 1234 --> APP
     Browser -- HTTP: 7017 --> SmartView
-    ExternalAPI -- HTTP: 23180 --> REST
+    ExternalAPI -- HTTP: 8080 --> REST
     APP -- TCP: 7890 --> DBA
     REST -- TCP: 7890 --> DBA
     SmartView -- API --> REST
@@ -208,8 +208,8 @@ docker compose -f docker-compose-postgresql.yaml --profile with-rest --profile w
 > **Nota:** Os perfis funcionam da mesma forma para todos os bancos de dados (PostgreSQL, MSSQL e Oracle).
 
 4.  Acesse a aplicação:
-    *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:23002>
-    *   **Credenciais (Release 12.1.2310):**
+    *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:12345>
+    *   **Credenciais (Release 12.1.2510):**
         *   **Usuário:** `admin`
         *   **Senha:** `Docker@123`
 
@@ -296,11 +296,11 @@ Para executar cada contêiner individualmente (sem Docker Compose), siga os pass
         ```
     *   **AppServer (Modo Aplicação):**
         ```bash
-        docker run -d --name totvs_appserver --network totvs -p 23001:23001 -p 23002:23002 -e "APPSERVER_MODE=application" juliansantosinfo/totvs_appserver:latest
+        docker run -d --name totvs_appserver --network totvs -p 1234:1234 -p 12345:12345 -e "APPSERVER_MODE=application" juliansantosinfo/totvs_appserver:latest
         ```
     *   **AppServer (Modo REST):**
         ```bash
-        docker run -d --name totvs_apprest --network totvs -p 23180:23180 -e "APPSERVER_MODE=rest" juliansantosinfo/totvs_appserver:latest
+        docker run -d --name totvs_apprest --network totvs -p 8080:8080 -e "APPSERVER_MODE=rest" juliansantosinfo/totvs_appserver:latest
         ```
     *   **SmartView:**
         ```bash
@@ -399,10 +399,9 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `APPSERVER_DBACCESS_ALIAS` | Alias da conexão com o banco. | `protheus` |
 | `APPSERVER_LICENSE_SERVER` | Host do License Server. | `totvs_licenseserver` |
 | `APPSERVER_LICENSE_PORT` | Porta do License Server. | `5555` |
-| `APPSERVER_PORT` | Porta principal do AppServer (modo `application`). | `23001` |
-| `APPSERVER_WEB_PORT` | Porta da interface web/Smartclient (modo `application`). | `23002` |
-| `APPSERVER_REST_PORT` | Porta do serviço REST (modo `rest`). | `23180` |
-| `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `23088` |
+| `APPSERVER_PORT` | Porta principal do AppServer (modo `application`). | `1234` |
+| `APPSERVER_WEB_PORT` | Porta da interface web/Smartclient (modo `application`). | `12345` |
+| `APPSERVER_REST_PORT` | Porta do serviço REST (modo `rest`). | `8080` |
 | `APPSERVER_CONSOLEFILE`| Caminho do arquivo de log do serviço. | `/totvs/protheus/bin/appserver/appserver.log` |
 | `APPSERVER_RPO_CUSTOM` | Caminho para o RPO customizado. | `/totvs/protheus/apo/custom.rpo` |
 | `APPSERVER_ENVIRONMENT_LOCALFILES`| Tipo de banco para arquivos locais (`SQLite`). | `SQLITE` |

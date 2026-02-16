@@ -36,9 +36,9 @@ Acompanhar os logs é essencial para diagnosticar erros de compilação, falhas 
 ### Mapeamento de Portas Padrão
 | Serviço | Porta Interna | Porta Host (Localhost) | Descrição |
 | :--- | :--- | :--- | :--- |
-| **AppServer** | 23002 | 23002 | Interface Web (WebApp) / SmartClient HTML |
-| **AppServer** | 23001 | 23001 | Interface TCP |
-| **AppRest** | 23180 | 23180 | API REST |
+| **AppServer** | 12345 | 12345 | Interface Web (WebApp) / SmartClient HTML |
+| **AppServer** | 1234 | 1234 | Interface TCP |
+| **AppRest** | 8080 | 8080 | API REST |
 | **DBAccess** | 7890 | 7890 | Monitor do DBAccess |
 | **License** | 5555 | 5555 | Comunicação de Licença |
 | **PostgreSQL**| 5432 | 5432 | Acesso SQL direto (DBeaver, pgAdmin) |

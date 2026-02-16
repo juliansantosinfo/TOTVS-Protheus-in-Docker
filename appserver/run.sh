@@ -19,8 +19,7 @@ readonly DOCKER_TAG="${DOCKER_USER}/${APPSERVER_IMAGE_NAME}:${APPSERVER_VERSION}
 
 docker run -d \
     --name totvs_appserver \
-    -p 23001:23001 \
-    -p 23002:23002 \
+    -p 1234:1234 \
+    -p 12345:12345 \
     -p 8080:8080 \
-    -p 8088:8088
     "${DOCKER_TAG}"
