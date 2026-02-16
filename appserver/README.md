@@ -35,8 +35,8 @@ Esta imagem é versátil e pode operar em dois modos distintos, configurados atr
         docker run -d \
           --name totvs_appserver \
           --network totvs \
-          -p 24001:24001 \
-          -p 24002:24002 \
+          -p 1234:1234 \
+          -p 12345:12345 \
           -e "APPSERVER_MODE=application" \
           juliansantosinfo/totvs_appserver:latest
         ```
@@ -46,7 +46,7 @@ Esta imagem é versátil e pode operar em dois modos distintos, configurados atr
         docker run -d \
           --name totvs_apprest \
           --network totvs \
-          -p 24180:24180 \
+          -p 8080:8080 \
           -e "APPSERVER_MODE=rest" \
           juliansantosinfo/totvs_appserver:latest
         ```
@@ -76,10 +76,9 @@ Caso queira construir a imagem localmente:
 | `APPSERVER_DBACCESS_ALIAS` | Alias da conexão com o banco. | `protheus` |
 | `APPSERVER_LICENSE_SERVER` | Host do License Server. | `totvs_licenseserver` |
 | `APPSERVER_LICENSE_PORT` | Porta do License Server. | `5555` |
-| `APPSERVER_PORT` | Porta principal do AppServer. | `24001` |
-| `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `24002` |
-| `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `24180` |
-| `APPSERVER_WEB_MANAGER` | Porta da interface de gerenciamento. | `8088` |
+| `APPSERVER_PORT` | Porta principal do AppServer. | `1234` |
+| `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `12345` |
+| `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `8080` |
 | `LICENSE_WAIT_RETRIES` | Número de tentativas de conexão com o License Server. | `30` |
 | `LICENSE_WAIT_INTERVAL` | Intervalo em segundos entre tentativas. | `2` |
 | `DBACCESS_WAIT_RETRIES` | Número de tentativas de conexão com o DBAccess. | `30` |
