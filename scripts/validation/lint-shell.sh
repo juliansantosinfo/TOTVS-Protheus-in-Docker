@@ -1,7 +1,11 @@
 #!/bin/bash
+#
 # ==============================================================================
 # SCRIPT: lint-shell.sh
 # DESCRIÇÃO: Executa ShellCheck em todos os arquivos .sh do projeto.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./scripts/validation/lint-shell.sh
 # ==============================================================================
 
 if ! command -v shellcheck &> /dev/null; then

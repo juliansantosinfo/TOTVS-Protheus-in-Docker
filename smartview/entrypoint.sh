@@ -1,4 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/bash
+#
+# ==============================================================================
+# SCRIPT: entrypoint.sh
+# DESCRIÇÃO: Ponto de entrada do container TOTVS SmartView. Gerencia extração 
+#            de recursos, inicialização do SmartView e monitoramento de logs.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-02-05
+# USO: ./entrypoint.sh
+# ==============================================================================
 
 # Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
@@ -6,15 +15,6 @@ if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
 fi
 
 set -euo pipefail
-
-######################################################################
-# SCRIPT:      entrypoint.sh
-# DESCRIÇÃO:   Ponto de entrada do container TOTVS SmartView. 
-#              Gerencia extração de recursos, inicialização do SmartView 
-#              e monitoramento de logs.
-# AUTOR:       Julian de Almeida Santos
-# DATA:        2025-02-05
-######################################################################
 
 ## 🚀 VARIÁVEIS DE CONFIGURAÇÃO
 

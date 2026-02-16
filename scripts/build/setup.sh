@@ -2,35 +2,17 @@
 #
 # ==============================================================================
 # SCRIPT: setup.sh
-# DESCRIÇÃO:
-#   Script unificado para automatizar o download, montagem e extração dos
-#   pacotes do projeto TOTVS-Protheus-in-Docker a partir do GitHub.
-#
-#   Ele permite baixar recursos para os seguintes módulos:
-#     - appserver
-#     - dbaccess
-#     - licenseserver
-#     - mssql
-#     - postgres
-#     - smartview
-#
-#   Caso nenhum módulo seja informado, o script processará todos em sequência.
-#
+# DESCRIÇÃO: Script unificado para automatizar o download, montagem e extração 
+#            dos pacotes do projeto TOTVS-Protheus-in-Docker a partir do GitHub.
+#            Suporta módulos: appserver, dbaccess, licenseserver, mssql, postgres,
+#            oracle e smartview.
 # AUTOR: Julian de Almeida Santos
 # DATA: 2025-10-16
-# USO:
-#   ./setup.sh [modulo]
-#   Exemplo:
-#     ./setup.sh appserver
-#     ./setup.sh        ← executa todos
-#
-# DEPENDÊNCIAS:
-#   - curl
-#   - jq
-#   - tar
+# USO: ./scripts/build/setup.sh [modulo]
 # ==============================================================================
 
-set -e
+# --- Configuração de Robustez (Boas Práticas Bash) ---
+set -euo pipefail
 
 # Caminho para o versions.env (assumindo execução da raiz ou de scripts/validation/)
 if [ -f "versions.env" ]; then
@@ -138,7 +120,7 @@ processar_modulo() {
     echo "🔍 Consultando recursos locais em no diretório temporário..."
     echo "Diretório Temporário: ${DOWNLOAD_DIR}"
     
-    if ! ls "${DOWNLOAD_DIR}/${file}"* >/dev/null 2>&1; then
+    if ! ls "${DOWNLOAD_DIR}/*" >/dev/null 2>&1; then
     
         echo "🔍 Consultando API do GitHub..."
         echo "URL: ${API_URL}"
@@ -159,7 +141,7 @@ processar_modulo() {
     echo ""
     echo "🧩 Verificando partes divididas..."
     for file in "${FILES[@]}"; do
-        if [[ "$file" == "protheus_data.tar.gz" && "$GH_RELEASE" -ne "release2310" ]]; then
+        if [[ "$file" == "protheus_data.tar.gz" && "$GH_RELEASE" != "release2310" ]]; then
             echo "⏭️ Ignorando arquivo ${file}"
             continue
         fi
@@ -221,7 +203,7 @@ remove_item() {
 }
 
 # Executa o script clean.sh localizado no mesmo diretório que este script
-# read -p "Deseja limpar os resources existentes antes de executar o setup (s/n)? " execute_clean
+# read -p "Deseja limpar os resources existentes antes de executar o setup (s/N)? " execute_clean
 # echo ""
 
 # if [[ "$execute_clean" =~ ^[Ss]$ ]]; then

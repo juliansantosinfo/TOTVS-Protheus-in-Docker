@@ -1,7 +1,11 @@
 #!/bin/bash
+#
 # ==============================================================================
 # SCRIPT: lint-dockerfile.sh
 # DESCRIÇÃO: Executa Hadolint em todos os Dockerfiles do projeto.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./scripts/validation/lint-dockerfile.sh
 # ==============================================================================
 
 if ! command -v hadolint &> /dev/null; then

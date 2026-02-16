@@ -1,19 +1,18 @@
 #!/bin/bash
+#
 # ==============================================================================
-#  Projeto:      Limpeza de Arquivos Temporários.
-#  Script:       clean.sh
-#  Descrição:    Remove arquivos e diretórios temporários gerados pelos módulos
-#                do sistema (appserver, dbaccess, licenseserver, smartview, mssql, 
-#                postgres).
-#  Autor:        Julian de Almeida Santos
-#  Data:         16/10/2025
-#  Versão:       1.0
-#  Uso:          ./clean.sh [diretório]
-#                Se nenhum diretório for informado, todos serão limpos.
-#  Diretórios:   appserver, dbaccess, licenseserver, smartview, mssql, postgres
+# SCRIPT: clean.sh
+# DESCRIÇÃO: Remove arquivos e diretórios temporários gerados pelos módulos
+#            do sistema (appserver, dbaccess, licenseserver, smartview, mssql, 
+#            postgres, oracle).
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-16
+# USO: ./scripts/build/clean.sh [modulo]
 # ==============================================================================
 
+# --- Configuração de Robustez (Boas Práticas Bash) ---
 set -euo pipefail
+
 IFS=$'\n\t'
 
 # Função auxiliar para remover arquivos e diretórios com verificação
@@ -47,11 +46,14 @@ limpar() {
     postgres)
       remove_item "postgres/resources"
       ;;
+    oracle)
+      remove_item "oracle/resources"
+      ;;
     smartview)
       remove_item "smartview/totvs/smartview.tar.gz"
       ;;
     *)
-      echo "❌ Erro: diretório inválido '$dir'. Use: appserver, dbaccess, licenseserver, smartview, mssql ou postgres."
+      echo "❌ Erro: diretório inválido '$dir'. Use: appserver, dbaccess, licenseserver, smartview, mssql, postgres ou oracle."
       exit 1
       ;;
   esac
@@ -64,7 +66,7 @@ echo ""
 
 # Se nenhum argumento for passado, limpar todos
 if [[ $# -eq 0 ]]; then
-  for dir in appserver dbaccess licenseserver smartview mssql postgres; do
+  for dir in appserver dbaccess licenseserver smartview mssql postgres oracle; do
     echo "🔹 Limpando '$dir'..."
     limpar "$dir"
     echo ""

@@ -1,27 +1,18 @@
 #!/bin/bash
+#
+# ==============================================================================
+# SCRIPT: setup-database.sh
+# DESCRIÇÃO: Configura o banco de dados, ambiente e as bibliotecas de driver 
+#            ODBC/JDBC com base no perfil de banco de dados (DATABASE_PROFILE).
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-18
+# USO: ./setup-database.sh
+# ==============================================================================
 
 # Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
     set -x
 fi
-
-######################################################################
-# SCRIPT:      setup-database.sh
-# DESCRIÇÃO:   Configura o banco de dados, ambiente e as bibliotecas de 
-#              driver ODBC/JDBC com base no perfil de banco de dados (DATABASE_PROFILE).
-# AUTOR:       Julian de Almeida Santos
-# DATA:        2025-10-18
-#
-# VARIAVEIS DE AMBIENTE REQUERIDAS:
-# - DATABASE_PROFILE....: Define o SGBD a ser configurado (MSSQL ou POSTGRES).
-# - DATABASE_ALIAS      : Define Alias ODBC.
-# - DATABASE_SERVER     : Define host para o Servidor de Banco de Dados.
-# - DATABASE_PORT       : Define porta para o Servidor de Banco de Dados.
-# - DATABASE_NAME       : Define nome do Banco de Dados.
-# - DATABASE_USERNAME   : Define usuário para o Servidor de Banco de Dados.
-# - DATABASE_PASSWORD   : Define senha para o Servidor de Banco de Dados.
-#
-######################################################################
 
 DATABASE_DEFAULT_NAME=""
 DATABASE_DEFAULT_ALIAS=""

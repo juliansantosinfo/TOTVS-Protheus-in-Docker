@@ -1,16 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/bash
+#
 # ==============================================================================
 # SCRIPT: run.sh
 # DESCRIÇÃO: Script interativo para simplificar a inicialização do ambiente
 #            TOTVS-Protheus-in-Docker. Guia o usuário na escolha do banco
 #            de dados e do perfil de execução.
-#
-# AUTOR: Gemini
+# AUTOR: Julian de Almeida Santos
 # DATA: 2025-10-20
 # USO: ./run.sh
 # ==============================================================================
 
-# --- Configuração de Robustez ---
+# --- Configuração de Robustez (Boas Práticas Bash) ---
+# -e: Sai imediatamente se um comando falhar.
+# -u: Trata variáveis não definidas como erro.
+# -o pipefail: Garante que um pipeline (ex: cat | tar) falhe se qualquer comando falhar.
 set -euo pipefail
 
 # --- Funções ---
