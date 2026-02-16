@@ -1,10 +1,12 @@
 #!/bin/bash
+#
 # ==============================================================================
-# SCRIPT: validate-versions.sh
+# SCRIPT: versions.sh
 # DESCRIÇÃO: Valida se a versão definida nos Dockerfiles corresponde à versão
 #            centralizada no arquivo versions.env.
-#            Pode corrigir automaticamente com a flag --fix.
-# USO: ./scripts/validate-versions.sh [--fix]
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./scripts/validation/versions.sh [--fix]
 # ==============================================================================
 
 set -u

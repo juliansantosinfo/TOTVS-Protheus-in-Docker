@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # ==============================================================================
-# SCRIPT: build.sh (Versão Final e Completa)
+# SCRIPT: build.sh
 # DESCRIÇÃO: Responsável por realizar o build da imagem Docker para o servidor de
 #            aplicações TOTVS "appserver" e restaurar ou atualizar dependências da aplicação.
 # AUTOR: Julian de Almeida Santos
@@ -113,5 +113,4 @@ echo "🐳 Iniciando Docker build..."
 # Usa a variável $DOCKER_TAG reconstruída.
 docker build --progress="$DOCKER_PROGRESS_MODE" -t "$DOCKER_TAG" .
 echo "✅ Docker build finalizado com sucesso. Imagem: $DOCKER_TAG"
-
 echo "✅ Processo de build finalizado com sucesso!"

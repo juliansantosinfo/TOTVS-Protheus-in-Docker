@@ -1,9 +1,9 @@
 #!/bin/bash
 #
 # ==============================================================================
-# SCRIPT: build.sh (Versão Final e Completa)
-# DESCRIÇÃO: Responsável por realizar o build da imagem Docker para o serviço PostgreSQL
-#            e restaurar ou atualizar dependências da aplicação.
+# SCRIPT: build.sh
+# DESCRIÇÃO: Responsável por realizar o build da imagem Docker para o serviço 
+#            PostgreSQL TOTVS.
 # AUTOR: Julian de Almeida Santos
 # DATA: 2025-10-19
 # USO: ./build.sh [plain | auto | tty]

@@ -26,9 +26,7 @@ services:
     networks:
       - totvs
     healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -U ${DATABASE_USERNAME:-postgres} -d ${DATABASE_NAME:-protheus}
+      test: ["CMD", "/healthcheck.sh"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -53,6 +51,12 @@ services:
       LICENSE_PORT: 5555
       LICENSE_WEBAPP_PORT: 8020
       TZ: ${TZ}
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - totvs
 
@@ -82,15 +86,9 @@ services:
       postgres:
         condition: service_healthy
       licenseserver:
-        condition: service_started
+        condition: service_healthy
     healthcheck:
-      test:
-        - CMD
-        - isql
-        - '-b'
-        - ${DATABASE_ALIAS:-protheus}
-        - ${DATABASE_USERNAME:-postgres}
-        - ${DATABASE_PASSWORD}
+      test: ["CMD", "/healthcheck.sh"]
       interval: 10s
       timeout: 10s
       retries: 10
@@ -135,9 +133,15 @@ services:
       - totvs
     depends_on:
       licenseserver:
-        condition: service_started
+        condition: service_healthy
       dbaccess:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   apprest:
     image: juliansantosinfo/totvs_appserver:12.1.2410
@@ -178,9 +182,15 @@ services:
       - totvs
     depends_on:
       licenseserver:
-        condition: service_started
+        condition: service_healthy
       dbaccess:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     profiles:
       - full
       - with-rest
@@ -199,6 +209,15 @@ services:
       - totvs_smartview_data:/totvs/smartview
     networks:
       - totvs
+    depends_on:
+      apprest:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     profiles:
       - full
       - with-smartview

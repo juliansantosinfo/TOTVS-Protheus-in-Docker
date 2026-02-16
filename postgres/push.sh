@@ -1,8 +1,18 @@
 #!/bin/bash
-set -euo pipefail
-
+#
+# ==============================================================================
 # SCRIPT: push.sh
-# DESCRIPTION: Pushes the Docker image for this service to Docker Hub.
+# DESCRIÇÃO: Envia a imagem Docker do PostgreSQL TOTVS para o Docker Hub.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-12
+# USO: ./push.sh
+# ==============================================================================
+
+# --- Configuração de Robustez (Boas Práticas Bash) ---
+# -e: Sai imediatamente se um comando falhar.
+# -u: Trata variáveis não definidas como erro.
+# -o pipefail: Garante que um pipeline (ex: cat | tar) falhe se qualquer comando falhar.
+set -euo pipefail
 
 # 1. Navegar para o diretório do script para garantir caminhos relativos corretos
 cd "$(dirname "$0")"

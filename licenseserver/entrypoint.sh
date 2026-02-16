@@ -1,25 +1,18 @@
-#! /bin/bash
+#!/bin/bash
+#
+# ==============================================================================
+# SCRIPT: entrypoint.sh
+# DESCRIÇÃO: Ponto de entrada do container TOTVS License Server. Configura o 
+#            arquivo INI, aplica limites de sistema (ulimit) e inicia o serviço.
+# AUTOR: Julian de Almeida Santos
+# DATA: 2025-10-19
+# USO: ./entrypoint.sh
+# ==============================================================================
 
 # Ativa modo de depuração se a variável DEBUG_SCRIPT estiver como true/1/yes
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
     set -x
 fi
-
-######################################################################
-# SCRIPT:      entrypoint.sh
-# DESCRIÇÃO:   Ponto de entrada do container TOTVS License Server.
-#              Configura o arquivo INI, aplica limites de sistema (ulimit)
-#              e inicia o serviço.
-# AUTOR:       Julian de Almeida Santos
-# DATA:        2025-10-19
-#
-# VARIAVEIS DE AMBIENTE REQUERIDAS (usadas na configuração do INI):
-# - LICENSE_TCP_PORT
-# - LICENSE_CONSOLEFILE
-# - LICENSE_PORT
-# - LICENSE_WEBAPP_PORT
-#
-######################################################################
 
 # ---------------------------------------------------------------------
 

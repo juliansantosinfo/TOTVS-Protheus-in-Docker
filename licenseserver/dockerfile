@@ -13,8 +13,9 @@ ENV TZ=America/Sao_Paulo
 
 COPY ./totvs /totvs
 COPY ./entrypoint.sh /entrypoint.sh
+COPY ./healthcheck.sh /healthcheck.sh
 
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh /healthcheck.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 
