@@ -4,19 +4,70 @@ on:
   push:
     branches: [ "master", "main", "12.1.*" ]
     paths-ignore:
-      - 'docs/**'
       - '.vscode/**'
+      - 'docs/**'
+      - 'scripts/hooks/**'
       - '.env.example'
       - '.gitignore'
-      - 'CHANGELOG'
+      - 'CHANGELOG.md'
       - 'docker-compose*'
-      - 'LICENSE.txt'
+      - 'LICENSE'
       - 'README.md'
       - 'run.sh'
+
+  pull_request:
+    branches: [ "master", "main", "12.1.*" ]
+    paths-ignore:
+      - '.vscode/**'
+      - 'docs/**'
+      - 'scripts/hooks/**'
+      - '.env.example'
+      - '.gitignore'
+      - 'CHANGELOG.md'
+      - 'docker-compose*'
+      - 'LICENSE'
+      - 'README.md'
+      - 'run.sh'
+      
   workflow_dispatch:
 
 jobs:
+  lint-and-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck and Hadolint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          sudo curl -L https://github.com/hadolint/hadolint/releases/latest/download/hadolint-linux-x86_64 -o /usr/local/bin/hadolint
+          sudo chmod +x /usr/local/bin/hadolint
+
+      - name: Make validation scripts executable
+        run: chmod +x scripts/validation/*.sh
+
+      - name: Validate .env
+        run: ./scripts/validation/env.sh
+
+      - name: Run Docker Compose Config Check
+        run: ./scripts/validation/lint-compose.sh
+
+      - name: Run Hadolint (Dockerfile)
+        run: ./scripts/validation/lint-dockerfile.sh
+
+      - name: Run ShellCheck
+        run: ./scripts/validation/lint-shell.sh
+
+      - name: Validate Secrets
+        run: ./scripts/validation/secrets.sh --full
+
+      - name: Validate Versions
+        run: ./scripts/validation/versions.sh
+
   build-and-push:
+    needs: lint-and-validation
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -33,19 +84,62 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Make scripts executable
+        run: |
+          chmod +x scripts/build/*.sh 
+          chmod +x scripts/test/*.sh
+
+      - name: Extract Version from versions.env
+        id: get_version
+        run: |
+          SERVICE_UPPER=$(echo "${{ matrix.service }}" | tr '[:lower:]' '[:upper:]')
+          VERSION_VAR="${SERVICE_UPPER}_VERSION"
+          # Lê o arquivo e extrai o valor da variável correspondente
+          VERSION_VALUE=$(grep "^${VERSION_VAR}=" versions.env | cut -d'=' -f2)
+          echo "SERVICE_VERSION=${VERSION_VALUE}" >> $GITHUB_ENV
+          echo "Final Version for ${{ matrix.service }}: ${VERSION_VALUE}"
+
+      - name: Cache Protheus Binaries
+        id: cache-binaries
+        uses: actions/cache@v4
+        with:
+          path: |
+            appserver/totvs/protheus_data.tar.gz
+            appserver/totvs/protheus.tar.gz
+            dbaccess/totvs/dbaccess
+            licenseserver/totvs/licenseserver
+            mssql/resources/data.tar.gz
+            postgres/resources/data.tar.gz
+            oracle/resources/data.tar.gz
+            smartview/totvs/smartview.tar.gz
+          key: ${{ runner.os }}-protheus-binaries-${{ hashFiles('versions.env') }}
+          restore-keys: |
+            ${{ runner.os }}-protheus-binaries-
+
       - name: Setup Resources (Download Binaries)
-        run: |
-          chmod +x scripts/build/setup.sh
-          ./scripts/build/setup.sh ${{ matrix.service }}
+        run: ./scripts/build/setup.sh ${{ matrix.service }}
 
-      - name: Build Image
-        run: |
-          chmod +x ${{ matrix.service }}/build.sh
-          bash ${{ matrix.service }}/build.sh auto
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: juliansantosinfo/totvs_${{ matrix.service }}
+          tags: |
+            type=raw,value=${{ env.SERVICE_VERSION }}
+            type=ref,event=branch,enable=${{ contains(fromJSON('["appserver", "mssql", "postgres", "oracle"]'), matrix.service) }}
+            type=raw,value=latest,enable=${{ github.ref_name == 'master' || github.ref_name == 'main' }}
 
-      - name: Push to Docker Hub
-        env:
-          PUSH_LATEST: ${{ github.ref_name == 'master' || github.ref_name == 'main' }}
-        run: |
-          chmod +x ${{ matrix.service }}/push.sh
-          bash ${{ matrix.service }}/push.sh
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
