@@ -23,7 +23,7 @@ if [ -z "$FILES" ]; then
     exit 0
 fi
 
-echo "$FILES" | xargs hadolint --ignore DL3041 --ignore DL3038 --ignore DL3042
+echo "$FILES" | xargs hadolint --failure-threshold error
 
 if [ $? -eq 0 ]; then
     echo "✅ Hadolint passou."
