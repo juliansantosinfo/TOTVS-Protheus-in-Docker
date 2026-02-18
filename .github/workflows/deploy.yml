@@ -109,9 +109,9 @@ jobs:
             postgres/resources/data.tar.gz
             oracle/resources/data.tar.gz
             smartview/totvs/smartview.tar.gz
-          key: ${{ runner.os }}-protheus-binaries-${{ hashFiles('versions.env') }}
+          key: ${{ runner.os }}-protheus-binaries-${{ matrix.service }}-${{ hashFiles('versions.env') }}
           restore-keys: |
-            ${{ runner.os }}-protheus-binaries-
+            ${{ runner.os }}-protheus-binaries-${{ matrix.service }}-
 
       - name: Setup Resources (Download Binaries)
         run: ./scripts/build/setup.sh ${{ matrix.service }}
