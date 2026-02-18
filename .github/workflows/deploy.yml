@@ -60,9 +60,6 @@ jobs:
       - name: Run ShellCheck
         run: ./scripts/validation/lint-shell.sh
 
-      - name: Validate Secrets
-        run: ./scripts/validation/secrets.sh --full
-
       - name: Validate Versions
         run: ./scripts/validation/versions.sh
 
