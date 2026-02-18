@@ -18,7 +18,7 @@ fi
 
 ## 🚀 VARIÁVEIS DE CONFIGURAÇÃO
 
-  title="TOTVS License Server 3.7.0"
+  title="TOTVS License Server"
   prog="appsrvlinux"
   inifile="appserver.ini"
   pathbin="/totvs/licenseserver/bin/appserver"
