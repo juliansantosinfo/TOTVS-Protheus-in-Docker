@@ -123,7 +123,7 @@ jobs:
           images: juliansantosinfo/totvs_${{ matrix.service }}
           tags: |
             type=raw,value=${{ env.SERVICE_VERSION }}
-            type=ref,event=branch,enable=${{ contains(fromJSON('["appserver", "mssql", "postgres", "oracle"]'), matrix.service) }}
+            type=ref,event=branch,enable=${{ contains(fromJSON('["appserver", "mssql", "postgres", "oracle"]'), matrix.service) && github.ref_name != 'master' }}
             type=raw,value=latest,enable=${{ github.ref_name == 'master' || github.ref_name == 'main' }}
 
       - name: Set up Docker Buildx
