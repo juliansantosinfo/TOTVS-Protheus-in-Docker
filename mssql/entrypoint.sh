@@ -24,6 +24,7 @@ set -e
   DB_DATA_DIR="/var/opt/mssql/data"
   DB_BACKUP_FILE="/tmp/data.tar.gz"
   DB_SERVICE="/opt/mssql/bin/sqlservr"
+  RESTORE_BACKUP="${RESTORE_BACKUP:-Y}"
 
 # ---------------------------------------------------------------------
 

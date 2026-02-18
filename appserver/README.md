@@ -84,5 +84,4 @@ Caso queira construir a imagem localmente:
 | `DBACCESS_WAIT_RETRIES` | Número de tentativas de conexão com o DBAccess. | `30` |
 | `DBACCESS_WAIT_INTERVAL` | Intervalo em segundos entre tentativas. | `2` |
 | `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
-
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |

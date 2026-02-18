@@ -60,5 +60,4 @@ Caso queira construir a imagem localmente:
 | `POSTGRES_DB` | Nome do banco de dados a ser criado na inicialização. | `protheus` |
 | `RESTORE_BACKUP` | Define se o backup inicial deve ser restaurado (`Y`/`N`). | `Y` |
 | `DEBUG_SCRIPT` | Ativa o modo de depuração dos scripts (`true`/`false`). | `false` |
-
 | `TZ` | Fuso horário do contêiner. | `America/Sao_Paulo` |
