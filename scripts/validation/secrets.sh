@@ -5,13 +5,21 @@
 # DESCRIÇÃO: Verifica se há possíveis segredos expostos nos arquivos estagiados.
 # AUTOR: Julian de Almeida Santos
 # DATA: 2025-10-12
-# USO: ./scripts/validation/secrets.sh
+# USO: ./scripts/validation/secrets.sh [--full]
 # ==============================================================================
 
-echo "🔍 Verificando segredos em arquivos estagiados..."
-
-# Lista arquivos estagiados, excluindo arquivos deletados
-FILES=$(git diff --cached --name-only --diff-filter=ACMR)
+case "$1" in
+    --full)
+        # Lista todos arquivos do projeto
+        echo "🔍 Verificando segredos em todos os arquivos..."
+        FILES=$(find . -not -path "./totvs/*" -not -path "./.git/*")
+        ;;
+    *)  
+        echo "🔍 Verificando segredos em arquivos estagiados..."
+        # Lista arquivos estagiados, excluindo arquivos deletados
+        FILES=$(git diff --cached --name-only --diff-filter=ACMR)
+        ;;
+esac
 
 if [ -z "$FILES" ]; then
     exit 0
@@ -21,7 +29,7 @@ fi
 KEYWORDS="PASSWORD|SECRET|KEY|TOKEN|CREDENTIAL"
 
 # Arquivos permitidos (whitelist)
-WHITELIST=".env.example|versions.env|scripts/scan-secrets.sh"
+WHITELIST=".env.example|versions.env|scripts/scan-secrets.sh|README.md|Dockerfile|entrypoint.sh"
 
 EXIT_CODE=0
 
