@@ -12,7 +12,9 @@
 # ==============================================================================
 
 # --- Configuração de Robustez (Boas Práticas Bash) ---
-set -euo pipefail
+# -e: Sai imediatamente se um comando falhar.
+# -o pipefail: Garante que um pipeline (ex: cat | tar) falhe se qualquer comando falhar.
+set -eo pipefail
 
 # Caminho para o versions.env (assumindo execução da raiz ou de scripts/validation/)
 if [ -f "versions.env" ]; then
@@ -60,42 +62,49 @@ processar_modulo() {
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/appserver"
             DEST_DIR="appserver/totvs"
             FILES=("protheus.tar.gz" "protheus_data.tar.gz")
+            DEST_FILES=("protheus.tar.gz" "protheus_data.tar.gz")
             ;;
         dbaccess)
             GH_PATH="${GH_RELEASE}/dbaccess"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/dbaccess"
             DEST_DIR="dbaccess/totvs"
             FILES=("dbaccess.tar.gz")
+            DEST_FILES=("dbaccess")
             ;;
         licenseserver)
             GH_PATH="${GH_RELEASE}/licenseserver"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/licenseserver"
             DEST_DIR="licenseserver/totvs"
             FILES=("licenseserver.tar.gz")
+            DEST_FILES=("licenseserver")
             ;;
         mssql)
             GH_PATH="${GH_RELEASE}/mssql"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/mssql"
             DEST_DIR="mssql/resources"
             FILES=("data.tar.gz")
+            DEST_FILES=("data.tar.gz")
             ;;
         postgres)
             GH_PATH="${GH_RELEASE}/postgres"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/postgres"
             DEST_DIR="postgres/resources"
             FILES=("data.tar.gz")
+            DEST_FILES=("data.tar.gz")
             ;;
         oracle)
             GH_PATH="${GH_RELEASE}/oracle"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/oracle"
             DEST_DIR="oracle/resources"
             FILES=("data.tar.gz")
+            DEST_FILES=("data.tar.gz")
             ;;
         smartview)
             GH_PATH="smartview/3.9.0.4558336"
             DOWNLOAD_DIR="/tmp/smartview"
             DEST_DIR="smartview/totvs"
             FILES=("smartview.tar.gz")
+            DEST_FILES=("smartview.tar.gz")
             ;;
         *)
             echo "❌ Módulo inválido: $MODULO"
@@ -117,11 +126,23 @@ processar_modulo() {
 
     # --- DOWNLOAD DOS ARQUIVOS ---
 
-    echo "🔍 Consultando recursos locais em no diretório temporário..."
-    echo "Diretório Temporário: ${DOWNLOAD_DIR}"
-    
-    if ! ls "${DOWNLOAD_DIR}/*" >/dev/null 2>&1; then
-    
+    echo "🔍 Consultando recursos locais no diretório de destino..."
+    echo "Diretório de Destino: ${DEST_DIR}"
+
+    RUN_DOWNLOAD=0
+    for file in "${DEST_FILES[@]}"; do
+        if [ ! -e "${DEST_DIR}/${file}" ]; then
+            echo "❌ Arquivo/Diretório ${DEST_DIR}/${file} não localizado!"
+            RUN_DOWNLOAD=1
+        else
+            echo "✅ Arquivo/Diretório ${DEST_DIR}/${file} localizado!"
+        fi
+    done
+
+    # --- BAIXA, EXTRAI E INSTALA DEPENDENCIAS.
+    if [[ "$RUN_DOWNLOAD" == "1" ]]; then
+
+        # --- BAIXA DEPENDENCIAS
         echo "🔍 Consultando API do GitHub..."
         echo "URL: ${API_URL}"
     
@@ -133,62 +154,62 @@ processar_modulo() {
                 [[ $? -eq 0 ]] && echo "✅ Download concluído: ${file_name}" || echo "❌ Erro ao baixar ${file_name}"
             fi
         done
+
+        # --- JUNTA PARTES DIVIDIDAS ---
+        echo ""
+        echo "🧩 Verificando partes divididas..."
+        for file in "${FILES[@]}"; do
+            if [[ "$file" == "protheus_data.tar.gz" && "$GH_RELEASE" != "release2310" ]]; then
+                echo "⏭️ Ignorando arquivo ${file}"
+                continue
+            fi
+            if [[ -f "${DOWNLOAD_DIR}/$file" ]]; then
+                echo "⏭️ Ignorando arquivo ${file}"
+                continue
+            fi
+            if ls "${DOWNLOAD_DIR}/${file}"* >/dev/null 2>&1; then
+                echo "🔗 Montando ${file} a partir das partes..."
+                cat "${DOWNLOAD_DIR}/${file}"* > "${DOWNLOAD_DIR}/${file}"
+            else
+                echo "⚠️ Nenhuma parte encontrada para ${file}"
+            fi
+        done
+
+        # --- EXTRAÇÃO OU CÓPIA ---
+        if [[ "$MODULO" =~ ^(dbaccess|licenseserver)$ ]]; then
+            echo ""
+            echo "📦 Iniciando extração dos arquivos..."
+            for file in "${FILES[@]}"; do
+                if [ -f "${DOWNLOAD_DIR}/${file}" ]; then
+                    echo "📂 Extraindo ${file} para ${DEST_DIR}"
+                    tar -xzf "${DOWNLOAD_DIR}/${file}" -C "${DEST_DIR}/"
+                else
+                    echo "⚠️ Arquivo ${file} não encontrado para extração."
+                fi
+            done
+        else
+            echo ""
+            echo "📂 Copiando arquivos para ${DEST_DIR}"
+            for file in "${FILES[@]}"; do
+                if [ -f "${DOWNLOAD_DIR}/${file}" ]; then
+                    cp "${DOWNLOAD_DIR}/${file}" "${DEST_DIR}/"
+                    echo "✅ Copiado: ${file}"
+                else
+                    echo "⚠️ Arquivo não encontrado: ${file}"
+                fi
+            done
+        fi
+
+        echo ""
+        echo "------------------------------------------"
+        echo "✅ Processo concluído para o módulo: ${MODULO}"
+        echo "Arquivos baixados em: ${DOWNLOAD_DIR}"
+        echo "Arquivos finais em: ${DEST_DIR}"
+        echo "------------------------------------------"
+        echo ""
     else
         echo "⏭️ Ignorando download, arquivos disponíveus localmente."
     fi
-
-    # --- JUNTA PARTES DIVIDIDAS ---
-    echo ""
-    echo "🧩 Verificando partes divididas..."
-    for file in "${FILES[@]}"; do
-        if [[ "$file" == "protheus_data.tar.gz" && "$GH_RELEASE" != "release2310" ]]; then
-            echo "⏭️ Ignorando arquivo ${file}"
-            continue
-        fi
-        if [[ -f "${DOWNLOAD_DIR}/$file" ]]; then
-            echo "⏭️ Ignorando arquivo ${file}"
-            continue
-        fi
-        if ls "${DOWNLOAD_DIR}/${file}"* >/dev/null 2>&1; then
-            echo "🔗 Montando ${file} a partir das partes..."
-            cat "${DOWNLOAD_DIR}/${file}"* > "${DOWNLOAD_DIR}/${file}"
-        else
-            echo "⚠️ Nenhuma parte encontrada para ${file}"
-        fi
-    done
-
-    # --- EXTRAÇÃO OU CÓPIA ---
-    if [[ "$MODULO" =~ ^(dbaccess|licenseserver)$ ]]; then
-        echo ""
-        echo "📦 Iniciando extração dos arquivos..."
-        for file in "${FILES[@]}"; do
-            if [ -f "${DOWNLOAD_DIR}/${file}" ]; then
-                echo "📂 Extraindo ${file} para ${DEST_DIR}"
-                tar -xzf "${DOWNLOAD_DIR}/${file}" -C "${DEST_DIR}/"
-            else
-                echo "⚠️ Arquivo ${file} não encontrado para extração."
-            fi
-        done
-    else
-        echo ""
-        echo "📂 Copiando arquivos para ${DEST_DIR}"
-        for file in "${FILES[@]}"; do
-            if [ -f "${DOWNLOAD_DIR}/${file}" ]; then
-                cp "${DOWNLOAD_DIR}/${file}" "${DEST_DIR}/"
-                echo "✅ Copiado: ${file}"
-            else
-                echo "⚠️ Arquivo não encontrado: ${file}"
-            fi
-        done
-    fi
-
-    echo ""
-    echo "------------------------------------------"
-    echo "✅ Processo concluído para o módulo: ${MODULO}"
-    echo "Arquivos baixados em: ${DOWNLOAD_DIR}"
-    echo "Arquivos finais em: ${DEST_DIR}"
-    echo "------------------------------------------"
-    echo ""
 }
 
 # Função auxiliar para remover arquivos e diretórios com verificação
