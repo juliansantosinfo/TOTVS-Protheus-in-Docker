@@ -28,11 +28,11 @@ Este é um dos componentes da arquitetura dockerizada do Protheus, servindo como
 
 3.  **Execute o contêiner:**
     ```bash
-    docker run -d 
-      --name totvs_oracle 
-      --network totvs 
-      -p 1521:1521 
-      -e "ORACLE_PASSWORD=ProtheusDatabasePassword1"
+    docker run -d \
+      --name totvs_oracle \ 
+      --network totvs \
+      -p 1521:1521 \
+      -e "ORACLE_PASSWORD=ProtheusDatabasePassword1" \
       juliansantosinfo/totvs_oracle:latest
     ```
 
