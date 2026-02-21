@@ -1,5 +1,6 @@
 .env
 .gemini
+GEMINI.md
 .vscode/
 .venv/
 temp/
@@ -13,3 +14,4 @@ mssql/resources/data.tar.gz
 oracle/resources/data.tar.gz
 postgres/resources/data.tar.gz
 smartview/totvs/smartview.tar.gz
+
