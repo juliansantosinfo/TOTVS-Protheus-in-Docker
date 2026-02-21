@@ -55,12 +55,12 @@ Embora as imagens possam estar disponíveis no Docker Hub, é altamente recomend
 Utilize o script mestre de build na raiz:
 ```bash
 # Para construir todas as imagens
-./scripts/build.sh
+./scripts/build/build.sh
 
 # Para construir apenas uma específica (ex: appserver)
 ./appserver/build.sh
 ```
-Este processo pode levar vários minutos na primeira vez, pois envolve o download de imagens base (Oracle Linux, Postgres) e a instalação de pacotes.
+Este processo pode levar vários minutos na primeira vez, pois envolve o download de imagens base (**Red Hat UBI8** ou **Oracle Linux 8**) e a instalação de pacotes via `dnf` ou `microdnf` (gerenciado automaticamente pelo sistema).
 
 ## 3.5. Inicialização do Ambiente (Deploy)
 
