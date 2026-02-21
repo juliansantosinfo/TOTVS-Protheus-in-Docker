@@ -1,4 +1,4 @@
-FROM oraclelinux:8-slim
+FROM redhat/ubi8:8.5-236
 
 LABEL release="12.1.2410"
 LABEL build="24.3.1.1"
@@ -39,10 +39,11 @@ COPY ./service.sh /service.sh
 
 WORKDIR /
 
-RUN microdnf update -y \
-    && microdnf install -y gzip iputils nano telnet procps-ng python3 dmidecode \
-    && microdnf clean all \
-    && pip3 install --no-cache-dir flask==2.0.3
+RUN PKG_MGR=$(command -v dnf || command -v microdnf) && \
+    $PKG_MGR update -y && \
+    $PKG_MGR install -y gzip iputils nano procps-ng dmidecode tar && \
+    $PKG_MGR clean all && \
+    rm -rf /var/cache/dnf
 
 RUN chmod +x /entrypoint.sh /healthcheck.sh /service.sh
 
