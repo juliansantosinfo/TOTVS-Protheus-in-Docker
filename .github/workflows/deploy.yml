@@ -4,30 +4,32 @@ on:
   push:
     branches: [ "master", "main", "12.1.*" ]
     paths-ignore:
-      - '.vscode/**'
-      - 'docs/**'
-      - 'scripts/hooks/**'
-      - '.env.example'
-      - '.gitignore'
-      - 'CHANGELOG.md'
-      - 'docker-compose*'
-      - 'LICENSE'
-      - 'README.md'
-      - 'run.sh'
+      - '**/.vscode/**'
+      - '**/docs/**'
+      - '**/scripts/hooks/**'
+      - '**/.env.example'
+      - '**/.gitignore'
+      - '**/CHANGELOG'
+      - '**/LICENSE.txt'
+      - '**/README.md'
+      - '**/GEMINI.md'
+      - '**/docker-compose*'
+      - '**/run.sh'
 
   pull_request:
     branches: [ "master", "main", "12.1.*" ]
     paths-ignore:
-      - '.vscode/**'
-      - 'docs/**'
-      - 'scripts/hooks/**'
-      - '.env.example'
-      - '.gitignore'
-      - 'CHANGELOG.md'
-      - 'docker-compose*'
-      - 'LICENSE'
-      - 'README.md'
-      - 'run.sh'
+      - '**/.vscode/**'
+      - '**/docs/**'
+      - '**/scripts/hooks/**'
+      - '**/.env.example'
+      - '**/.gitignore'
+      - '**/CHANGELOG'
+      - '**/LICENSE.txt'
+      - '**/README.md'
+      - '**/GEMINI.md'
+      - '**/docker-compose*'
+      - '**/run.sh'
       
   workflow_dispatch:
 
