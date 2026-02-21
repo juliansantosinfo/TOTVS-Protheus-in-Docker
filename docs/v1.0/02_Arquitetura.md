@@ -30,11 +30,17 @@ flowchart TB
 
 ## 2.2. Detalhamento dos Componentes
 
+#### Imagem Base Padronizada (Security & Stability)
+Todos os microserviços (AppServer, DBAccess, LicenseServer e SmartView) foram projetados para rodar em imagens base **Enterprise Linux** (como **Red Hat Universal Base Image - UBI8** ou **Oracle Linux 8**). Esta flexibilidade garante:
+*   **Segurança Corporativa:** Uso de imagens assinadas e mantidas por grandes vendors.
+*   **Flexibilidade de Build:** O projeto utiliza uma camada de abstração para gerenciamento de pacotes (`PKG_MGR`), permitindo o uso transparente de `dnf` ou `microdnf` independente da imagem base escolhida no Dockerfile.
+*   **Minimalismo:** Foco em imagens otimizadas, removendo interpretadores e ferramentas não utilizadas nativamente para reduzir a superfície de ataque.
+
 ### 2.2.1. Serviço de Banco de Dados (Database Layer)
 O alicerce do sistema. O projeto suporta nativamente três "sabores" de banco de dados, definidos através de arquivos Compose distintos.
 
 *   **Opção A: PostgreSQL (Recomendado)**
-    *   **Imagem Base:** `postgres:15`
+    *   **Imagem Base:** `postgres:15` (ou conforme `versions.env`)
     *   **Função:** Armazenar os dados do ERP (tabelas, dicionários SXs).
     *   **Particularidades:** O Dockerfile customizado configura o `locale` (pt_BR) e encoding (LATIN1) essenciais para o correto funcionamento do Protheus com acentuação.
     *   **Persistência:** Utiliza volumes Docker para garantir que os dados sobrevivam ao reinício do container.
@@ -50,22 +56,24 @@ O alicerce do sistema. O projeto suporta nativamente três "sabores" de banco de
     *   **Particularidades:** Configuração automatizada de usuário e schema Protheus no boot.
 
 ### 2.2.2. Middleware de Banco de Dados (DBAccess)
-*   **Imagem:** `totvs_dbaccess`
+*   **Imagem:** `totvs_dbaccess` (Base: RHEL/Oracle Linux)
 *   **Função:** Atua como tradutor entre o AppServer (código ADVPL) e o Banco de Dados (SQL).
 *   **Inteligência de Inicialização:**
-    *   **Wait-for-Network:** O container agora possui mecanismos nativos de retentativa para aguardar a disponibilidade TCP do Banco de Dados e do License Server antes de iniciar, evitando falhas em cascata durante o boot frio da stack.
+    *   **Wait-for-Network:** O container agora possui mecanismos nativos de retentativa para aguardar a disponibilidade TCP do Banco de Dados e do License Server antes de iniciar, evitando falhas em cascata durante o boot frio da stack. Utiliza verificações nativas via `/dev/tcp` para máxima compatibilidade.
 *   **Configuração Dinâmica:**
     *   No boot, o script `entrypoint.sh` detecta qual banco está sendo usado (Postgres, MSSQL ou Oracle) através de variáveis de ambiente.
-    *   Ele configura automaticamente os drivers ODBC (`odbc.ini`), o gerenciador de drivers (`odbcinst.ini`) e o arquivo de configuração do serviço (`dbaccess.ini`).
+    *   Ele configura automaticamente os drivers ODBC (`odbc.ini`), o gerenciador de drivers (`odbcinst.ini`) e o arquivo de configuração do serviço (`dbaccess.ini`) utilizando scripts de setup específicos para cada banco.
     *   Isso permite que a **mesma imagem Docker** sirva para conectar em qualquer banco suportado.
 
 ### 2.2.3. Servidor de Licenças (License Server)
-*   **Imagem:** `totvs_licenseserver`
+*   **Imagem:** `totvs_licenseserver` (Base: RHEL/Oracle Linux)
 *   **Função:** Controla as sessões de usuário e permissões de módulos.
 *   **Operação:** Emula um servidor de licenças local ou conecta-se a um servidor corporativo virtual (caso configurado). Para ambientes de desenvolvimento, geralmente opera em modo de demonstração ou com licenças de desenvolvedor.
 
 ### 2.2.4. Servidor de Aplicação (AppServer)
 Este é o coração do processamento. O projeto utiliza uma abordagem inteligente onde uma única imagem Docker (`totvs_appserver`) pode assumir papéis diferentes baseada na variável `APPSERVER_MODE`.
+
+*   **Otimização:** A imagem foi simplificada, removendo o servidor de gerenciamento web em Python/Flask que existia anteriormente, focando estritamente na execução do ERP e APIs REST, o que a torna mais leve e segura.
 
 *   **Papel 1: Application Server (Standard)**
     *   **Modo:** `application`
@@ -84,9 +92,10 @@ Este é o coração do processamento. O projeto utiliza uma abordagem inteligent
     
 
 ### 2.2.5. SmartView (TReports)
-*   **Imagem:** `totvs_smartview`
+*   **Imagem:** `totvs_smartview` (Base: RHEL/Oracle Linux)
 *   **Função:** Servidor de relatórios modernos da TOTVS.
 *   **Integração:** Conecta-se exclusivamente ao AppServer em modo REST para extrair dados e definições de relatórios.
+*   **Compatibilidade Gráfica:** A imagem inclui `libgdiplus` e `fontconfig` configurados via repositórios EPEL para garantir a renderização correta de relatórios PDF e exportações gráficas.
 
 ## 2.3. Rede e Comunicação
 Todos os containers são colocados em uma rede virtual Docker privada (`totvs`).

@@ -2,15 +2,21 @@
 
 ## Overview
 
-Este diretório contém a implementação do container Docker para o **SmartView** da TOTVS.
+Este diretório contém a implementação do container Docker para o **SmartView** da TOTVS, projetado para rodar sobre distribuições **Enterprise Linux** (como **Red Hat UBI** ou **Oracle Linux**).
 
-O SmartView é o servidor de Business Intelligence (BI) e Analytics do Protheus, responsável por processar consultas analíticas, gerar relatórios e fornecer visualizações de dados.
+O SmartView é o servidor de Business Intelligence (BI) e Analytics do Protheus, responsável por processar consultas analíticas, gerar relatórios modernos e fornecer visualizações de dados (TReports).
+
+### Diferenciais desta Imagem
+
+*   **Compatibilidade Gráfica:** A imagem configura automaticamente o repositório **EPEL** para instalar `libgdiplus` e `fontconfig`, essenciais para a renderização de relatórios e exportações gráficas em ambientes Linux corporativos.
+*   **Performance:** Base empresarial otimizada para execução de aplicações .NET Core.
 
 ### Outros Componentes Necessários
 
 *   **Banco de Dados**: `mssql`, `postgres` ou `oracle`.
-*   **dbaccess**: O serviço de acesso ao banco de dados.
-*   **licenseserver**: O serviço de gerenciamento de licenças.
+*   **dbaccess**: Middleware de acesso ao banco.
+*   **licenseserver**: Gestão de licenças.
+*   **AppRest**: O SmartView consome dados via API REST do Protheus.
 
 ## Início Rápido
 
@@ -49,6 +55,7 @@ Caso queira construir a imagem localmente:
     ```bash
     ./build.sh
     ```
+    *Nota: O build instala automaticamente as dependências do EPEL e gera o cache de fontes via fc-cache.*
 
 ## Variáveis de Ambiente
 

@@ -2,14 +2,19 @@
 
 ## Overview
 
-Este diretório contém a implementação do container Docker para o **License Server** da TOTVS.
+Este diretório contém a implementação do container Docker para o **License Server** da TOTVS, projetado para rodar sobre distribuições **Enterprise Linux** (como **Red Hat UBI** ou **Oracle Linux**).
 
-Este serviço é um componente essencial da arquitetura, responsável pelo gerenciamento e distribuição de licenças para os serviços de aplicação do Protheus.
+Este serviço é um componente essencial da arquitetura, responsável pelo gerenciamento, controle de concorrência e distribuição de licenças para os serviços de aplicação do Protheus.
+
+### Diferenciais desta Imagem
+
+*   **Padronização Corporativa:** Base empresarial para maior segurança e estabilidade.
+*   **Performance:** Configurada para operar nativamente em ambientes Linux com alto volume de conexões simultâneas.
 
 ### Outros Componentes Necessários
 
-*   **Banco de Dados**: `mssql` ou `postgres`.
-*   **dbaccess**: O serviço de acesso ao banco de dados.
+*   **Banco de Dados**: `mssql`, `postgres` ou `oracle`.
+*   **dbaccess**: Middleware de acesso ao banco.
 *   **appserver**: O servidor de aplicação Protheus.
 
 ## Início Rápido
