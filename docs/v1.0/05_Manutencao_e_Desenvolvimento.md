@@ -13,9 +13,9 @@ Para manter este projeto, é crucial entender a organização das pastas.
 ## 5.2. Personalizando Dockerfiles
 Se você precisar instalar dependências de SO adicionais (ex: bibliotecas Python para SmartClient, fontes para relatórios, drivers de impressora):
 
-1.  Edite `appserver/dockerfile`.
-2.  Localize a seção de instalação de pacotes (geralmente `yum install` ou `apt-get install` dependendo da base, aqui usamos Oracle Linux/RedHat base, então `microdnf` ou `yum`).
-3.  Adicione os pacotes.
+1.  Edite o `dockerfile` do serviço correspondente.
+2.  Localize a seção de instalação de pacotes. O projeto utiliza a abstração `$PKG_MGR` para lidar tanto com `dnf` quanto com `microdnf` em bases Red Hat UBI ou Oracle Linux.
+3.  Adicione os pacotes desejados seguindo a sintaxe: `$PKG_MGR install -y <pacote>`.
 4.  Rebuilde a imagem: `./appserver/build.sh`.
 
 ## 5.3. Entendendo os Entrypoints (Scripts de Inicialização)
@@ -49,15 +49,16 @@ Este projeto está equipado com automação via GitHub Actions para garantir que
 
 ### Como atualizar a versão do projeto?
 Para lançar uma nova versão (ex: mudar de 12.1.2510 para 12.1.2610):
-1.  Edite o arquivo `versions.env` na raiz (se implementado conforme recomendações) ou os cabeçalhos dos scripts `build.sh` individuais.
-2.  Atualize os binários no repositório de recursos externos.
-3.  Faça o commit. O CI/CD cuidará do resto.
+1.  Edite o arquivo `versions.env` na raiz. Este arquivo é a **única fonte de verdade** para versões, nomes de imagens e tags de release.
+2.  Execute o script de sincronização: `./scripts/validation/versions.sh --fix` para atualizar os labels em todos os Dockerfiles automaticamente.
+3.  Atualize os binários no repositório de recursos externos.
+4.  Faça o commit. O CI/CD cuidará do resto.
 
 ## 5.5. Melhores Práticas de Segurança Implementadas
 *   **Usuário não-root:** Sempre que possível, os serviços rodam com usuário `totvs` (UID 1000) e não `root`, para evitar escalada de privilégios em caso de invasão.
 *   **Segredos:** Senhas não são hardcoded nas imagens. São passadas via variáveis de ambiente.
     *   *Melhoria Futura:* Implementar Docker Secrets para não expor senhas nem nas variáveis de ambiente visíveis via `docker inspect`.
-*   **Imagens Mínimas:** Uso de bases `slim` (Oracle Linux Slim) para reduzir superfície de ataque e tamanho.
+*   **Imagens Mínimas:** Uso de bases empresariais (**Enterprise Linux**) para reduzir superfície de ataque, tamanho e garantir suporte corporativo. No AppServer, foram removidos interpretadores adicionais como Python para maior endurecimento (hardening) da imagem.
 
 ## 5.6. Estendendo o Projeto
 Deseja adicionar o **TOTVS TSS** (Nota Fiscal Eletrônica)?
