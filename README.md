@@ -8,6 +8,12 @@ O sistema de ERP Protheus é uma solução de software complexa que requer confi
 
 ---
 
+## Aviso Legal e Instruções de Uso
+
+Este repositório é um projeto independente e não possui qualquer afiliação com a TOTVS S/A. O código e as imagens aqui disponibilizados são destinados **exclusivamente para fins de desenvolvimento e testes**. **Não utilize este projeto em ambiente de produção.**
+
+---
+
 ## 🚀 Ferramentas de Apoio (Recomendado)
 
 *   **[TOTVS Protheus Compose Generator](https://juliansantosinfo.github.io/TOTVS-Protheus-Compose-Generator/):** Configure seu ambiente visualmente e baixe o `docker-compose.yml` e `.env` customizados.
@@ -23,23 +29,25 @@ O sistema de ERP Protheus é uma solução de software complexa que requer confi
 
 ## 🏗️ Arquitetura e Componentes
 
-A arquitetura do projeto é dividida nos seguintes serviços:
+A arquitetura do projeto é baseada em distribuições **Enterprise Linux** (como **Red Hat UBI** ou **Oracle Linux**), garantindo segurança, estabilidade e conformidade corporativa em todos os microserviços.
 
-1.  **`appserver`**: O servidor de aplicação Protheus. Esta é uma imagem versátil que pode operar em três modos, definidos pela variável de ambiente `APPSERVER_MODE`:
-    *   `application` (padrão): Executa o servidor de aplicação principal, permitindo acesso via Smartclient.
-    *   `rest`: Executa o servidor para atender requisições da API REST.
-    *   `sqlite`: Executa como um servidor SQLite para evitar problemas de concorrência no acesso aos arquivos por múltiplos serviços.
-2.  **`dbaccess`**: O serviço intermediário que gerencia e fornece o acesso ao banco de dados.
-3.  **`licenseserver`**: O serviço de gerenciamento de licenças da TOTVS.
-4.  **`smartview`**: Servidor de Business Intelligence e Analytics (TReports).
-5.  **Banco de Dados**: Suporte nativo a **Microsoft SQL Server** (`mssql`), **PostgreSQL** (`postgres`) e **Oracle Database** (`oracle`).
+O projeto é dividido nos seguintes serviços:
 
-### Fluxo de Dependência
-```text
-[DB (Postgres/MSSQL/Oracle)] <--- [DBAccess] <--- [AppServer / AppRest]
-[License Server] <-------------------------- [AppServer / AppRest / DBAccess]
-[AppRest] <--------------------------------- [SmartView]
-```
+1.  **`appserver`**: O servidor de aplicação Protheus (Base: RHEL/Oracle Linux). Esta é uma imagem otimizada e versátil que pode operar em três modos:
+    *   `application` (padrão): Executa o servidor de aplicação principal (SmartClient Web/TCP).
+    *   `rest`: Executa o servidor dedicado para a API REST.
+    *   `sqlite`: Executa como servidor de arquivos locais (LocalFiles) para alta performance.
+    *   *Nota: O servidor web de gerenciamento legado em Python foi removido para maior segurança e leveza.*
+2.  **`dbaccess`**: Middleware de acesso ao banco de dados (Base: RHEL/Oracle Linux), com suporte a setup dinâmico de drivers ODBC.
+3.  **`licenseserver`**: Gestão de licenças TOTVS (Base: RHEL/Oracle Linux).
+4.  **`smartview`**: Servidor de BI e Analytics (Base: RHEL/Oracle Linux com suporte gráfico EPEL).
+5.  **Banco de Dados**: Suporte nativo a **Microsoft SQL Server**, **PostgreSQL** e **Oracle Database**.
+
+### ⚙️ Gestão de Versões (Centralizada)
+
+O projeto utiliza o arquivo `versions.env` na raiz como **fonte única de verdade** para todas as versões de componentes e tags de imagem. Ao alterar uma versão, o script `./scripts/validation/versions.sh --fix` sincroniza automaticamente todos os Dockerfiles.
+
+---
 
 ### Fluxo de Comunicação
 
@@ -99,25 +107,15 @@ flowchart TB
 
 ---
 
-## Aviso Legal e Instruções de Uso
-
-Este repositório é um projeto independente e não possui qualquer afiliação com a TOTVS S/A. O código e as imagens aqui disponibilizados são destinados **exclusivamente para fins de desenvolvimento e testes**. **Não utilize este projeto em ambiente de produção.**
-
-Ao utilizar este repositório, você concorda com os termos da licença MIT.
-
----
-
 ## Requisitos de Sistema
 
 Certifique-se de ter os seguintes pré-requisitos instalados em seu sistema:
 
-*   **Windows:**
-    1.  **WSL2:** Ative o Subsistema Windows para Linux. [Guia de Instalação](https://learn.microsoft.com/pt-br/windows/wsl/install).
-    2.  **Docker Desktop:** Instale o Docker Desktop para Windows. [Guia de Instalação](https://docs.docker.com/desktop/windows/install).
-*   **Linux:**
-    1.  **Docker e Docker Compose:** Instale as versões mais recentes. Consulte a documentação oficial para sua distribuição.
-*   **Mac:**
-    1.  **Docker Desktop:** Instale o Docker Desktop para macOS. [Guia de Instalação](https://docs.docker.com/desktop/mac/install/).
+*   **Linux (Recomendado):** Docker Engine e Docker Compose v2.
+*   **Windows:** WSL2 (Obrigatório) + Docker Desktop configurado para o backend WSL2.
+*   **Mac:** Docker Desktop (Intel ou Apple Silicon via Rosetta).
+
+> **Aviso de Performance:** No Windows/WSL2, mantenha os arquivos do projeto dentro do sistema de arquivos do Linux (`/home/...`) para evitar lentidão extrema de I/O.
 
 ---
 
@@ -135,7 +133,7 @@ Você pode configurar o ambiente de duas formas: utilizando o gerador web (mais 
    docker compose up -d
    ```
 
-### Opção 2: Configuração Manual
+### Opção 2: Manual (Recomendada para Devs)
 
 1.  Clone este repositório:
     ```bash
@@ -143,12 +141,18 @@ Você pode configurar o ambiente de duas formas: utilizando o gerador web (mais 
     cd TOTVS-Protheus-in-Docker
     ```
 
-2.  Configure as variáveis de ambiente. Copie o arquivo de exemplo `.env.example` para `.env` e ajuste as variáveis conforme necessário, como a senha do banco de dados.
+2.  Instale os Git Hooks e prepare o ambiente:
+    ```bash
+    ./scripts/hooks/install.sh
+    ./scripts/build/setup.sh
+    ```
+
+3.  Configure as variáveis de ambiente. Copie o arquivo de exemplo `.env.example` para `.env` e ajuste as variáveis conforme necessário, como a senha do banco de dados.:
     ```bash
     cp .env.example .env
     ```
 
-3.  Inicie os contêineres usando Docker Compose. Escolha o comando de acordo com o banco de dados desejado:
+4.  Inicie os contêineres usando Docker Compose. Escolha o comando de acordo com o banco de dados desejado:
 
     *   **Para usar PostgreSQL (Recomendado):**
         ```bash
@@ -164,6 +168,19 @@ Você pode configurar o ambiente de duas formas: utilizando o gerador web (mais 
         ```bash
         docker compose -f docker-compose-oracle.yaml -p totvs up -d
         ```
+
+---
+
+## 📦 Build Local e Automação
+
+O projeto conta com scripts robustos em `scripts/` para facilitar o ciclo de vida:
+
+| Script | Função |
+|---|---|
+| `./scripts/build/setup.sh` | Baixa binários e recursos pré-configurados. |
+| `./scripts/build/build.sh` | Realiza o build de todas as imagens localmente. |
+| `./scripts/validation/versions.sh` | Valida a consistência de versões e labels. |
+| `./scripts/test/test-compose.sh` | Valida se os arquivos compose estão sintaticamente corretos. |
 
 ### 💡 Perfis de Inicialização (Profiles)
 
