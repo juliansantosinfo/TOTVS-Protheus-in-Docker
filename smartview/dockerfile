@@ -1,4 +1,4 @@
-FROM oraclelinux:8-slim
+FROM redhat/ubi8:8.5-236
 
 LABEL release="3.9.0.4558336"
 LABEL description="TOTVS SmartView Server" 
@@ -16,19 +16,28 @@ WORKDIR /totvs
 # 1. oracle-epel-release-el8: Necessário para o libgdiplus
 # 2. fontconfig: Essencial para o SkiaSharp gerenciar fontes
 # 3. libgdiplus: Necessário para compatibilidade System.Drawing/DevExpress
-RUN microdnf update -y \
-    && microdnf install -y oracle-epel-release-el8 \
-    && microdnf install -y \
+RUN PKG_MGR=$(command -v dnf || command -v microdnf) && \
+    $PKG_MGR update -y && \
+    # Instalação do EPEL
+    if command -v dnf > /dev/null 2>&1; then \
+        $PKG_MGR install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm; \
+    else \
+        # No Oracle Linux Slim, o builder é necessário para dependências da libgdiplus
+        $PKG_MGR install -y oracle-epel-release-el8; \
+    fi && \
+    # Instalação de pacotes
+    $PKG_MGR install -y \
         gzip \
         iputils \
         nano \
-        telnet \
         procps-ng \
         libicu \
         fontconfig \
         libX11 \
-        libgdiplus \
-    && microdnf clean all
+        libgdiplus && \
+    # Limpeza completa
+    $PKG_MGR clean all && \
+    rm -rf /var/cache/dnf /var/cache/yum /var/lib/dnf/history
 
 # Garante que o cache de fontes seja gerado (evita erro de TypeInitialization no Skia)
 RUN fc-cache -fv
