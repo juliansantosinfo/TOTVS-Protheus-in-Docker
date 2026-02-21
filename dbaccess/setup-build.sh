@@ -2,8 +2,7 @@
 #
 # ==============================================================================
 # SCRIPT: setup-build.sh
-# DESCRIÇÃO: Instala dependências para container TOTVS DbAccess no 
-#            Oracle Linux 8-slim, com microdnf.
+# DESCRIÇÃO: Instala dependências para container TOTVS DbAccess.
 # AUTOR: Julian de Almeida Santos
 # DATA: 2025-10-18
 # USO: ./setup-build.sh
@@ -13,6 +12,8 @@
 if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
     set -x
 fi
+
+PKG_MGR=$(command -v dnf || command -v microdnf)
 
 #---------------------------------------------------------------------
 
@@ -34,8 +35,8 @@ fi
     echo "🔄 ATUALIZANDO PACOTES DO SISTEMA"
     echo "------------------------------------------------------"
     
-    echo "⚙️ Executando microdnf update..."
-    microdnf update -y
+    echo "⚙️ Executando "$PKG_MGR" update..."
+    $PKG_MGR update -y
     
     if [ $? -eq 0 ]; then
         echo "✅ Pacotes atualizados com sucesso."
@@ -56,7 +57,7 @@ fi
     DEPENDENCIAS="gzip iputils nano wget unixODBC unixODBC-devel"
     echo "⚙️ Instalando dependências: **$DEPENDENCIAS**..."
     
-    microdnf install -y $DEPENDENCIAS
+    $PKG_MGR install -y $DEPENDENCIAS
     
     if [ $? -eq 0 ]; then
         echo "✅ Dependências instaladas com sucesso."
@@ -203,6 +204,10 @@ fi
 #---------------------------------------------------------------------
 
 ## 🚀 FINALIZAÇÃO
+    # --- Limpa cache ---
+    echo "🧹 Limpando cache..."
+    $PKG_MGR clean all
+    rm -rf /var/cache/dnf
 
     echo ""
     echo "======================================================"

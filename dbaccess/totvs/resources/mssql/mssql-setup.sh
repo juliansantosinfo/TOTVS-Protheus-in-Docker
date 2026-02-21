@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================
 # Script: mssql-setup.sh
-# Descrição: Instala o driver ODBC e sqlcmd para o MSSQL 2019 no Oracle Linux 8-slim, com microdnf.
+# Descrição: Instala o driver ODBC e sqlcmd para o MSSQL 2019.
 # Autor: Julian de Almeida Santos
 # ==============================================================
 # Este script executa os seguintes passos:

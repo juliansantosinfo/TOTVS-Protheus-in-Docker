@@ -1,4 +1,4 @@
-FROM oraclelinux:8-slim
+FROM redhat/ubi8:8.5-236
 
 LABEL version="3.7.0"
 LABEL description="TOTVS LicenseServer" 

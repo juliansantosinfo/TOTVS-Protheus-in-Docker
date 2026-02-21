@@ -102,22 +102,6 @@ RESOURCES_DIR="${TOTVS_DIR}/resources"
 
 # ---------------------------------------------------------------------
 
-## 🚀 FUNÇÕES DE CONTROLE DO SERVIDOR WEB
-
-  start_webserver() {
-    echo "🌐 Iniciando servidor web para gerenciamento do AppServer..."
-    nohup python3 "${HTTPSERVER_MANAGER}" > /dev/null 2>&1 &
-    echo "✅ Servidor web iniciado em segundo plano."
-  }
-
-  stop_webserver() {
-    echo "🛑 Finalizando servidor web..."
-    pkill -f "${HTTPSERVER_MANAGER}" || echo "ℹ️ Nenhum processo do servidor web encontrado."
-    echo "✅ Servidor web finalizado."
-  }
-
-# ---------------------------------------------------------------------
-
 ## 🚀 FUNÇÃO PRINCIPAL DE EXECUÇÃO
 
   main() {
@@ -127,7 +111,6 @@ RESOURCES_DIR="${TOTVS_DIR}/resources"
     echo "------------------------------------------------------"
       
     start_appserver
-    start_webserver
 
     echo
     echo "📜 Monitorando logs em tempo real:"
