@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [appserver, dbaccess, licenseserver, mssql, postgres, smartview]
+        service: [appserver, dbaccess, licenseserver, mssql, oracle, postgres, smartview]
 
     steps:
       - name: Checkout repository
