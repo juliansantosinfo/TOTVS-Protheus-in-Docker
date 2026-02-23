@@ -20,5 +20,5 @@ readonly DOCKER_TAG="${DOCKER_USER}/${ORACLE_IMAGE_NAME}:${ORACLE_VERSION}"
 docker run -d \
     --name totvs_oracle \
     -p 1521:1521 \
-    -e "ORACLE_PASSWORD=${DATABASE_PASSWORD:-ProtheusDatabasePassword1}" \
+    -e ORACLE_PWD="${DATABASE_PASSWORD:-ProtheusDatabasePassword1}" \
     "${DOCKER_TAG}"

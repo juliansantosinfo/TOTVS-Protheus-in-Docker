@@ -1,10 +1,10 @@
-.env
-.gemini
-GEMINI.md
-.vscode/
-.venv/
-temp/
-volume/
+**/.env
+**/.gemini/
+**/.venv/
+**/.vscode/
+**/temp/
+**/volume/
+**/GEMINI.md
 
 appserver/totvs/protheus.tar.gz
 appserver/totvs/protheus_data.tar.gz
@@ -14,4 +14,4 @@ mssql/resources/data.tar.gz
 oracle/resources/data.tar.gz
 postgres/resources/data.tar.gz
 smartview/totvs/smartview.tar.gz
-
+**/LINUX.X64_213000_db_home.zip

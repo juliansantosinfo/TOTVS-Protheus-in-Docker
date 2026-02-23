@@ -17,19 +17,22 @@ echo "🧩 Instalando Oracle Instant Client (Basic, ODBC, SQL*Plus)..."
 if command -v dnf > /dev/null 2>&1; then
     # --- Instala o repositório do Oracle Instant Client ---
     echo "🔄 Instalando repositório do Oracle Instant Client..."
-    curl -o oracle-instantclient-basic-21.21.0.0.0-1.el8.x86_64.rpm  https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-basic-21.21.0.0.0-1.el8.x86_64.rpm
-    curl -o oracle-instantclient-sqlplus-21.21.0.0.0-1.el8.x86_64.rpm  https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-sqlplus-21.21.0.0.0-1.el8.x86_64.rpm
-    curl -o oracle-instantclient-devel-21.21.0.0.0-1.el8.x86_64.rpm  https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-devel-21.21.0.0.0-1.el8.x86_64.rpm
+    curl -o oracle-instantclient-basic-21.21.0.0.0-1.el8.x86_64.rpm https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-basic-21.21.0.0.0-1.el8.x86_64.rpm
+    curl -o oracle-instantclient-sqlplus-21.21.0.0.0-1.el8.x86_64.rpm https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-sqlplus-21.21.0.0.0-1.el8.x86_64.rpm
+    curl -o oracle-instantclient-devel-21.21.0.0.0-1.el8.x86_64.rpm https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-devel-21.21.0.0.0-1.el8.x86_64.rpm
+    curl -o oracle-instantclient-odbc-21.21.0.0.0-1.el8.x86_64.rpm https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient21/x86_64/getPackage/oracle-instantclient-odbc-21.21.0.0.0-1.el8.x86_64.rpm
 
     # --- Instala o repositório do Oracle Instant Client ---
     echo "🔄 Instalando dependencias do Oracle Instant Client..."
     $PKG_MGR localinstall -y oracle-instantclient-basic-21.21.0.0.0-1.el8.x86_64.rpm 
     $PKG_MGR localinstall -y oracle-instantclient-sqlplus-21.21.0.0.0-1.el8.x86_64.rpm 
     $PKG_MGR localinstall -y oracle-instantclient-devel-21.21.0.0.0-1.el8.x86_64.rpm
+    $PKG_MGR localinstall -y oracle-instantclient-odbc-21.21.0.0.0-1.el8.x86_64.rpm
 
     rm -rf oracle-instantclient-basic-21.21.0.0.0-1.el8.x86_64.rpm 
     rm -rf oracle-instantclient-sqlplus-21.21.0.0.0-1.el8.x86_64.rpm 
     rm -rf oracle-instantclient-devel-21.21.0.0.0-1.el8.x86_64.rpm
+    rm -rf oracle-instantclient-odbc-21.21.0.0.0-1.el8.x86_64.rpm
 else
     # --- Instala o repositório do Oracle Instant Client ---
     echo "🔄 Instalando repositório do Oracle Instant Client..."

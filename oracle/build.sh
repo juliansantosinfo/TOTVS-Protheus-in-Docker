@@ -17,6 +17,7 @@
 set -euo pipefail
 
 # --- Variáveis de Configuração Global ---
+export ORACLE_CHARACTERSET=WE8MSWIN1252
 readonly REQUIRED_DIR_NAME="oracle"
 readonly RESOURCES_DIR="./resources"
 readonly DATABASE_FILE="data.tar.gz"
@@ -85,7 +86,7 @@ while [ ! -f "$DATABASE_PATH" ]; do
     # Executa o setup.sh a partir do diretório onde ele está localizado
     current_directory=$(pwd)
     cd ../
-    ./scripts/build/setup.sh oracle
+    . ./scripts/build/setup.sh oracle
     cd "$current_directory"
 
     # Pequena pausa para evitar loop excessivo
