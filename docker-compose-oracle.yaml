@@ -24,7 +24,7 @@ services:
       - totvs
 
   licenseserver:
-    image: juliansantosinfo/totvs_licenseserver:3.6.2
+    image: juliansantosinfo/totvs_licenseserver:3.7.0
     container_name: totvs_licenseserver
     restart: always
     ulimits:
@@ -52,7 +52,7 @@ services:
       - totvs
 
   dbaccess:
-    image: juliansantosinfo/totvs_dbaccess:24.1.0.0
+    image: juliansantosinfo/totvs_dbaccess:24.1.1.0
     container_name: totvs_dbaccess
     restart: always
     # Expor portas do DbAccess (útil para monitoramento)
