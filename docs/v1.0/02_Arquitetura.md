@@ -51,9 +51,9 @@ O alicerce do sistema. O projeto suporta nativamente três "sabores" de banco de
     *   **Particularidades:** Exige aceitação de EULA. O script de inicialização é capaz de restaurar backups `.bak` automaticamente.
 
 *   **Opção C: Oracle Database (XE/Free)**
-    *   **Imagem Base:** `gvenzl/oracle-xe:21-slim`
+    *   **Imagem Base:** `juliansantosinfo/oracle_xe:21.3.0` (Imagens customizadas e otimizadas)
     *   **Função:** Suporte para ambientes que utilizam a tecnologia Oracle.
-    *   **Particularidades:** Configuração automatizada de usuário e schema Protheus no boot.
+    *   **Particularidades:** Imagem unificada que suporta restauração automática de volumes de dados via `data.tar.gz`. Possui validação de integridade de arquivos (hashes) durante o build para garantir segurança e consistência.
 
 ### 2.2.2. Middleware de Banco de Dados (DBAccess)
 *   **Imagem:** `totvs_dbaccess` (Base: RHEL/Oracle Linux)
