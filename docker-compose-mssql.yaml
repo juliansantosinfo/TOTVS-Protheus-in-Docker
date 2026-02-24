@@ -9,7 +9,7 @@
 services:
 
   mssql:
-    image: juliansantosinfo/totvs_mssql:12.1.2510
+    image: juliansantosinfo/totvs_mssql:2019
     container_name: totvs_mssql
     user: root
     restart: always
