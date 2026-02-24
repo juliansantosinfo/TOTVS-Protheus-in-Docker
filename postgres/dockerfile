@@ -1,6 +1,6 @@
 FROM postgres:15
 
-LABEL version="12.1.2410"
+LABEL version="15"
 LABEL description="TOTVS PostgreSQL"
 LABEL maintainer="Julian de Almeida Santos <julian.santos.info@gmail.com>"
 

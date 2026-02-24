@@ -86,7 +86,7 @@ processar_modulo() {
             DEST_FILES=("data.tar.gz")
             ;;
         postgres)
-            GH_PATH="${GH_RELEASE}/postgres"
+            GH_PATH="postgres/${POSTGRES_VERSION}"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/postgres"
             DEST_DIR="postgres/resources"
             FILES=("data.tar.gz")
