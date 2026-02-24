@@ -2,9 +2,16 @@
 
 ## Overview
 
-Este diretório contém a implementação do container Docker para o banco de dados **Microsoft SQL Server**, configurado para ser usado com o ambiente TOTVS Protheus.
+Este diretório contém a implementação do container Docker para o banco de dados **Microsoft SQL Server**, especificamente configurado para o ERP TOTVS Protheus.
 
-Este é um dos componentes da arquitetura dockerizada do Protheus, servindo como o backend de banco de dados.
+A imagem utiliza uma estratégia de **pré-carregamento de dados**, onde o banco de dados já vem com a estrutura de dicionários do Protheus inicializada através de snapshots físicos (arquivos `.mdf` e `.ldf`), garantindo um "boot" pronto para uso em segundos.
+
+### Recursos Necessários
+Para que a imagem funcione corretamente, o arquivo `data.tar.gz` deve estar presente em `mssql/resources/`. Você pode baixá-lo automaticamente via script de setup:
+```bash
+./scripts/build/setup.sh mssql
+```
+
 
 ### Outros Componentes Necessários
 

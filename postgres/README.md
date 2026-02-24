@@ -2,9 +2,16 @@
 
 ## Overview
 
-Este diretório contém a implementação do container Docker para o banco de dados **PostgreSQL**, configurado para ser usado com o ambiente TOTVS Protheus.
+Este diretório contém a implementação do container Docker para o banco de dados **PostgreSQL**, configurado e otimizado para o ERP TOTVS Protheus.
 
-Este é um dos componentes da arquitetura dockerizada do Protheus, servindo como o backend de banco de dados.
+A imagem utiliza uma estratégia de **pré-carregamento de dados**, onde o banco de dados já vem com a estrutura de dicionários do Protheus inicializada através de snapshots do diretório `PGDATA`. Isso elimina a necessidade de rodar assistentes de criação de tabelas que podem levar horas.
+
+### Recursos Necessários
+Para que a imagem funcione corretamente, o arquivo `data.tar.gz` deve estar presente em `postgres/resources/`. Você pode baixá-lo automaticamente via script de setup:
+```bash
+./scripts/build/setup.sh postgres
+```
+
 
 ### Outros Componentes Necessários
 
