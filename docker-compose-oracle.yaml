@@ -9,7 +9,7 @@
 services:
 
   oracle:
-    image: juliansantosinfo/totvs_oracle:12.1.2310
+    image: juliansantosinfo/totvs_oracle:21.3.0
     container_name: totvs_oracle
     user: oracle
     restart: always

@@ -2,7 +2,7 @@
 #
 # ==============================================================================
 # SCRIPT: healthcheck.sh
-# DESCRIÇÃO: Valida a saúde do serviço AppServer/Rest Protheus.
+# DESCRIÇÃO: Valida a saúde do serviço ORACLE dentro do container.
 # AUTOR: Julian de Almeida Santos
 # DATA: 2026-02-16
 # USO: ./healthcheck.sh
@@ -13,9 +13,13 @@ if [[ "${DEBUG_SCRIPT:-}" =~ ^(true|1|yes|y)$ ]]; then
     set -x
 fi
 
-# Tenta abrir uma conexão TCP na porta selecionada
-# Utiliza o bash /dev/tcp para validação leve sem dependências extras
-if timeout 1 bash -c "echo > /dev/tcp/localhost/1521" > /dev/null 2>&1; then
+# Garante que o script será encerrado em caso de erro
+set -e
+
+# Executa o utilitário oficial do PostgreSQL para verificar o status
+# -U: Usuário (postgres por padrão ou variável de ambiente)
+# -d: Banco de dados
+if "$ORACLE_BASE/$CHECK_DB_FILE" > /dev/null 2>&1; then
     exit 0
 else
     exit 1

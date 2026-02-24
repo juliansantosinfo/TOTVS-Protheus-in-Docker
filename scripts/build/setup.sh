@@ -93,7 +93,7 @@ processar_modulo() {
             DEST_FILES=("data.tar.gz")
             ;;
         oracle)
-            GH_PATH="${GH_RELEASE}/oracle"
+            GH_PATH="oracle/${ORACLE_VERSION}"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/oracle"
             DEST_DIR="oracle/resources"
             FILES=("data.tar.gz")
