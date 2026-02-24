@@ -79,7 +79,7 @@ processar_modulo() {
             DEST_FILES=("licenseserver")
             ;;
         mssql)
-            GH_PATH="${GH_RELEASE}/mssql"
+            GH_PATH="mssql/${MSSQL_VERSION}"
             DOWNLOAD_DIR="/tmp/${GH_RELEASE}/mssql"
             DEST_DIR="mssql/resources"
             FILES=("data.tar.gz")
