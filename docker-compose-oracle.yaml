@@ -22,6 +22,12 @@ services:
       - totvs_oracle_data:/opt/oracle/oradata
     networks:
       - totvs
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
 
   licenseserver:
     image: juliansantosinfo/totvs_licenseserver:3.7.0
@@ -52,7 +58,7 @@ services:
       - totvs
 
   dbaccess:
-    image: juliansantosinfo/totvs_dbaccess:24.1.1.0
+    image: juliansantosinfo/totvs_dbaccess:24.1.0.0
     container_name: totvs_dbaccess
     restart: always
     # Expor portas do DbAccess (útil para monitoramento)
