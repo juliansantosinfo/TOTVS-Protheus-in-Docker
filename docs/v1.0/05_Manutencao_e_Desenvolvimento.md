@@ -87,5 +87,12 @@ Estes scripts garantem que o código siga os padrões estabelecidos:
 *   **`env.sh`**: Valida a paridade entre `.env` e `.env.example`.
 *   **`lint-shell.sh`**: Analisa scripts Bash com `shellcheck`.
 *   **`lint-dockerfile.sh`**: Analisa Dockerfiles com `hadolint`.
-*   **`secrets.sh`**: Varre o código em busca de segredos (senhas/tokens) expostos.
-*   **`commit-msg.sh`**: Valida o padrão Conventional Commits.
+## 5.8. Integridade de Imagens e Validação de Hashes
+Para garantir que as imagens sejam construídas a partir de arquivos íntegros e não corrompidos, o projeto está implementando validações de hash SHA1.
+
+*   **Oracle Database:** O diretório `oracle/` contém um arquivo `.hashes.sha1`. Durante o `build.sh`, o script valida se os arquivos locais (como scripts SQL e entrypoints) correspondem aos hashes registrados.
+*   **Como atualizar os hashes:** Se você alterar propositalmente um arquivo e desejar atualizar o registro de integridade, execute:
+    ```bash
+    find . -type f ! -name ".hashes.sha1" -exec sha1sum {} + > .hashes.sha1
+    ```
+    *(Execute este comando de dentro da pasta do módulo correspondente)*.

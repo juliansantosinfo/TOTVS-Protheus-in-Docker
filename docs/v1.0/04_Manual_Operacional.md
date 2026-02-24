@@ -43,7 +43,7 @@ Acompanhar os logs é essencial para diagnosticar erros de compilação, falhas 
 | **License** | 5555 | 5555 | Comunicação de Licença |
 | **PostgreSQL**| 5432 | 5432 | Acesso SQL direto (DBeaver, pgAdmin) |
 | **MSSQL** | 1433 | 1433 | Acesso SQL direto (SSMS) |
-| **Oracle** | 1521 | 21521 | Acesso SQL direto (SQL Developer, DBeaver) |
+| **Oracle** | 1521 | 1521 | Acesso SQL direto (SQL Developer, DBeaver) |
 
 ## 4.3. Manutenção de Dados (Backup e Restore)
 
