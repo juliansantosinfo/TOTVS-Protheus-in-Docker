@@ -2,7 +2,7 @@
 #
 # ==============================================================================
 # SCRIPT: push.sh
-# DESCRIÇÃO: Envia a imagem Docker do Oracle Database TOTVS para o Docker Hub.
+# DESCRIÇÃO: Envia a imagem Docker do ORACLE TOTVS para o Docker Hub.
 # AUTOR: Julian de Almeida Santos
 # DATA: 2025-10-12
 # USO: ./push.sh
