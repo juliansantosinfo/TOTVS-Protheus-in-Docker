@@ -9,7 +9,7 @@
 services:
 
   postgres:
-    image: juliansantosinfo/totvs_postgres:12.1.2310
+    image: juliansantosinfo/totvs_postgres:15
     container_name: totvs_postgres
     user: root
     restart: always
