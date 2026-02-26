@@ -226,9 +226,9 @@ docker compose -f docker-compose-postgresql.yaml --profile with-rest --profile w
 
 4.  Acesse a aplicação:
     *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:12345>
-    *   **Credenciais (Release 12.1.2510):**
+    *   **Credenciais:**
         *   **Usuário:** `admin`
-        *   **Senha:** `Docker@123`
+        *   **Senha:** ` ` *(1 Espaço em branco)*
 
 ---
 
