@@ -58,7 +58,7 @@ O diagrama abaixo ilustra como os serviços interagem dentro da rede Docker e co
 config:
   layout: elk
 ---
-flowchart TB
+flowchart LR
  subgraph Host["Host Machine (Linux/WSL2/Windows)"]
         Browser["Navegador / SmartClient"]
         ExternalAPI["Sistemas Externos / APIs"]
@@ -90,7 +90,7 @@ flowchart TB
     APP -- TCP: 5555 --> LIC
     REST -- TCP: 5555 --> LIC
     DBA -- TCP: 5555 --> LIC
-    DBA -- TCP: 1433/5432 --> DB
+    DBA -- TCP: 1433/1521/5432 --> DB
 
      Browser:::host
      ExternalAPI:::host
