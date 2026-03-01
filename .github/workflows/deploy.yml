@@ -65,8 +65,36 @@ jobs:
       - name: Validate Versions
         run: ./scripts/validation/versions.sh
 
-  build-and-push:
+  smoke_test:
     needs: lint-and-validation
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [docker-compose.yaml, docker-compose-postgresql.yaml, docker-compose-mssql.yaml, docker-compose-oracle.yaml]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make scripts executable
+        run: |
+          chmod +x scripts/build/*.sh 
+          chmod +x scripts/test/*.sh
+
+      - name: Setup Resources (Download Binaries)
+        run: ./scripts/build/setup.sh
+      
+      - name: Build images
+        run: ./scripts/build/build.sh
+
+      - name: Build images
+        run: ./scripts/test/test-compose.sh
+
+  build-and-push:
+    needs: 
+        - lint-and-validation
+        - smoke_test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
