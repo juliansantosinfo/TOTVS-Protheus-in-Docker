@@ -89,7 +89,7 @@ jobs:
         run: ./scripts/build/build.sh
 
       - name: Build images
-        run: ./scripts/test/test-compose.sh
+        run: ./scripts/test/test-compose.sh -f ${{ matrix.service }}
 
   build-and-push:
     needs: 

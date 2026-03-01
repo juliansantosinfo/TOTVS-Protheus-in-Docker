@@ -6,8 +6,9 @@
 #            de todos os arquivos docker-compose do projeto.
 # AUTOR: Julian de Almeida Santos
 # DATA: 2026-02-16
-# USO: ./scripts/validation/test-compose.sh [--full]
+# USO: ./scripts/validation/test-compose.sh [--full] [-f <arquivo>]
 #      --full: Realiza o teste de 'up/down' além da validação de sintaxe.
+#      -f <arquivo>: Testa apenas o arquivo compose especificado.
 # ==============================================================================
 
 set -euo pipefail
@@ -21,9 +22,35 @@ COMPOSE_FILES=(
 )
 TEST_PROJECT_NAME="totvs-smoke-test"
 FULL_TEST=false
+CUSTOM_FILE=""
 
-if [[ "${1:-}" == "--full" ]]; then
-    FULL_TEST=true
+# Parse argumentos
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --full)
+            FULL_TEST=true
+            shift
+            ;;
+        -f)
+            if [ -z "${2:-}" ]; then
+                echo "❌ Erro: Flag -f requer um argumento (caminho do arquivo)"
+                echo "Uso: $0 [--full] [-f <arquivo>]"
+                exit 1
+            fi
+            CUSTOM_FILE="$2"
+            shift 2
+            ;;
+        *)
+            echo "❌ Argumento desconhecido: $1"
+            echo "Uso: $0 [--full] [-f <arquivo>]"
+            exit 1
+            ;;
+    esac
+done
+
+# Se arquivo customizado foi especificado, usar apenas ele
+if [ -n "$CUSTOM_FILE" ]; then
+    COMPOSE_FILES=("$CUSTOM_FILE")
 fi
 
 # --- Preparação ---
@@ -86,9 +113,27 @@ echo "🧪 INICIANDO VALIDAÇÃO DE DOCKER COMPOSE"
 echo "=========================================================="
 
 # 1. Validação de Sintaxe (Modular)
-if ! ./scripts/validation/lint-compose.sh; then
-    echo "🛑 Abortando testes de runtime devido a erros de sintaxe."
-    exit 1
+if [ -n "$CUSTOM_FILE" ]; then
+    # Validação inline para arquivo customizado
+    echo "🔍 Validando sintaxe de: $CUSTOM_FILE"
+    if [ ! -f "$CUSTOM_FILE" ]; then
+        echo "❌ Arquivo não encontrado: $CUSTOM_FILE"
+        exit 1
+    fi
+    if ! docker compose -f "$CUSTOM_FILE" config > /dev/null 2>&1; then
+        echo "❌ Erro de sintaxe em: $CUSTOM_FILE"
+        exit 1
+    fi
+    if ! run_smoke_test "$CUSTOM_FILE"; then
+        exit 1
+    fi
+    echo "✅ Arquivo válido."
+else
+    # Validação de todos os arquivos
+    if ! ./scripts/validation/lint-compose.sh; then
+        echo "🛑 Abortando testes de runtime devido a erros de sintaxe."
+        exit 1
+    fi
 fi
 
 # 2. Testes de Inicialização (se solicitado)
