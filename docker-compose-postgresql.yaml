@@ -17,10 +17,10 @@ services:
       - '5432:5432'
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-ProtheusDatabasePassword1}
       POSTGRES_DB: ${DATABASE_NAME:-protheus}
       POSTGRES_INITDB_ARGS: '--locale=pt_BR.ISO-8859-1 -E LATIN1'
-      TZ: ${TZ}
+      TZ: ${TZ:-America/Sao_Paulo}
     volumes:
       - totvs_postgres_data:/var/lib/postgresql/data
     networks:
@@ -28,8 +28,8 @@ services:
     healthcheck:
       test: ["CMD", "/healthcheck.sh"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
       start_period: 10s
 
   licenseserver:
@@ -50,7 +50,7 @@ services:
       LICENSE_CONSOLEFILE: /totvs/licenseserver/bin/appserver/licenseserver.log
       LICENSE_PORT: 5555
       LICENSE_WEBAPP_PORT: 8020
-      TZ: ${TZ}
+      TZ: ${TZ:-America/Sao_Paulo}
     healthcheck:
       test: ["CMD", "/healthcheck.sh"]
       interval: 10s
@@ -75,11 +75,11 @@ services:
       DATABASE_ALIAS: ${DATABASE_ALIAS:-protheus}
       DATABASE_NAME: ${DATABASE_NAME:-protheus}
       DATABASE_USERNAME: ${DATABASE_USERNAME:-postgres}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-ProtheusDatabasePassword1}
       DBACCESS_LICENSE_SERVER: totvs_licenseserver
       DBACCESS_LICENSE_PORT: 5555
       DBACCESS_CONSOLEFILE: /totvs/dbaccess/multi/dbconsole.log
-      TZ: ${TZ}
+      TZ: ${TZ:-America/Sao_Paulo}
     networks:
       - totvs
     depends_on:
@@ -120,7 +120,7 @@ services:
       APPSERVER_PORT: 1234
       APPSERVER_WEB_PORT: 12345
       EXTRACT_RESOURCES: 'true'
-      TZ: ${TZ}
+      TZ: ${TZ:-America/Sao_Paulo}
     volumes:
       - totvs_protheus_data:/totvs/protheus_data
       - totvs_appserver_apo:/totvs/protheus/apo
@@ -167,7 +167,7 @@ services:
       APPSERVER_WEB_PORT: 32345
       APPSERVER_REST_PORT: 8080
       EXTRACT_RESOURCES: 'true'
-      TZ: ${TZ}
+      TZ: ${TZ:-America/Sao_Paulo}
     volumes:
       - totvs_protheus_data:/totvs/protheus_data
       - totvs_apprest_apo:/totvs/protheus/apo
@@ -198,7 +198,7 @@ services:
       - '7019:7019'
     environment:
       EXTRACT_RESOURCES: 'true'
-      TZ: ${TZ}
+      TZ: ${TZ:-America/Sao_Paulo}
     volumes:
       - totvs_smartview_data:/totvs/smartview
     networks:
@@ -215,6 +215,7 @@ services:
     profiles:
       - full
       - with-smartview
+
 volumes:
   totvs_postgres_data:
     driver: local
