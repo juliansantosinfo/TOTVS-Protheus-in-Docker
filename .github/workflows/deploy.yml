@@ -82,6 +82,23 @@ jobs:
           chmod +x scripts/build/*.sh 
           chmod +x scripts/test/*.sh
 
+      - name: Cache Protheus Binaries
+        id: cache-binaries
+        uses: actions/cache@v4
+        with:
+          path: |
+            appserver/totvs/protheus_data.tar.gz
+            appserver/totvs/protheus.tar.gz
+            dbaccess/totvs/dbaccess
+            licenseserver/totvs/licenseserver
+            mssql/resources/data.tar.gz
+            postgres/resources/data.tar.gz
+            oracle/resources/data.tar.gz
+            smartview/totvs/smartview.tar.gz
+          key: protheus-binaries-all-${{ hashFiles('versions.env') }}
+          restore-keys: |
+            protheus-binaries-all-
+
       - name: Setup Resources (Download Binaries)
         run: ./scripts/build/setup.sh
       
@@ -93,8 +110,8 @@ jobs:
 
   build-and-push:
     needs: 
-        - lint-and-validation
-        - smoke_test
+      - lint-and-validation
+      - smoke_test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -142,6 +159,7 @@ jobs:
           key: ${{ runner.os }}-protheus-binaries-${{ matrix.service }}-${{ hashFiles('versions.env') }}
           restore-keys: |
             ${{ runner.os }}-protheus-binaries-${{ matrix.service }}-
+            protheus-binaries-all-
 
       - name: Setup Resources (Download Binaries)
         run: ./scripts/build/setup.sh ${{ matrix.service }}
