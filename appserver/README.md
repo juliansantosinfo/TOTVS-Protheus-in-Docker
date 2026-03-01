@@ -43,7 +43,7 @@ Esta imagem é versátil e pode operar em três modos distintos, configurados at
           --name totvs_appserver \
           --network totvs \
           -p 1234:1234 \
-          -p 12345:12345 \
+          -p 1235:1235 \
           -e "APPSERVER_MODE=application" \
           juliansantosinfo/totvs_appserver:latest
         ```
@@ -85,7 +85,7 @@ Caso queira construir a imagem localmente:
 | `APPSERVER_LICENSE_SERVER` | Host do License Server. | `totvs_licenseserver` |
 | `APPSERVER_LICENSE_PORT` | Porta do License Server. | `5555` |
 | `APPSERVER_PORT` | Porta principal do AppServer (TCP). | `1234` |
-| `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `12345` |
+| `APPSERVER_WEB_PORT` | Porta da interface web (Smartclient). | `1235` |
 | `APPSERVER_REST_PORT` | Porta do serviço REST (usado no modo `rest`). | `8080` |
 | `APPSERVER_ENVIRONMENT_LOCALFILES`| Tipo de banco para arquivos locais. | `SQLITE` |
 | `LICENSE_WAIT_RETRIES` | Tentativas de conexão com o License Server. | `30` |

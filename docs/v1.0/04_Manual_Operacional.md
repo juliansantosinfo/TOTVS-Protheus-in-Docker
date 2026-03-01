@@ -36,7 +36,7 @@ Acompanhar os logs é essencial para diagnosticar erros de compilação, falhas 
 ### Mapeamento de Portas Padrão
 | Serviço | Porta Interna | Porta Host (Localhost) | Descrição |
 | :--- | :--- | :--- | :--- |
-| **AppServer** | 12345 | 12345 | Interface Web (WebApp) / SmartClient HTML |
+| **AppServer** | 1235 | 1235 | Interface Web (WebApp) / SmartClient HTML |
 | **AppServer** | 1234 | 1234 | Interface TCP |
 | **AppRest** | 8080 | 8080 | API REST |
 | **DBAccess** | 7890 | 7890 | Monitor do DBAccess |
