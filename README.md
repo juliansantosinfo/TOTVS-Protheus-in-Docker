@@ -80,7 +80,7 @@ flowchart LR
         Middleware
         Application
   end
-    Browser -- HTTP: 12345 --> APP
+    Browser -- HTTP: 1235 --> APP
     Browser -- SmartClient: 1234 --> APP
     Browser -- HTTP: 7017 --> SmartView
     ExternalAPI -- HTTP: 8080 --> REST
@@ -225,7 +225,7 @@ docker compose -f docker-compose-postgresql.yaml --profile with-rest --profile w
 > **Nota:** Os perfis funcionam da mesma forma para todos os bancos de dados (PostgreSQL, MSSQL e Oracle).
 
 4.  Acesse a aplicação:
-    *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:12345>
+    *   **Smartclient Web:** Abra seu navegador e acesse <http://localhost:1235>
     *   **Credenciais:**
         *   **Usuário:** `admin`
         *   **Senha:** ` ` *(1 Espaço em branco)*
@@ -313,7 +313,7 @@ Para executar cada contêiner individualmente (sem Docker Compose), siga os pass
         ```
     *   **AppServer (Modo Aplicação):**
         ```bash
-        docker run -d --name totvs_appserver --network totvs -p 1234:1234 -p 12345:12345 -e "APPSERVER_MODE=application" juliansantosinfo/totvs_appserver:latest
+        docker run -d --name totvs_appserver --network totvs -p 1234:1234 -p 1235:1235 -e "APPSERVER_MODE=application" juliansantosinfo/totvs_appserver:latest
         ```
     *   **AppServer (Modo REST):**
         ```bash
@@ -417,7 +417,7 @@ Abaixo estão as principais variáveis para configurar os serviços.
 | `APPSERVER_LICENSE_SERVER` | Host do License Server. | `totvs_licenseserver` |
 | `APPSERVER_LICENSE_PORT` | Porta do License Server. | `5555` |
 | `APPSERVER_PORT` | Porta principal do AppServer (modo `application`). | `1234` |
-| `APPSERVER_WEB_PORT` | Porta da interface web/Smartclient (modo `application`). | `12345` |
+| `APPSERVER_WEB_PORT` | Porta da interface web/Smartclient (modo `application`). | `1235` |
 | `APPSERVER_REST_PORT` | Porta do serviço REST (modo `rest`). | `8080` |
 | `APPSERVER_CONSOLEFILE`| Caminho do arquivo de log do serviço. | `/totvs/protheus/bin/appserver/appserver.log` |
 | `APPSERVER_RPO_CUSTOM` | Caminho para o RPO customizado. | `/totvs/protheus/apo/custom.rpo` |
