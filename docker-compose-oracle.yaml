@@ -101,7 +101,7 @@ services:
         hard: 65536
     ports:
       - '1234:1234' # AppServer Port
-      - '12345:12345' # Web/Smartclient Port
+      - '1235:1235' # Web/Smartclient Port
     environment:
       APPSERVER_MODE: application
       APPSERVER_RPO_CUSTOM: /totvs/protheus/apo/custom.rpo
@@ -115,7 +115,7 @@ services:
       APPSERVER_LICENSE_SERVER: totvs_licenseserver
       APPSERVER_LICENSE_PORT: 5555
       APPSERVER_PORT: 1234
-      APPSERVER_WEB_PORT: 12345
+      APPSERVER_WEB_PORT: 1235
       EXTRACT_RESOURCES: 'true'
       TZ: ${TZ:-America/Sao_Paulo}
     volumes:

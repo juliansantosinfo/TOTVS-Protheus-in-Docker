@@ -20,7 +20,7 @@ flowchart TB
         License["Container: LicenseServer"]
         Database[("Container: Banco de Dados<br>PostgreSQL, MSSQL ou Oracle")]
   end
-    Client["SmartClient / Browser"] -- Porta 1234/12345 --> AppServer
+    Client["SmartClient / Browser"] -- Porta 1234/1235 --> AppServer
     ExtSystem["Sistemas Externos"] -- Porta 8080 --> AppRest
     AppServer -- TCP --> DBAccess & License
     AppRest -- TCP --> DBAccess & License
@@ -77,7 +77,7 @@ Este é o coração do processamento. O projeto utiliza uma abordagem inteligent
 
 *   **Papel 1: Application Server (Standard)**
     *   **Modo:** `application`
-    *   **Portas:** 1234 (TCP SmartClient), 12345 (Web SmartClient).
+    *   **Portas:** 1234 (TCP SmartClient), 1235 (Web SmartClient).
     *   **Uso:** É onde os usuários se conectam para operar o sistema. Executa as interfaces de tela, rotinas de cadastro, processos, etc.
     
 *   **Papel 2: REST Server**
@@ -100,7 +100,7 @@ Este é o coração do processamento. O projeto utiliza uma abordagem inteligent
 ## 2.3. Rede e Comunicação
 Todos os containers são colocados em uma rede virtual Docker privada (`totvs`).
 *   **Comunicação Interna:** Os containers conversam entre si usando seus nomes de serviço como DNS (ex: o AppServer conecta no `dbaccess` usando o hostname `dbaccess`, não IP).
-*   **Exposição Externa:** Apenas as portas necessárias para o usuário (ex: 12345 para Web, 1433 para SQL Management Studio) são mapeadas para o `localhost` da máquina hospedeira.
+*   **Exposição Externa:** Apenas as portas necessárias para o usuário (ex: 1235 para Web, 1433 para SQL Management Studio) são mapeadas para o `localhost` da máquina hospedeira.
 
 ## 2.4. Volumes e Persistência de Dados
 O Docker é efêmero por natureza (arquivos somem se o container for deletado). Para evitar perda de dados, utilizamos Volumes Docker:
