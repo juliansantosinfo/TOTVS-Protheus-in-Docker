@@ -1,0 +1,8 @@
+f4e9a3df9cbc1c681fdfc76625ca876b9224986d  ./README.md
+669cf58ffd8778a03fd62889ad2397438e883180  ./run.sh
+5968a5d483c7a80e6955511ae2612bb8a00745b1  ./healthcheck.sh
+de14321bc829c504c6bd02e37ad0f5afa5f36565  ./resources/data.tar.gz
+9130e684324aa2a8ebbf2da4e7f464dc0f63b1ba  ./build.sh
+ef53ba650981ec7a8f3e7875f66d579f30a0fd68  ./entrypoint.sh
+dbd171bfcfad3ebeac9a891362085ad63f1800d8  ./push.sh
+9d1a0824b0b34a98985998e65d61da52f721a0f1  ./dockerfile
