@@ -103,6 +103,14 @@ fi
 #               SEÇÃO 2: EXECUÇÃO DO DOCKER BUILD
 # ----------------------------------------------------
 
+if sha1sum -c --quiet .hashes.sha1 > /dev/null 2>&1; then
+    echo "⏭️ Não houve alterações nos arquivos, build não sera processado."
+    exit 0    
+else
+    find . -type f ! -name .hashes.sha1 -exec sha1sum {} + > .hashes.sha1
+    echo "✅ Arquivo de HASHES atualizado!"
+fi
+
 echo "🐳 Iniciando Docker build..."
 # Executa o comando docker build, usando as flags para um build limpo e output legível.
 # Usa a variável $DOCKER_TAG reconstruída.
