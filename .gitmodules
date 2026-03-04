@@ -1,3 +1,6 @@
 [submodule "appserver"]
 	path = appserver
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-AppServer.git
+[submodule "dbaccess"]
+	path = dbaccess
+	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-DbAccess.git
