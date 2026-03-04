@@ -35,9 +35,8 @@ fi
 
 # Armazena os nomes das aplicações que serão construídas.
 APPS_TO_BUILD=()
-# Variáveis para repassar os argumentos opcionais (progress).
-PROGRESS_ARG="auto"
-PROMPT_ARG="auto"
+# Variáveis para repassar os argumentos opcionais.
+PROMPT_ARG=""
 
 # ----------------------------------------------------
 #               FUNÇÃO DE VALIDAÇÃO
@@ -62,11 +61,8 @@ is_valid_app() {
 for arg in "$@"; do
     case "$arg" in
         # Captura os argumentos opcionais de modo (progress)
-        "plain" | "auto" | "tty")
-            PROGRESS_ARG="$arg"
-            ;;
-        "no-prompt" | "noprompt")
-            PROMPT_ARG="$arg"
+        "--progress=plain" | "--progress=auto" | "--progress=tty" | "--no-cache" | "--no-extract")
+            PROMPT_ARG=" $arg"
             ;;
         # Se não for um argumento de modo conhecido, trata como nome de aplicação.
         *)
@@ -96,7 +92,7 @@ echo "--- Etapa: Execução de Builds ---"
 
 echo "=========================================================="
 echo "🎯 INICIANDO BUILD MASTER: ${APPS_TO_BUILD[*]}"
-echo "Parâmetros repassados: Progress='${PROGRESS_ARG:-padrão do script filho}'"
+echo "Parâmetros repassados: $PROMPT_ARG"
 echo "=========================================================="
 
 # Variável de controle para rastrear o sucesso de todos os builds.
@@ -118,10 +114,10 @@ for APP_NAME in "${APPS_TO_BUILD[@]}"; do
     fi
 
     # Executa o script filho, repassando os argumentos de progress.
-    echo "➡️ Chamando script: $SCRIPT_PATH ${PROGRESS_ARG} ${PROMPT_ARG}"
-    
+    echo "➡️ Chamando script: ${SCRIPT_PATH}${PROMPT_ARG}"
+
     # Usa 'bash' explicitamente e verifica o status de saída.
-    if ! bash "$SCRIPT_PATH" "$PROGRESS_ARG" "${PROMPT_ARG}"; then
+    if ! bash "${SCRIPT_PATH}${PROMPT_ARG}"; then
         echo "❌ FALHA: O script de build para '$APP_NAME' falhou." >&2
         MASTER_SUCCESS=false
     else

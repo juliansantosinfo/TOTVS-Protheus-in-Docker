@@ -34,7 +34,7 @@ EXIT_CODE=0
 validate_service() {
     local service=$1
     local version_var=$2
-    local dockerfile="./$service/dockerfile"
+    local dockerfile="./$service/Dockerfile"
     local expected_version="${!version_var}"
 
     if [ ! -f "$dockerfile" ]; then
