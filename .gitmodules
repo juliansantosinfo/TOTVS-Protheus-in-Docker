@@ -4,3 +4,6 @@
 [submodule "dbaccess"]
 	path = dbaccess
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-DbAccess.git
+[submodule "licenseserver"]
+	path = licenseserver
+	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-LicenseServer.git
