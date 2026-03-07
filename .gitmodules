@@ -7,3 +7,6 @@
 [submodule "licenseserver"]
 	path = licenseserver
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-LicenseServer.git
+[submodule "mssql"]
+	path = mssql
+	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-MSSQL.git
