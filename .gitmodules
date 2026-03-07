@@ -13,3 +13,6 @@
 [submodule "oracle"]
 	path = oracle
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-ORACLE.git
+[submodule "postgres"]
+	path = postgres
+	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-PostgreSQL.git
