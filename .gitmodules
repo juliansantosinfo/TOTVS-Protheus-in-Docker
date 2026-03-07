@@ -10,3 +10,6 @@
 [submodule "mssql"]
 	path = mssql
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-MSSQL.git
+[submodule "oracle"]
+	path = oracle
+	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-ORACLE.git
