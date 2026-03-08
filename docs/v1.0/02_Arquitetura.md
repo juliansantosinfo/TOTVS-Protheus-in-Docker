@@ -119,7 +119,7 @@ Uma das maiores inovações deste projeto é a estratégia de **Pré-carregament
 ### Estrutura dos Pacotes de Recursos
 Os arquivos baixados pelo `setup.sh` não são instaladores, mas sim sistemas de arquivos compactados (`.tar.gz`) que são extraídos diretamente para dentro dos containers ou volumes.
 
-#### 1. AppServer (`appserver/totvs/`)
+#### 1. AppServer (`services/appserver/totvs/`)
 A aplicação é dividida em dois pacotes distintos para separar o que é "estático" (binários) do que é "variável" (dados do sistema).
 *   **`protheus.tar.gz` (Stateless):** Contém exclusivamente os binários de execução (`appsrvlinux`, bibliotecas `.so`), certificados e configurações base (`appserver.ini`). Este pacote é imutável durante a operação.
 *   **`protheus_data.tar.gz` (Stateful):** Contém a estrutura de dados do sistema ERP:
@@ -128,11 +128,11 @@ A aplicação é dividida em dois pacotes distintos para separar o que é "está
     *   `data/`: Logs e arquivos temporários.
     *   *Nota:* Esta separação facilita a persistência, pois o diretório `protheus_data` é o candidato ideal para ser montado em um volume.
 
-#### 2. Bancos de Dados (`mssql/resources/`, `postgres/resources/` e `oracle/resources/`)
+#### 2. Bancos de Dados (`services/mssql/resources/`, `services/postgres/resources/` e `services/oracle/resources/`)
 Para garantir que o Protheus inicie "pronto para logar" (`admin/admin`), os containers de banco de dados não rodam scripts SQL (`CREATE TABLE...`). Eles restauram uma estrutura física de banco já existente.
 *   **`data.tar.gz`**: Contém os arquivos de dados físicos do banco (`.mdf/.ldf` para MSSQL, o diretório `PGDATA` completo para PostgreSQL ou o diretório `oradata` completo para Oracle).
 *   **Vantagem:** O tempo de inicialização do banco cai de horas (criação de milhares de tabelas do ERP) para segundos (apenas o start do serviço de banco).
 
-#### 3. SmartView (`smartview/totvs/`)
+#### 3. SmartView (`services/smartview/totvs/`)
 *   **`smartview.tar.gz`**: Contém a aplicação .NET Core completa e autocontida (DLLs, executável `smartview`). Por ser uma aplicação moderna e autocontida, não exige a mesma complexidade de separação de pastas do AppServer legado.
 

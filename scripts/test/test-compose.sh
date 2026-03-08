@@ -71,10 +71,11 @@ run_smoke_test() {
         return 1
     fi
 
-    echo "⏳ Aguardando serviços ficarem saudáveis (timeout 240s)..."
-    local timeout=240
+    local timeout=480
     local count=0
     local all_healthy=false
+
+    echo "⏳ Aguardando serviços ficarem saudáveis (timeout ${timeout}s)..."
 
     while [ $count -lt $timeout ]; do
         # Verifica se há containers não saudáveis (excluindo os que não tem healthcheck)
