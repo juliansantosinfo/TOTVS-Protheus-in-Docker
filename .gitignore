@@ -1,17 +1,61 @@
-**/.env
-**/.gemini/
-**/.venv/
-**/.vscode/
-**/temp/
-**/volume/
-**/GEMINI.md
+# ==============================================================================
+# TOTVS Protheus in Docker - Master Gitignore
+# ==============================================================================
 
+# ------------------------------------------------------------------------------
+# 1. Environment and Local Settings
+# ------------------------------------------------------------------------------
+**/.env
+**/.venv/
+
+# ------------------------------------------------------------------------------
+# 2. OS and IDE Specific Files
+# ------------------------------------------------------------------------------
+.DS_Store
+**/.idea/
+Thumbs.db
+
+# ------------------------------------------------------------------------------
+# 3. Project Temporary and Volume Data
+# ------------------------------------------------------------------------------
+**/temp/
+**/Temp/
+**/volume/
+
+# ------------------------------------------------------------------------------
+# 4. TOTVS Binaries, Resources and Large Files
+# ------------------------------------------------------------------------------
+# AppServer & RPOs
 appserver/totvs/protheus.tar.gz
 appserver/totvs/protheus_data.tar.gz
+
+# DBAccess
 dbaccess/totvs/dbaccess
+
+# License Server
 licenseserver/totvs/licenseserver
+
+# Database Resources
 mssql/resources/data.tar.gz
 oracle/resources/data.tar.gz
 postgres/resources/data.tar.gz
-smartview/totvs/smartview.tar.gz
 **/LINUX.X64_213000_db_home.zip
+
+# SmartView
+smartview/totvs/smartview.tar.gz
+
+# Component Packages (Local download cache)
+**/packages/**
+!**/packages/
+!**/packages/.gitkeep
+
+# ------------------------------------------------------------------------------
+# 5. Tooling and AI Assistants
+# ------------------------------------------------------------------------------
+# Gemini CLI/Agent
+**/.gemini/
+**/GEMINI.md
+**/.geminiignore
+
+# AmazonQ / CodeWhisperer
+.amazonq/
