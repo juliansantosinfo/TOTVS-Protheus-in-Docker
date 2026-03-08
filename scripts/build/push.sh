@@ -1,85 +1,58 @@
 #!/bin/bash
 #
 # ==============================================================================
-# SCRIPT: push.sh
-# DESCRIÇÃO: Script mestre para enviar todas as imagens Docker para o Docker Hub.
-#            Chama o script push.sh individual de cada serviço.
+# SCRIPT: push.sh (Master)
+# DESCRIÇÃO: Script mestre para automatizar o push de múltiplas imagens Docker
+#            do ecossistema TOTVS Protheus para o Docker Hub.
 # AUTOR: Julian de Almeida Santos
-# DATA: 2025-10-12
-# USO: ./push.sh [OPTIONS]
-#
-# OPÇÕES:
-#   --no-latest                 Não faz push da tag 'latest'
-#   --tag=<TAG>                 Define uma tag customizada para push
-#   -h, --help                  Exibe esta mensagem de ajuda
+# DATA: 2024-03-08
+# USO: ./scripts/build/push.sh [apps...] [OPTIONS]
 #
 # EXEMPLOS:
-#   ./push.sh
-#   ./push.sh --no-latest
-#   ./push.sh --tag=custom-tag
+#   ./scripts/build/push.sh appserver dbaccess
+#   ./scripts/build/push.sh --no-latest
+#   ./scripts/build/push.sh appserver --tag=custom-tag
 # ==============================================================================
 
 # --- Configuração de Robustez (Boas Práticas Bash) ---
-# -e: Sai imediatamente se um comando falhar.
-# -u: Trata variáveis não definidas como erro.
-# -o pipefail: Garante que um pipeline (ex: cat | tar) falhe se qualquer comando falhar.
 set -euo pipefail
 
 # ----------------------------------------------------
-#   SEÇÃO 1: DEFINICAO DE FUNCOES AUXILIARES
+#   SEÇÃO 1: DEFINIÇÃO DE FUNÇÕES AUXILIARES
 # ----------------------------------------------------
 
-    # --- Funções de Impressão ---
     print_success() {
-        local message="$1"
-        echo "✅ $message"
+        echo -e "✅ \033[1;32m$1\033[0m"
     }
 
     print_error() {
-        local message="$1"
-        echo "🚨 Erro: $message" >&2
-    }
-
-    print_warning() {
-        local message="$1"
-        echo "⚠️ Aviso: $message"
+        echo -e "🚨 \033[1;31mErro: $1\033[0m" >&2
     }
 
     print_info() {
-        local message="$1"
-        echo "ℹ️ $message"
+        echo -e "ℹ️ \033[1;34m$1\033[0m"
+    }
+
+    print_progress() {
+        echo -e "🚀 \033[1;35m$1\033[0m"
     }
 
     print_docker() {
-        local message="$1"
-        echo "🐳 $message"
+        echo -e "🐳 \033[1;36m$1\033[0m"
     }
 
-    show_help() {
-        cat << EOF
-USO: ./push.sh [OPTIONS]
-
-OPÇÕES:
-  --no-latest                 Não faz push da tag 'latest'
-  --tag=<TAG>                 Define uma tag customizada para push
-  -h, --help                  Exibe esta mensagem de ajuda
-
-EXEMPLOS:
-  ./push.sh
-  ./push.sh --no-latest
-  ./push.sh --tag=custom-tag
-
-EOF
-        exit 0
+    print_banner() {
+        echo -e "\033[1;36m==========================================================\033[0m"
+        echo -e "\033[1;36m🎯 $1\033[0m"
+        echo -e "\033[1;36m==========================================================\033[0m"
     }
 
     check_versions() {
         if [ -f "versions.env" ]; then
             # shellcheck source=versions.env
             source "versions.env"
-            print_info "Versões carregadas do 'versions.env'"
         else
-            print_error "Arquivo 'versions.env' não encontrado."
+            print_error "Arquivo 'versions.env' não encontrado na raiz do projeto."
             exit 1
         fi
     }
@@ -88,69 +61,88 @@ EOF
 #   SEÇÃO 2: PARSE DE ARGUMENTOS
 # ----------------------------------------------------
 
-    PUSH_LATEST="true"
-    CUSTOM_TAG=""
+    VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
+    APPS_TO_PUSH=()
+    PUSH_OPTIONS=()
 
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            --no-latest)
-                PUSH_LATEST="false"
-                shift
-                ;;
-            --tag=*)
-                CUSTOM_TAG="${1#*=}"
-                shift
-                ;;
-            -h|--help)
-                show_help
-                ;;
-            *)
-                print_error "Opção desconhecida: $1"
-                show_help
-                ;;
-        esac
+    # Itera sobre os argumentos para separar apps de opções
+    for arg in "$@"; do
+        is_app=false
+        for app in "${VALID_APPS[@]}"; do
+            if [[ "$arg" == "$app" ]]; then
+                APPS_TO_PUSH+=("$arg")
+                is_app=true
+                break
+            fi
+        done
+        
+        if [[ "$is_app" == "false" ]]; then
+            PUSH_OPTIONS+=("$arg")
+        fi
     done
 
+    # Se nenhum app foi informado, utiliza todos
+    if [[ ${#APPS_TO_PUSH[@]} -eq 0 ]]; then
+        print_info "Nenhum app especificado. Fazendo push de todos os submodulos..."
+        APPS_TO_PUSH=("${VALID_APPS[@]}")
+    fi
+
 # ----------------------------------------------------
-#   SEÇÃO 3: DEFINIÇÕES VARIAVEIS
+#   SEÇÃO 3: FLUXO DE EXECUÇÃO
 # ----------------------------------------------------
 
-    readonly VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
-    APPS_TO_PUSH=("${VALID_APPS[@]}")
+    check_versions
 
-    echo "=========================================================="
-    echo "🚀 STARTING PUSH"
-    echo "=========================================================="
+    print_banner "INICIANDO PROCESSO DE PUSH MASTER"
+    print_info "Apps selecionados: ${APPS_TO_PUSH[*]}"
+    [[ ${#PUSH_OPTIONS[@]} -gt 0 ]] && print_info "Opções extras: ${PUSH_OPTIONS[*]}"
+    echo ""
 
-    MASTER_SUCCESS=true
+    FAILED_APPS=()
+    ORIGINAL_DIR=$(pwd)
 
-    for APP_NAME in "${APPS_TO_PUSH[@]}"; do
-        echo ""
-        echo ">>> 📤 PUSHING SERVICE: $APP_NAME <<<"
+    for APP in "${APPS_TO_PUSH[@]}"; do
+        print_progress "Fazendo push do submodulo: $APP"
         
-        SCRIPT_PATH="./${APP_NAME}/push.sh"
-
-        if [ ! -f "$SCRIPT_PATH" ]; then
-            echo "🚨 ERROR: Push script not found: $SCRIPT_PATH" >&2
-            MASTER_SUCCESS=false
+        if [[ ! -d "$APP" ]]; then
+            print_error "Diretório '$APP' não encontrado."
+            FAILED_APPS+=("$APP")
             continue
         fi
 
-        # Execute the push script
-        if ! bash "$SCRIPT_PATH"; then
-            echo "❌ FAILURE: Push for '$APP_NAME' failed." >&2
-            MASTER_SUCCESS=false
-        else
-            echo "✅ SUCCESS: Push for '$APP_NAME' completed."
+        if [[ ! -f "$APP/push.sh" ]]; then
+            print_error "Script de push não encontrado em '$APP/'."
+            FAILED_APPS+=("$APP")
+            continue
         fi
+
+        # Entra no diretório do app para manter o contexto
+        cd "$APP"
+        
+        print_info "Executando push em context: ./$APP"
+        
+        # Executa o push do submodulo passando as opções extras
+        if ! ./push.sh "${PUSH_OPTIONS[@]+"${PUSH_OPTIONS[@]}"}"; then
+            print_error "Falha no push do submodulo '$APP'."
+            FAILED_APPS+=("$APP")
+        else
+            print_success "Push do submodulo '$APP' concluído com sucesso!"
+        fi
+
+        # Retorna ao diretório raiz
+        cd "$ORIGINAL_DIR"
+        echo "-----------------------------------"
     done
 
-    if [ "$MASTER_SUCCESS" = true ]; then
-        echo ""
-        echo "🎉 ALL PUSHES COMPLETED SUCCESSFULLY!"
+# ----------------------------------------------------
+#   SEÇÃO 4: FINALIZAÇÃO
+# ----------------------------------------------------
+
+    if [[ ${#FAILED_APPS[@]} -eq 0 ]]; then
+        print_banner "PROCESSO DE PUSH CONCLUÍDO COM SUCESSO"
         exit 0
     else
-        echo ""
-        echo "🛑 SOME PUSHES FAILED." >&2
+        print_banner "FALHA EM UM OU MAIS PUSHES"
+        print_error "Os seguintes apps falharam: ${FAILED_APPS[*]}"
         exit 1
     fi

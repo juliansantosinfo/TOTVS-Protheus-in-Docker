@@ -1,105 +1,129 @@
 #!/bin/bash
 #
 # ==============================================================================
-# SCRIPT: clean.sh
-# DESCRIÇÃO: Remove arquivos e diretórios temporários gerados pelos módulos
-#            do sistema (appserver, dbaccess, licenseserver, smartview, mssql, 
-#            postgres, oracle).
+# SCRIPT: clean.sh (Master)
+# DESCRIÇÃO: Script mestre para automatizar a limpeza de arquivos não versionados
+#            nos submodulos do ecossistema TOTVS Protheus.
 # AUTOR: Julian de Almeida Santos
-# DATA: 2025-10-16
-# USO: ./scripts/build/clean.sh [modulo]
+# DATA: 2024-03-08
+# USO: ./scripts/build/clean.sh [apps...]
+#
+# EXEMPLOS:
+#   ./scripts/build/clean.sh appserver dbaccess
+#   ./scripts/build/clean.sh
 # ==============================================================================
 
 # --- Configuração de Robustez (Boas Práticas Bash) ---
 set -euo pipefail
 
 # ----------------------------------------------------
-#   SEÇÃO 1: DEFINICAO DE FUNCOES AUXILIARES
+#   SEÇÃO 1: DEFINIÇÃO DE FUNÇÕES AUXILIARES
 # ----------------------------------------------------
 
-  print_success() {
-      echo "✅ $1"
-  }
-
-  print_error() {
-      echo "🚨 $1"
-  }
-
-  print_info() {
-      echo "🧹 $1"
-  }
-
-  print_warning() {
-      echo "⚠️ $1"
-  }
-
-  # Função para verificar se o diretório existe e é acessível
-  verificar_diretorio() {
-    local dir="$1"
-    
-    cd "$dir" || {
-        print_error "Erro: não foi possível acessar o diretório: $dir"
-        exit 1
+    print_success() {
+        echo -e "✅ \033[1;32m$1\033[0m"
     }
-  }
 
-  # Função para verificar se o script clean.sh existe
-  verificar_script_clean() {
-    local dir="$1"
-    
-    [[ -f ./clean.sh ]] || {
-        print_error "Aviso: clean.sh não encontrado em $dir, pulando..."
-        return 1
+    print_error() {
+        echo -e "🚨 \033[1;31mErro: $1\033[0m" >&2
     }
-    return 0
-  }
 
-  # Função para executar o script de limpeza
-  executar_limpeza() {
-    ./clean.sh
-  }
-
-  # Função para retornar ao diretório base
-  retornar_diretorio_base() {
-    cd .. || {
-        print_error "Erro: não foi possível retornar ao diretório base do projeto"
-        exit 1
+    print_info() {
+        echo -e "🧹 \033[1;34m$1\033[0m"
     }
-  }
 
-  # Função para limpar um diretório específico
-  limpar() {
-    local dir="$1"
-    
-    verificar_diretorio "$dir"
-    
-    if verificar_script_clean "$dir"; then
-      executar_limpeza
-    fi
-    
-    retornar_diretorio_base
-  }
+    print_progress() {
+        echo -e "🚀 \033[1;35m$1\033[0m"
+    }
+
+    print_banner() {
+        echo -e "\033[1;36m==========================================================\033[0m"
+        echo -e "\033[1;36m🎯 $1\033[0m"
+        echo -e "\033[1;36m==========================================================\033[0m"
+    }
 
 # ----------------------------------------------------
-#   SEÇÃO 1: DEFINICAO DE FUNCOES AUXILIARES
+#   SEÇÃO 2: PARSE DE ARGUMENTOS
 # ----------------------------------------------------
 
-  echo "============================================="
-  echo "🧼 Iniciando limpeza de arquivos temporários..."
-  echo "============================================="
-  echo ""
+    VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
+    APPS_TO_CLEAN=()
 
-  # Se nenhum argumento for passado, limpar todos
-  if [[ $# -eq 0 ]]; then
-    for dir in appserver dbaccess licenseserver smartview mssql postgres oracle; do
-      echo "🔹 Limpando '$dir'..."
-      limpar "$dir"
-      echo ""
+    # Itera sobre os argumentos para processar os apps
+    for arg in "$@"; do
+        is_app=false
+        for app in "${VALID_APPS[@]}"; do
+            if [[ "$arg" == "$app" ]]; then
+                APPS_TO_CLEAN+=("$arg")
+                is_app=true
+                break
+            fi
+        done
+        
+        if [[ "$is_app" == "false" ]]; then
+            echo -e "⚠️  Aviso: O argumento '$arg' não é um nome de aplicação válido e será ignorado."
+        fi
     done
-  else
-    limpar "$1"
-  fi
 
-  echo ""
-  echo "✅ Limpeza concluída com sucesso!"
-  echo ""
+    # Se nenhum app foi informado, utiliza todos
+    if [[ ${#APPS_TO_CLEAN[@]} -eq 0 ]]; then
+        print_info "Nenhum app especificado. Limpando todos os submodulos..."
+        APPS_TO_CLEAN=("${VALID_APPS[@]}")
+    fi
+
+# ----------------------------------------------------
+#   SEÇÃO 3: FLUXO DE EXECUÇÃO
+# ----------------------------------------------------
+
+    print_banner "INICIANDO PROCESSO DE LIMPEZA MASTER"
+    print_info "Apps selecionados: ${APPS_TO_CLEAN[*]}"
+    echo ""
+
+    FAILED_APPS=()
+    ORIGINAL_DIR=$(pwd)
+
+    for APP in "${APPS_TO_CLEAN[@]}"; do
+        print_progress "Limpando submodulo: $APP"
+        
+        if [[ ! -d "$APP" ]]; then
+            print_error "Diretório '$APP' não encontrado."
+            FAILED_APPS+=("$APP")
+            continue
+        fi
+
+        if [[ ! -f "$APP/clean.sh" ]]; then
+            print_error "Script de limpeza não encontrado em '$APP/'."
+            FAILED_APPS+=("$APP")
+            continue
+        fi
+
+        # Entra no diretório do app para manter o contexto
+        cd "$APP"
+        
+        print_info "Executando clean em context: ./$APP"
+        
+        # Executa o clean do submodulo
+        if ! ./clean.sh; then
+            print_error "Falha na limpeza do submodulo '$APP'."
+            FAILED_APPS+=("$APP")
+        else
+            print_success "Limpeza do submodulo '$APP' concluída com sucesso!"
+        fi
+
+        # Retorna ao diretório raiz
+        cd "$ORIGINAL_DIR"
+        echo "-----------------------------------"
+    done
+
+# ----------------------------------------------------
+#   SEÇÃO 4: FINALIZAÇÃO
+# ----------------------------------------------------
+
+    if [[ ${#FAILED_APPS[@]} -eq 0 ]]; then
+        print_banner "PROCESSO DE LIMPEZA CONCLUÍDO COM SUCESSO"
+        exit 0
+    else
+        print_banner "FALHA EM UM OU MAIS PROCESSOS DE LIMPEZA"
+        print_error "Os seguintes apps falharam: ${FAILED_APPS[*]}"
+        exit 1
+    fi
