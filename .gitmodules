@@ -16,3 +16,6 @@
 [submodule "postgres"]
 	path = postgres
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-PostgreSQL.git
+[submodule "smartview"]
+	path = smartview
+	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-Smartview.git
