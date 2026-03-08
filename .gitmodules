@@ -1,21 +1,21 @@
 [submodule "appserver"]
-	path = appserver
+	path = services/appserver
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-AppServer.git
 [submodule "dbaccess"]
-	path = dbaccess
+	path = services/dbaccess
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-DbAccess.git
 [submodule "licenseserver"]
-	path = licenseserver
+	path = services/licenseserver
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-LicenseServer.git
 [submodule "mssql"]
-	path = mssql
+	path = services/mssql
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-MSSQL.git
 [submodule "oracle"]
-	path = oracle
+	path = services/oracle
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-ORACLE.git
 [submodule "postgres"]
-	path = postgres
+	path = services/postgres
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-PostgreSQL.git
 [submodule "smartview"]
-	path = smartview
+	path = services/smartview
 	url = git@github.com:juliansantosinfo/TOTVS-Protheus-in-Docker-Smartview.git
