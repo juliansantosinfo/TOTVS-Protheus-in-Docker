@@ -1,46 +1,44 @@
-name: Build and Push Docker Images
+name: Test Docker Compose Files
 
 on:
   push:
-    branches: [ "master", "main", "12.1.*" ]
+    branches: ["master", "main", "12.1.*"]
     paths-ignore:
-      - '**/.vscode/**'
-      - '**/docs/**'
-      - '**/scripts/hooks/**'
-      - '**/.env.example'
-      - '**/.gitignore'
-      - '**/.antigravityignore'
-      - '**/CHANGELOG'
-      - '**/LICENSE*'
-      - '**/README.md'
-      - '**/GEMINI.md'
-      - '**/docker-compose*'
-      - '**/run.sh'
-      - '**/clean.sh'
+      - "**/.vscode/**"
+      - "**/docs/**"
+      - "**/scripts/hooks/**"
+      - "**/.env.example"
+      - "**/.gitignore"
+      - "**/.antigravityignore"
+      - "**/CHANGELOG"
+      - "**/LICENSE*"
+      - "**/README.md"
+      - "**/GEMINI.md"
+      - "**/run.sh"
+      - "**/clean.sh"
 
   pull_request:
-    branches: [ "master", "main", "12.1.*" ]
+    branches: ["master", "main", "12.1.*"]
     paths-ignore:
-      - '**/.vscode/**'
-      - '**/docs/**'
-      - '**/scripts/hooks/**'
-      - '**/.env.example'
-      - '**/.gitignore'
-      - '**/.antigravityignore'
-      - '**/CHANGELOG'
-      - '**/LICENSE*'
-      - '**/README.md'
-      - '**/GEMINI.md'
-      - '**/docker-compose*'
-      - '**/run.sh'
-      - '**/clean.sh'
-      
+      - "**/.vscode/**"
+      - "**/docs/**"
+      - "**/scripts/hooks/**"
+      - "**/.env.example"
+      - "**/.gitignore"
+      - "**/.antigravityignore"
+      - "**/CHANGELOG"
+      - "**/LICENSE*"
+      - "**/README.md"
+      - "**/GEMINI.md"
+      - "**/run.sh"
+      - "**/clean.sh"
+
   workflow_dispatch:
     inputs:
       service:
         description: 'Selecione o serviço para build/push (ou "all" para todos)'
         required: true
-        default: 'all'
+        default: "all"
         type: choice
         options:
           - all
@@ -69,7 +67,9 @@ jobs:
           sudo chmod +x /usr/local/bin/hadolint
 
       - name: Make scripts executable
-        run: find scripts/ -name "*.sh" -exec chmod +x {} +
+        run: |
+          find scripts/ -name "*.sh" -exec chmod +x {} +
+          find services/ -name "*.sh" -exec chmod +x {} +
 
       - name: Validate .env
         run: ./scripts/validation/env.sh
@@ -92,7 +92,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [docker-compose.yaml, docker-compose-postgresql.yaml, docker-compose-mssql.yaml, docker-compose-oracle.yaml]
+        service:
+          [
+            docker-compose.yaml,
+            docker-compose-postgresql.yaml,
+            docker-compose-mssql.yaml,
+            docker-compose-oracle.yaml,
+          ]
 
     steps:
       - name: Checkout repository
@@ -107,39 +113,9 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Make scripts executable
-        run: find scripts/ -name "*.sh" -exec chmod +x {} +
-      
-      - name: Build images
-        run: ./scripts/build/build.sh
+        run: |
+          find scripts/ -name "*.sh" -exec chmod +x {} +
+          find services/ -name "*.sh" -exec chmod +x {} +
 
       - name: Run Smoke Test
         run: ./scripts/test/test-compose.sh -f ${{ matrix.service }}
-
-  build-and-push:
-    needs: 
-      - lint-and-validation
-      - smoke_test
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        service: ${{ (github.event.inputs.service == 'all' || github.event.inputs.service == '') && fromJSON('["appserver", "dbaccess", "licenseserver", "mssql", "oracle", "postgres", "smartview"]') || fromJSON(format('["{0}"]', github.event.inputs.service)) }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Make scripts executable
-        run: find scripts/ -name "*.sh" -exec chmod +x {} +
-
-      - name: Build Docker image
-        run: ./scripts/build/build.sh ${{ matrix.service }}
-
-      - name: Push Docker image
-        run: ./scripts/build/push.sh ${{ matrix.service }}
