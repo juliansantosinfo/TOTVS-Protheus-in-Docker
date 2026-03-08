@@ -94,7 +94,6 @@ jobs:
       matrix:
         service:
           [
-            docker-compose.yaml,
             docker-compose-postgresql.yaml,
             docker-compose-mssql.yaml,
             docker-compose-oracle.yaml,
