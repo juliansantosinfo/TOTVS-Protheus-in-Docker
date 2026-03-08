@@ -9,12 +9,14 @@ on:
       - '**/scripts/hooks/**'
       - '**/.env.example'
       - '**/.gitignore'
+      - '**/.antigravityignore'
       - '**/CHANGELOG'
-      - '**/LICENSE.txt'
+      - '**/LICENSE*'
       - '**/README.md'
       - '**/GEMINI.md'
       - '**/docker-compose*'
       - '**/run.sh'
+      - '**/clean.sh'
 
   pull_request:
     branches: [ "master", "main", "12.1.*" ]
@@ -24,14 +26,31 @@ on:
       - '**/scripts/hooks/**'
       - '**/.env.example'
       - '**/.gitignore'
+      - '**/.antigravityignore'
       - '**/CHANGELOG'
-      - '**/LICENSE.txt'
+      - '**/LICENSE*'
       - '**/README.md'
       - '**/GEMINI.md'
       - '**/docker-compose*'
       - '**/run.sh'
+      - '**/clean.sh'
       
   workflow_dispatch:
+    inputs:
+      service:
+        description: 'Selecione o serviço para build/push (ou "all" para todos)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - appserver
+          - dbaccess
+          - licenseserver
+          - mssql
+          - oracle
+          - postgres
+          - smartview
 
 jobs:
   lint-and-validation:
@@ -47,8 +66,8 @@ jobs:
           sudo curl -L https://github.com/hadolint/hadolint/releases/latest/download/hadolint-linux-x86_64 -o /usr/local/bin/hadolint
           sudo chmod +x /usr/local/bin/hadolint
 
-      - name: Make validation scripts executable
-        run: chmod +x scripts/validation/*.sh
+      - name: Make scripts executable
+        run: find scripts/ -name "*.sh" -exec chmod +x {} +
 
       - name: Validate .env
         run: ./scripts/validation/env.sh
@@ -78,29 +97,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Make scripts executable
-        run: |
-          chmod +x scripts/build/*.sh 
-          chmod +x scripts/test/*.sh
-
-      - name: Cache Protheus Binaries
-        id: cache-binaries
-        uses: actions/cache@v4
-        with:
-          path: |
-            appserver/totvs/protheus_data.tar.gz
-            appserver/totvs/protheus.tar.gz
-            dbaccess/totvs/dbaccess
-            licenseserver/totvs/licenseserver
-            mssql/resources/data.tar.gz
-            postgres/resources/data.tar.gz
-            oracle/resources/data.tar.gz
-            smartview/totvs/smartview.tar.gz
-          key: protheus-binaries-all-${{ hashFiles('versions.env') }}
-          restore-keys: |
-            protheus-binaries-all-
-
-      - name: Setup Resources (Download Binaries)
-        run: ./scripts/build/setup.sh
+        run: find scripts/ -name "*.sh" -exec chmod +x {} +
       
       - name: Build images
         run: ./scripts/build/build.sh
@@ -116,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [appserver, dbaccess, licenseserver, mssql, oracle, postgres, smartview]
+        service: ${{ (github.event.inputs.service == 'all' || github.event.inputs.service == '') && fromJSON('["appserver", "dbaccess", "licenseserver", "mssql", "oracle", "postgres", "smartview"]') || fromJSON(format('["{0}"]', github.event.inputs.service)) }}
 
     steps:
       - name: Checkout repository
@@ -129,62 +126,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Make scripts executable
-        run: |
-          chmod +x scripts/build/*.sh 
-          chmod +x scripts/test/*.sh
+        run: find scripts/ -name "*.sh" -exec chmod +x {} +
 
-      - name: Extract Version from versions.env
-        id: get_version
-        run: |
-          SERVICE_UPPER=$(echo "${{ matrix.service }}" | tr '[:lower:]' '[:upper:]')
-          VERSION_VAR="${SERVICE_UPPER}_VERSION"
-          # Lê o arquivo e extrai o valor da variável correspondente
-          VERSION_VALUE=$(grep "^${VERSION_VAR}=" versions.env | cut -d'=' -f2)
-          echo "SERVICE_VERSION=${VERSION_VALUE}" >> $GITHUB_ENV
-          echo "Final Version for ${{ matrix.service }}: ${VERSION_VALUE}"
+      - name: Build Docker image
+        run: ./scripts/build/build.sh ${{ matrix.service }}
 
-      - name: Cache Protheus Binaries
-        id: cache-binaries
-        uses: actions/cache@v4
-        with:
-          path: |
-            appserver/totvs/protheus_data.tar.gz
-            appserver/totvs/protheus.tar.gz
-            dbaccess/totvs/dbaccess
-            licenseserver/totvs/licenseserver
-            mssql/resources/data.tar.gz
-            postgres/resources/data.tar.gz
-            oracle/resources/data.tar.gz
-            smartview/totvs/smartview.tar.gz
-          key: ${{ runner.os }}-protheus-binaries-${{ matrix.service }}-${{ hashFiles('versions.env') }}
-          restore-keys: |
-            ${{ runner.os }}-protheus-binaries-${{ matrix.service }}-
-            protheus-binaries-all-
-
-      - name: Setup Resources (Download Binaries)
-        run: ./scripts/build/setup.sh ${{ matrix.service }}
-
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: juliansantosinfo/totvs_${{ matrix.service }}
-          tags: |
-            type=raw,value=${{ env.SERVICE_VERSION }}
-            type=ref,event=branch,enable=${{ contains(fromJSON('["appserver", "mssql", "postgres", "oracle"]'), matrix.service) && github.ref_name != 'master' }}
-            type=raw,value=latest,enable=${{ github.ref_name == 'master' || github.ref_name == 'main' }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push Docker image
-        if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          context: ./${{ matrix.service }}
-          file: ./${{ matrix.service }}/dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Push Docker image
+        run: ./scripts/build/push.sh ${{ matrix.service }}
