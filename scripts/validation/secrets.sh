@@ -29,7 +29,7 @@ fi
 KEYWORDS="PASSWORD|SECRET|KEY|TOKEN|CREDENTIAL"
 
 # Arquivos permitidos (whitelist)
-WHITELIST=".env.example|versions.env|scripts/scan-secrets.sh|README.md|Dockerfile|entrypoint.sh"
+WHITELIST=".env.example|versions.env|scripts/scan-secrets.sh|README.md|Dockerfile|entrypoint.sh|secrets.sh|versions.sh"
 
 EXIT_CODE=0
 

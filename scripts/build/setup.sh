@@ -1,249 +1,136 @@
 #!/bin/bash
 #
 # ==============================================================================
-# SCRIPT: setup.sh
-# DESCRIÇÃO: Script unificado para automatizar o download, montagem e extração 
-#            dos pacotes do projeto TOTVS-Protheus-in-Docker a partir do GitHub.
-#            Suporta módulos: appserver, dbaccess, licenseserver, mssql, postgres,
-#            oracle e smartview.
+# SCRIPT: setup.sh (Master)
+# DESCRIÇÃO: Script mestre para automatizar o setup e descompactação de 
+#            recursos nos submodulos do ecossistema TOTVS Protheus.
 # AUTOR: Julian de Almeida Santos
-# DATA: 2025-10-16
-# USO: ./scripts/build/setup.sh [modulo]
+# DATA: 2024-03-08
+# USO: ./scripts/build/setup.sh [apps...]
+#
+# EXEMPLOS:
+#   ./scripts/build/setup.sh appserver dbaccess
+#   ./scripts/build/setup.sh
 # ==============================================================================
 
 # --- Configuração de Robustez (Boas Práticas Bash) ---
-# -e: Sai imediatamente se um comando falhar.
-# -o pipefail: Garante que um pipeline (ex: cat | tar) falhe se qualquer comando falhar.
-set -eo pipefail
+set -euo pipefail
 
-# Caminho para o versions.env (assumindo execução da raiz ou de scripts/validation/)
-if [ -f "versions.env" ]; then
-    source "versions.env"
-elif [ -f "../../versions.env" ]; then
-    source "../../versions.env"
-    # Ajusta o path se estiver rodando de dentro de scripts/validation/
-    cd ../..
-else
-    echo "🚨 Erro: Arquivo 'versions.env' não encontrado."
-    exit 1
-fi
+# ----------------------------------------------------
+#   SEÇÃO 1: DEFINIÇÃO DE FUNÇÕES AUXILIARES
+# ----------------------------------------------------
 
-# --- CONFIGURAÇÕES GERAIS ---
-GH_OWNER="juliansantosinfo"
-GH_REPO="TOTVS-Protheus-in-Docker-Resources"
-GH_BRANCH="main"
-GH_RELEASE="${RESOURCE_RELEASE:-}"
+    print_success() {
+        echo -e "✅ \033[1;32m$1\033[0m"
+    }
 
-# --- FUNÇÃO: Exibir ajuda ---
-mostrar_ajuda() {
-    echo "Uso: $0 [modulo]"
-    echo ""
-    echo "Modulos disponíveis:"
-    echo "  appserver      - Baixa os arquivos do AppServer"
-    echo "  dbaccess       - Baixa e extrai os arquivos do DBAccess"
-    echo "  licenseserver  - Baixa e extrai os arquivos do License Server"
-    echo "  mssql          - Baixa os arquivos do MSSQL"
-    echo "  postgres       - Baixa os arquivos do PostgreSQL"
-    echo "  oracle         - Baixa os arquivos do Oracle"
-    echo "  smartview      - Baixa os arquivos do SmartView"
-    echo ""
-    echo "Se nenhum módulo for informado, todos serão processados."
-    echo ""
-}
+    print_error() {
+        echo -e "🚨 \033[1;31mErro: $1\033[0m" >&2
+    }
 
-# --- FUNÇÃO: Processar módulo ---
-processar_modulo() {
-    local MODULO="$1"
-    local GH_PATH DOWNLOAD_DIR DEST_DIR FILES API_URL
+    print_info() {
+        echo -e "ℹ️  \033[1;34m$1\033[0m"
+    }
 
-    case "$MODULO" in
-        appserver)
-            GH_PATH="${GH_RELEASE}/appserver"
-            DOWNLOAD_DIR="/tmp/${GH_RELEASE}/appserver"
-            DEST_DIR="appserver/totvs"
-            FILES=("protheus.tar.gz" "protheus_data.tar.gz")
-            DEST_FILES=("protheus.tar.gz" "protheus_data.tar.gz")
-            ;;
-        dbaccess)
-            GH_PATH="${GH_RELEASE}/dbaccess"
-            DOWNLOAD_DIR="/tmp/${GH_RELEASE}/dbaccess"
-            DEST_DIR="dbaccess/totvs"
-            FILES=("dbaccess.tar.gz")
-            DEST_FILES=("dbaccess")
-            ;;
-        licenseserver)
-            GH_PATH="${GH_RELEASE}/licenseserver"
-            DOWNLOAD_DIR="/tmp/${GH_RELEASE}/licenseserver"
-            DEST_DIR="licenseserver/totvs"
-            FILES=("licenseserver.tar.gz")
-            DEST_FILES=("licenseserver")
-            ;;
-        mssql)
-            GH_PATH="mssql/${MSSQL_VERSION}"
-            DOWNLOAD_DIR="/tmp/${GH_RELEASE}/mssql"
-            DEST_DIR="mssql/resources"
-            FILES=("data.tar.gz")
-            DEST_FILES=("data.tar.gz")
-            ;;
-        postgres)
-            GH_PATH="postgres/${POSTGRES_VERSION}"
-            DOWNLOAD_DIR="/tmp/${GH_RELEASE}/postgres"
-            DEST_DIR="postgres/resources"
-            FILES=("data.tar.gz")
-            DEST_FILES=("data.tar.gz")
-            ;;
-        oracle)
-            GH_PATH="oracle/${ORACLE_VERSION}"
-            DOWNLOAD_DIR="/tmp/${GH_RELEASE}/oracle"
-            DEST_DIR="oracle/resources"
-            FILES=("data.tar.gz")
-            DEST_FILES=("data.tar.gz")
-            ;;
-        smartview)
-            GH_PATH="smartview/3.9.0.4558336"
-            DOWNLOAD_DIR="/tmp/smartview"
-            DEST_DIR="smartview/totvs"
-            FILES=("smartview.tar.gz")
-            DEST_FILES=("smartview.tar.gz")
-            ;;
-        *)
-            echo "❌ Módulo inválido: $MODULO"
-            return 1
-            ;;
-    esac
+    print_progress() {
+        echo -e "🚀 \033[1;35m$1\033[0m"
+    }
 
-    API_URL="https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}?ref=${GH_BRANCH}"
+    print_banner() {
+        echo -e "\033[1;36m==========================================================\033[0m"
+        echo -e "\033[1;36m🎯 $1\033[0m"
+        echo -e "\033[1;36m==========================================================\033[0m"
+    }
 
-    echo "=========================================="
-    echo "🔧 Iniciando setup do módulo: ${MODULO}"
-    echo "Repositório: ${GH_OWNER}/${GH_REPO}"
-    echo "Pasta: ${GH_PATH}"
-    echo "Branch: ${GH_BRANCH}"
-    echo "=========================================="
-    echo ""
+# ----------------------------------------------------
+#   SEÇÃO 2: PARSE DE ARGUMENTOS
+# ----------------------------------------------------
 
-    mkdir -p "${DOWNLOAD_DIR}" "${DEST_DIR}"
+    VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
+    APPS_TO_SETUP=()
 
-    # --- DOWNLOAD DOS ARQUIVOS ---
-
-    echo "🔍 Consultando recursos locais no diretório de destino..."
-    echo "Diretório de Destino: ${DEST_DIR}"
-
-    RUN_DOWNLOAD=0
-    for file in "${DEST_FILES[@]}"; do
-        if [ ! -e "${DEST_DIR}/${file}" ]; then
-            echo "❌ Arquivo/Diretório ${DEST_DIR}/${file} não localizado!"
-            RUN_DOWNLOAD=1
-        else
-            echo "✅ Arquivo/Diretório ${DEST_DIR}/${file} localizado!"
+    # Itera sobre os argumentos para processar os apps
+    for arg in "$@"; do
+        is_app=false
+        for app in "${VALID_APPS[@]}"; do
+            if [[ "$arg" == "$app" ]]; then
+                APPS_TO_SETUP+=("$arg")
+                is_app=true
+                break
+            fi
+        done
+        
+        if [[ "$is_app" == "false" ]]; then
+            echo -e "⚠️  Aviso: O argumento '$arg' não é um nome de aplicação válido e será ignorado."
         fi
     done
 
-    # --- BAIXA, EXTRAI E INSTALA DEPENDENCIAS.
-    if [[ "$RUN_DOWNLOAD" == "1" ]]; then
+    # Se nenhum app foi informado, utiliza todos
+    if [[ ${#APPS_TO_SETUP[@]} -eq 0 ]]; then
+        print_info "Nenhum app especificado. Iniciando setup de todos os submodulos..."
+        APPS_TO_SETUP=("${VALID_APPS[@]}")
+    fi
 
-        # --- BAIXA DEPENDENCIAS
-        echo "🔍 Consultando API do GitHub..."
-        echo "URL: ${API_URL}"
-    
-        curl -s "${API_URL}" | jq -r '.[] | select(.type=="file") | .download_url' | while read -r file_url; do
-            if [ -n "$file_url" ]; then
-                file_name=$(basename "${file_url}")
-                echo "⬇️  Baixando arquivo: ${file_name}"
-                curl -sL "${file_url}" -o "${DOWNLOAD_DIR}/${file_name}"
-                [[ $? -eq 0 ]] && echo "✅ Download concluído: ${file_name}" || echo "❌ Erro ao baixar ${file_name}"
-            fi
-        done
+# ----------------------------------------------------
+#   SEÇÃO 3: FLUXO DE EXECUÇÃO
+# ----------------------------------------------------
 
-        # --- JUNTA PARTES DIVIDIDAS ---
-        echo ""
-        echo "🧩 Verificando partes divididas..."
-        for file in "${FILES[@]}"; do
-            if [[ "$file" == "protheus_data.tar.gz" && "$GH_RELEASE" != "release2310" ]]; then
-                echo "⏭️ Ignorando arquivo ${file}"
-                continue
-            fi
-            if [[ -f "${DOWNLOAD_DIR}/$file" ]]; then
-                echo "⏭️ Ignorando arquivo ${file}"
-                continue
-            fi
-            if ls "${DOWNLOAD_DIR}/${file}"* >/dev/null 2>&1; then
-                echo "🔗 Montando ${file} a partir das partes..."
-                cat "${DOWNLOAD_DIR}/${file}"* > "${DOWNLOAD_DIR}/${file}"
-            else
-                echo "⚠️ Nenhuma parte encontrada para ${file}"
-            fi
-        done
+    print_banner "INICIANDO PROCESSO DE SETUP MASTER"
+    print_info "Apps selecionados: ${APPS_TO_SETUP[*]}"
+    echo ""
 
-        # --- EXTRAÇÃO OU CÓPIA ---
-        if [[ "$MODULO" =~ ^(dbaccess|licenseserver)$ ]]; then
-            echo ""
-            echo "📦 Iniciando extração dos arquivos..."
-            for file in "${FILES[@]}"; do
-                if [ -f "${DOWNLOAD_DIR}/${file}" ]; then
-                    echo "📂 Extraindo ${file} para ${DEST_DIR}"
-                    tar -xzf "${DOWNLOAD_DIR}/${file}" -C "${DEST_DIR}/"
-                else
-                    echo "⚠️ Arquivo ${file} não encontrado para extração."
-                fi
-            done
-        else
-            echo ""
-            echo "📂 Copiando arquivos para ${DEST_DIR}"
-            for file in "${FILES[@]}"; do
-                if [ -f "${DOWNLOAD_DIR}/${file}" ]; then
-                    cp "${DOWNLOAD_DIR}/${file}" "${DEST_DIR}/"
-                    echo "✅ Copiado: ${file}"
-                else
-                    echo "⚠️ Arquivo não encontrado: ${file}"
-                fi
-            done
+    FAILED_APPS=()
+    ORIGINAL_DIR=$(pwd)
+
+    for APP in "${APPS_TO_SETUP[@]}"; do
+        print_progress "Iniciando setup do submodulo: $APP"
+        
+        if [[ ! -d "services/$APP" ]]; then
+            print_error "Diretório 'services/$APP' não encontrado."
+            FAILED_APPS+=("$APP")
+            continue
         fi
 
-        echo ""
-        echo "------------------------------------------"
-        echo "✅ Processo concluído para o módulo: ${MODULO}"
-        echo "Arquivos baixados em: ${DOWNLOAD_DIR}"
-        echo "Arquivos finais em: ${DEST_DIR}"
-        echo "------------------------------------------"
-        echo ""
+        # Alguns submodulos podem usar unpack.sh ou setup.sh (interno)
+        SETUP_SCRIPT=""
+        if [[ -f "services/$APP/unpack.sh" ]]; then
+            SETUP_SCRIPT="./unpack.sh"
+        elif [[ -f "services/$APP/setup-build.sh" ]]; then
+            SETUP_SCRIPT="./setup-build.sh"
+        fi
+
+        if [[ -z "$SETUP_SCRIPT" ]]; then
+            print_info "Nenhum script de setup encontrado em 'services/$APP/'. Pulando..."
+            continue
+        fi
+
+        # Entra no diretório do app para manter o contexto
+        cd "services/$APP"
+        
+        print_info "Executando $SETUP_SCRIPT em context: ./services/$APP"
+        
+        # Executa o setup do submodulo
+        if ! bash "$SETUP_SCRIPT" "all"; then
+            print_error "Falha no setup do submodulo '$APP'."
+            FAILED_APPS+=("$APP")
+        else
+            print_success "Setup do submodulo '$APP' concluído com sucesso!"
+        fi
+
+        # Retorna ao diretório raiz
+        cd "$ORIGINAL_DIR"
+        echo "-----------------------------------"
+    done
+
+# ----------------------------------------------------
+#   SEÇÃO 4: FINALIZAÇÃO
+# ----------------------------------------------------
+
+    if [[ ${#FAILED_APPS[@]} -eq 0 ]]; then
+        print_banner "PROCESSO DE SETUP CONCLUÍDO COM SUCESSO"
+        exit 0
     else
-        echo "⏭️ Ignorando download, arquivos disponíveus localmente."
+        print_banner "FALHA EM UM OU MAIS PROCESSOS DE SETUP"
+        print_error "Os seguintes apps falharam: ${FAILED_APPS[*]}"
+        exit 1
     fi
-}
-
-# Função auxiliar para remover arquivos e diretórios com verificação
-remove_item() {
-  local path="$1"
-  if [[ -e "$path" ]]; then
-    echo "🧹 Removendo: $path"
-    rm -rf "$path"
-  else
-    echo "ℹ️  Ignorado (não existe): $path"
-  fi
-}
-
-# Executa o script clean.sh localizado no mesmo diretório que este script
-# read -p "Deseja limpar os resources existentes antes de executar o setup (s/N)? " execute_clean
-# echo ""
-
-# if [[ "$execute_clean" =~ ^[Ss]$ ]]; then
-#     "$(dirname "$0")/clean.sh"
-# fi
-
-# --- EXECUÇÃO PRINCIPAL ---
-if [[ -n "$1" ]]; then
-    MODULOS=("$1")
-else
-    echo "⚙️ Nenhum módulo informado — todos serão processados."
-    MODULOS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
-fi
-
-for mod in "${MODULOS[@]}"; do
-    processar_modulo "$mod"
-done
-
-echo "=========================================="
-echo "🏁 Todos os módulos foram processados com sucesso!"
-echo "=========================================="
-echo ""

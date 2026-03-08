@@ -13,20 +13,20 @@ chmod +x scripts/hooks/commit-msg.sh
 
 echo "🔧 Configurando Git Hooks..."
 
-# --- 1. Hook Pre-Commit ---
-echo "Instalando pre-commit em $PRE_COMMIT_HOOK..."
-cat <<EOF > "$PRE_COMMIT_HOOK"
-#!/bin/bash
-./scripts/hooks/pre-commit.sh
-EOF
-chmod +x "$PRE_COMMIT_HOOK"
-
-# --- 2. Hook Commit-Msg ---
+# --- 1. Hook Commit-Msg ---
 echo "Instalando commit-msg em $COMMIT_MSG_HOOK..."
 cat <<EOF > "$COMMIT_MSG_HOOK"
 #!/bin/bash
 ./scripts/hooks/commit-msg.sh "\$1"
 EOF
 chmod +x "$COMMIT_MSG_HOOK"
+
+# --- 2. Hook Pre-Commit ---
+echo "Instalando pre-commit em $PRE_COMMIT_HOOK..."
+cat <<EOF > "$PRE_COMMIT_HOOK"
+#!/bin/bash
+./scripts/hooks/pre-commit.sh
+EOF
+chmod +x "$PRE_COMMIT_HOOK"
 
 echo "✅ Git Hooks instalados com sucesso!"

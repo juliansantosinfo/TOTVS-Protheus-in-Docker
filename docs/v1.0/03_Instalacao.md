@@ -58,7 +58,7 @@ Utilize o script mestre de build na raiz:
 ./scripts/build/build.sh
 
 # Para construir apenas uma específica (ex: appserver)
-./appserver/build.sh
+./services/appserver/build.sh
 ```
 Este processo pode levar vários minutos na primeira vez, pois envolve o download de imagens base (**Red Hat UBI8** ou **Oracle Linux 8**) e a instalação de pacotes via `dnf` ou `microdnf` (gerenciado automaticamente pelo sistema).
 

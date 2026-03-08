@@ -86,11 +86,11 @@ Para atualizações pontuais (patches), você pode copiar o arquivo RPO diretame
     ```
 
 ### Atualizando Binários e RPO (Build Completo)
-Para uma atualização completa ou alteração de binários, o processo utiliza arquivos compactados que são consumidos durante o build da imagem. Estes arquivos **não são versionados no Git** e devem ser disponibilizados manualmente no diretório `appserver/totvs/`.
+Para uma atualização completa ou alteração de binários, o processo utiliza arquivos compactados que são consumidos durante o build da imagem. Estes arquivos **não são versionados no Git** e devem ser disponibilizados manualmente no diretório `services/appserver/totvs/`.
 
 1.  **Arquivos Necessários:**
-    *   `appserver/totvs/protheus.tar.gz`: Contém o binário do AppServer compactado.
-    *   `appserver/totvs/protheus_data.tar.gz`: Contém o diretório `protheus_data` compactado (incluindo XNU, dicionários, etc).
+    *   `services/appserver/totvs/protheus.tar.gz`: Contém o binário do AppServer compactado.
+    *   `services/appserver/totvs/protheus_data.tar.gz`: Contém o diretório `protheus_data` compactado (incluindo XNU, dicionários, etc).
 2.  **Executar o Build:**
     ```bash
     cd appserver

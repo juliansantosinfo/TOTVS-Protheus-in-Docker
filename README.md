@@ -45,7 +45,9 @@ O projeto é dividido nos seguintes serviços:
 
 ### ⚙️ Gestão de Versões (Centralizada)
 
-O projeto utiliza o arquivo `versions.env` na raiz como **fonte única de verdade** para todas as versões de componentes e tags de imagem. Ao alterar uma versão, o script `./scripts/validation/versions.sh --fix` sincroniza automaticamente todos os Dockerfiles.
+O projeto utiliza o arquivo `versions.env` na raiz como **fonte única de verdade** para todas as versões de componentes e tags de imagem. 
+
+Ao alterar uma versão, o script `./scripts/validation/versions.sh --fix` sincroniza automaticamente todos os Dockerfiles e scripts. Os scripts mestres de automação dependem estritamente desse arquivo para garantir builds consistentes.
 
 ---
 
@@ -173,14 +175,27 @@ Você pode configurar o ambiente de duas formas: utilizando o gerador web (mais 
 
 ## 📦 Build Local e Automação
 
-O projeto conta com scripts robustos em `scripts/` para facilitar o ciclo de vida:
+O projeto conta com scripts robustos no diretório `scripts/` para facilitar todo o ciclo de vida do ecossistema, permitindo a orquestração de múltiplos submodulos simultaneamente.
+
+### Scripts Mestres
+
+A partir da raiz do projeto, você pode gerenciar todos os serviços de forma unificada:
 
 | Script | Função |
 |---|---|
-| `./scripts/build/setup.sh` | Baixa binários e recursos pré-configurados. |
-| `./scripts/build/build.sh` | Realiza o build de todas as imagens localmente. |
-| `./scripts/validation/versions.sh` | Valida a consistência de versões e labels. |
-| `./scripts/test/test-compose.sh` | Valida se os arquivos compose estão sintaticamente corretos. |
+| `./scripts/build/setup.sh [apps...]` | Baixa binários e recursos pré-configurados. Essencial antes do primeiro build. |
+| `./scripts/build/build.sh [apps...]` | Realiza o build de imagens localmente. |
+| `./scripts/build/clean.sh [apps...]` | Remove arquivos não versionados e temporários, garantindo um ambiente limpo. |
+| `./scripts/build/push.sh [apps...]` | Envia as imagens construídas para o Docker Hub. |
+
+> **Dica de Uso:** Todos os scripts mestres aceitam de forma opcional os nomes dos serviços (ex: `appserver dbaccess`). Se nenhum argumento for passado, o script processará **todos** os submodulos disponíveis. Eles também repassam parâmetros extras para os scripts individuais (ex: `./scripts/build/build.sh appserver --no-cache`).
+
+### Outros Utilitários
+
+| Script | Função |
+|---|---|
+| `./scripts/validation/versions.sh` | Valida a consistência de versões e labels baseado no `versions.env`. |
+| `./scripts/test/test-compose.sh` | Valida se os arquivos compose estão sintaticamente corretos e executam um smoke test. |
 
 ### 💡 Perfis de Inicialização (Profiles)
 
@@ -252,42 +267,66 @@ Se preferir construir as imagens Docker localmente em vez de usar as do Docker H
 2.  Execute o script `build.sh` dentro do diretório de cada componente:
     ```bash
     # Construir a imagem do AppServer (que serve para 'application' e 'rest')
-    cd appserver/
+    cd services/appserver/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do DBAccess
-    cd dbaccess/
+    cd services/dbaccess/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do License Server
-    cd licenseserver/
+    cd services/licenseserver/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do MS SQL (se for usar)
-    cd mssql/
+    cd services/mssql/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do PostgreSQL (se for usar)
-    cd postgres/
+    cd services/postgres/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do Oracle (se for usar)
-    cd oracle/
+    cd services/oracle/
     ./build.sh
-    cd ..
+    cd ../..
     ```
+
+> **Nota:** É altamente recomendado utilizar os scripts mestres (`./scripts/build/build.sh`) na raiz do projeto em vez de acessar os diretórios individualmente, pois eles garantem o contexto e automação consistentes.
+
 3.  Após construir as imagens, suba os contêineres com os comandos do "Início Rápido".
+
+---
+
+## 🚀 CI/CD e GitHub Actions
+
+O projeto possui um fluxo rigoroso de Integração e Entrega Contínuas (CI/CD) utilizando o GitHub Actions, definido em `.github/workflows/deploy.yml`.
+
+### Fluxo Automatizado
+O workflow é acionado automaticamente em eventos de `push` e `pull_request` nas branches principais (`main`, `master`, `12.1.*`), ignorando corretamente edições em documentações e configurações locais para otimizar os runners.
+
+Ele executa três jobs principais:
+1. **Lint e Validação**: Verifica sintaxe de Dockerfiles (Hadolint), Shell Scripts (ShellCheck), consistência de variáveis (`versions.env`) e validação de Compose.
+2. **Smoke Test**: Executa o download de binários (`setup.sh`), build das imagens e sobe todos os perfis do Docker Compose (`postgres`, `mssql`, `oracle`) para garantir que os serviços se comunicam sem erros.
+3. **Build e Push**: Se o ambiente for válido e estiver rodando em uma branch principal (não-PR), realiza o build e envia as imagens multi-plataforma para o Docker Hub, com as tags apropriadas baseadas no `versions.env` e controle de label `latest`.
+
+### Gatilho Manual (Workflow Dispatch)
+O fluxo oferece um controle granular via *Workflow Dispatch*. Pela interface do GitHub Actions, você pode, de forma seletiva:
+- Escolher fazer o build/push de **todos** os serviços simultaneamente.
+- Selecionar o nome de um serviço específico para interagir (ex: `appserver` ou `smartview`), acelerando builds seletivos em releases menores.
+
+---
 
 ## Configuração
 
 A configuração dos serviços é feita principalmente por meio de **variáveis de ambiente**. Os arquivos `docker-compose-*.yaml` contêm as configurações padrão.
 
-Os `Dockerfiles` para cada componente estão em seus respectivos diretórios (`appserver/dockerfile`, `dbaccess/dockerfile`, etc.).
+Os `Dockerfiles` para cada componente estão em seus respectivos diretórios (`services/appserver/Dockerfile`, `services/dbaccess/Dockerfile`, etc.).
 
 ## Execução Manual dos Containers
 

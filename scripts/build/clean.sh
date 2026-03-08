@@ -1,80 +1,129 @@
 #!/bin/bash
 #
 # ==============================================================================
-# SCRIPT: clean.sh
-# DESCRIÇÃO: Remove arquivos e diretórios temporários gerados pelos módulos
-#            do sistema (appserver, dbaccess, licenseserver, smartview, mssql, 
-#            postgres, oracle).
+# SCRIPT: clean.sh (Master)
+# DESCRIÇÃO: Script mestre para automatizar a limpeza de arquivos não versionados
+#            nos submodulos do ecossistema TOTVS Protheus.
 # AUTOR: Julian de Almeida Santos
-# DATA: 2025-10-16
-# USO: ./scripts/build/clean.sh [modulo]
+# DATA: 2024-03-08
+# USO: ./scripts/build/clean.sh [apps...]
+#
+# EXEMPLOS:
+#   ./scripts/build/clean.sh appserver dbaccess
+#   ./scripts/build/clean.sh
 # ==============================================================================
 
 # --- Configuração de Robustez (Boas Práticas Bash) ---
 set -euo pipefail
 
-IFS=$'\n\t'
+# ----------------------------------------------------
+#   SEÇÃO 1: DEFINIÇÃO DE FUNÇÕES AUXILIARES
+# ----------------------------------------------------
 
-# Função auxiliar para remover arquivos e diretórios com verificação
-remove_item() {
-  local path="$1"
-  if [[ -e "$path" ]]; then
-    echo "🧹 Removendo: $path"
-    rm -rf "$path"
-  else
-    echo "ℹ️  Ignorado (não existe): $path"
-  fi
-}
+    print_success() {
+        echo -e "✅ \033[1;32m$1\033[0m"
+    }
 
-# Função para limpar um diretório específico
-limpar() {
-  local dir="$1"
-  case "$dir" in
-    appserver)
-      remove_item "appserver/totvs/protheus.tar.gz"
-      remove_item "appserver/totvs/protheus_data.tar.gz"
-      ;;
-    dbaccess)
-      remove_item "dbaccess/totvs/dbaccess"
-      ;;
-    licenseserver)
-      remove_item "licenseserver/totvs/licenseserver"
-      ;;
-    mssql)
-      remove_item "mssql/resources"
-      ;;
-    postgres)
-      remove_item "postgres/resources"
-      ;;
-    oracle)
-      remove_item "oracle/resources"
-      ;;
-    smartview)
-      remove_item "smartview/totvs/smartview.tar.gz"
-      ;;
-    *)
-      echo "❌ Erro: diretório inválido '$dir'. Use: appserver, dbaccess, licenseserver, smartview, mssql, postgres ou oracle."
-      exit 1
-      ;;
-  esac
-}
+    print_error() {
+        echo -e "🚨 \033[1;31mErro: $1\033[0m" >&2
+    }
 
-echo "============================================="
-echo "🧼 Iniciando limpeza de arquivos temporários..."
-echo "============================================="
-echo ""
+    print_info() {
+        echo -e "🧹 \033[1;34m$1\033[0m"
+    }
 
-# Se nenhum argumento for passado, limpar todos
-if [[ $# -eq 0 ]]; then
-  for dir in appserver dbaccess licenseserver smartview mssql postgres oracle; do
-    echo "🔹 Limpando '$dir'..."
-    limpar "$dir"
+    print_progress() {
+        echo -e "🚀 \033[1;35m$1\033[0m"
+    }
+
+    print_banner() {
+        echo -e "\033[1;36m==========================================================\033[0m"
+        echo -e "\033[1;36m🎯 $1\033[0m"
+        echo -e "\033[1;36m==========================================================\033[0m"
+    }
+
+# ----------------------------------------------------
+#   SEÇÃO 2: PARSE DE ARGUMENTOS
+# ----------------------------------------------------
+
+    VALID_APPS=("appserver" "dbaccess" "licenseserver" "mssql" "postgres" "oracle" "smartview")
+    APPS_TO_CLEAN=()
+
+    # Itera sobre os argumentos para processar os apps
+    for arg in "$@"; do
+        is_app=false
+        for app in "${VALID_APPS[@]}"; do
+            if [[ "$arg" == "$app" ]]; then
+                APPS_TO_CLEAN+=("$arg")
+                is_app=true
+                break
+            fi
+        done
+        
+        if [[ "$is_app" == "false" ]]; then
+            echo -e "⚠️  Aviso: O argumento '$arg' não é um nome de aplicação válido e será ignorado."
+        fi
+    done
+
+    # Se nenhum app foi informado, utiliza todos
+    if [[ ${#APPS_TO_CLEAN[@]} -eq 0 ]]; then
+        print_info "Nenhum app especificado. Limpando todos os submodulos..."
+        APPS_TO_CLEAN=("${VALID_APPS[@]}")
+    fi
+
+# ----------------------------------------------------
+#   SEÇÃO 3: FLUXO DE EXECUÇÃO
+# ----------------------------------------------------
+
+    print_banner "INICIANDO PROCESSO DE LIMPEZA MASTER"
+    print_info "Apps selecionados: ${APPS_TO_CLEAN[*]}"
     echo ""
-  done
-else
-  limpar "$1"
-fi
 
-echo ""
-echo "✅ Limpeza concluída com sucesso!"
-echo ""
+    FAILED_APPS=()
+    ORIGINAL_DIR=$(pwd)
+
+    for APP in "${APPS_TO_CLEAN[@]}"; do
+        print_progress "Limpando submodulo: $APP"
+        
+        if [[ ! -d "services/$APP" ]]; then
+            print_error "Diretório 'services/$APP' não encontrado."
+            FAILED_APPS+=("$APP")
+            continue
+        fi
+
+        if [[ ! -f "services/$APP/clean.sh" ]]; then
+            print_error "Script de limpeza não encontrado em 'services/$APP/'."
+            FAILED_APPS+=("$APP")
+            continue
+        fi
+
+        # Entra no diretório do app para manter o contexto
+        cd "services/$APP"
+        
+        print_info "Executando clean em context: ./services/$APP"
+        
+        # Executa o clean do submodulo
+        if ! ./clean.sh; then
+            print_error "Falha na limpeza do submodulo '$APP'."
+            FAILED_APPS+=("$APP")
+        else
+            print_success "Limpeza do submodulo '$APP' concluída com sucesso!"
+        fi
+
+        # Retorna ao diretório raiz
+        cd "$ORIGINAL_DIR"
+        echo "-----------------------------------"
+    done
+
+# ----------------------------------------------------
+#   SEÇÃO 4: FINALIZAÇÃO
+# ----------------------------------------------------
+
+    if [[ ${#FAILED_APPS[@]} -eq 0 ]]; then
+        print_banner "PROCESSO DE LIMPEZA CONCLUÍDO COM SUCESSO"
+        exit 0
+    else
+        print_banner "FALHA EM UM OU MAIS PROCESSOS DE LIMPEZA"
+        print_error "Os seguintes apps falharam: ${FAILED_APPS[*]}"
+        exit 1
+    fi
