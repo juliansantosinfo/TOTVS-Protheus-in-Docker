@@ -2,100 +2,129 @@
 #
 # ==============================================================================
 # SCRIPT: versions.sh
-# DESCRIÇÃO: Valida se a versão definida nos Dockerfiles corresponde à versão
-#            centralizada no arquivo versions.env.
+# DESCRIÇÃO: Valida se as versões definidas no Dockerfile correspondem às versões
+#            centralizadas no arquivo versions.env.
 # AUTOR: Julian de Almeida Santos
 # DATA: 2025-10-12
 # USO: ./scripts/validation/versions.sh [--fix]
 # ==============================================================================
 
-set -u
+# --- Configuração de Robustez (Boas Práticas Bash) ---
+set -euo pipefail
 
-# Caminho para o versions.env (assumindo execução da raiz ou de scripts/validation/)
-if [ -f "versions.env" ]; then
-    source "versions.env"
-elif [ -f "../../versions.env" ]; then
-    source "../../versions.env"
-    # Ajusta o path se estiver rodando de dentro de scripts/validation/
-    cd ../..
-else
-    echo "🚨 Erro: Arquivo 'versions.env' não encontrado."
-    exit 1
-fi
+# ----------------------------------------------------
+#   SEÇÃO 1: DEFINICAO DE FUNCOES AUXILIARES
+# ----------------------------------------------------
 
-AUTO_FIX=false
-if [[ "${1:-}" == "--fix" ]]; then
-    AUTO_FIX=true
-fi
+    print_success() {
+        echo "✅ $1"
+    }
 
-EXIT_CODE=0
+    print_error() {
+        echo "❌ $1" >&2
+    }
 
-# Função de Validação
-validate_service() {
-    local service=$1
-    local version_var=$2
-    local dockerfile="./$service/Dockerfile"
-    local expected_version="${!version_var}"
+    print_warning() {
+        echo "⚠️ $1"
+    }
 
-    if [ ! -f "$dockerfile" ]; then
-        echo "⚠️  Aviso: Dockerfile não encontrado para $service. Pulando."
-        return
-    fi
+    print_info() {
+        echo "🔍 $1"
+    }
 
-    # Extrai a versão atual (procura por LABEL release= ou LABEL version=)
-    # 1. grep: busca a linha
-    # 2. head: garante apenas a primeira ocorrência
-    # 3. cut: pega o valor depois do =
-    # 4. tr: remove aspas e espaços
-    local actual_version=$(grep -iE "LABEL (release|version)=" "$dockerfile" | head -n 1 | cut -d'=' -f2 | tr -d '"' | tr -d "[:space:]")
-    
-    # Identifica qual label está sendo usada para o possível fix
-    local label_type=$(grep -iE -o "LABEL (release|version)=" "$dockerfile" | head -n 1 | cut -d' ' -f2 | cut -d'=' -f1)
+    print_plain() {
+        echo "$1"
+    }
 
-    if [ "$actual_version" != "$expected_version" ]; then
-        if [ "$AUTO_FIX" = true ]; then
-            echo "🔧 Corrigindo $service: $actual_version -> $expected_version"
-            
-            # Substitui a versão no arquivo usando sed
-            # Usa regex para garantir que pegamos a linha certa (release ou version)
-            sed -i "s/LABEL $label_type="$actual_version"/LABEL $label_type="$expected_version"/" "$dockerfile"
-            
-            # Verifica se deu certo
-            local new_version=$(grep -iE "LABEL (release|version)=" "$dockerfile" | head -n 1 | cut -d'=' -f2 | tr -d '"' | tr -d "[:space:]")
-            if [ "$new_version" == "$expected_version" ]; then
-                echo "✅ $service corrigido com sucesso."
+    validate_label() {
+        local label_name=$1
+        local expected_value=$2
+        local service=$3
+        local actual_value
+
+        DOCKERFILE="./${service}/Dockerfile"
+        EXIT_CODE=0
+
+        if [ ! -f "$DOCKERFILE" ]; then
+            print_warning "Dockerfile não encontrado. Pulando validação."
+            exit 0
+        fi
+        
+        actual_value=$(grep -iE "LABEL ${label_name}=" "$DOCKERFILE" | head -n 1 | cut -d'=' -f2 | tr -d '"' | tr -d "[:space:]")
+        
+        if [ "$actual_value" != "$expected_value" ]; then
+            if [ "$AUTO_FIX" = true ]; then
+                print_info "Corrigindo ${label_name}: $actual_value -> $expected_value"
+                sed -i "s/LABEL ${label_name}=\"${actual_value}\"/LABEL ${label_name}=\"${expected_value}\"/" "$DOCKERFILE"
+                
+                # Verifica se deu certo
+                local new_value
+                new_value=$(grep -iE "LABEL ${label_name}=" "$DOCKERFILE" | head -n 1 | cut -d'=' -f2 | tr -d '"' | tr -d "[:space:]")
+                if [ "$new_value" == "$expected_value" ]; then
+                    print_success "${service} ${label_name} corrigido com sucesso."
+                else
+                    print_error "Falha ao corrigir ${label_name}."
+                    EXIT_CODE=1
+                fi
             else
-                echo "❌ Falha ao corrigir $service."
+                print_error "${label_name}: Dockerfile ($actual_value) difere de versions.env ($expected_value)"
                 EXIT_CODE=1
             fi
         else
-            echo "❌ ERRO ($service): Versão no Dockerfile ($actual_version) difere de versions.env ($expected_version)"
-            EXIT_CODE=1
+            print_success "${service} ${label_name}: $expected_value"
         fi
+    }
+
+# ----------------------------------------------------
+#   SEÇÃO 2: PARSE DE ARGUMENTOS
+# ----------------------------------------------------
+
+    AUTO_FIX=false
+
+    if [[ "${1:-}" == "--fix" ]]; then
+        AUTO_FIX=true
+    fi
+
+# ----------------------------------------------------
+#   SEÇÃO 3: CARREGAMENTO DE CONFIGURAÇÕES
+# ----------------------------------------------------
+
+    if [ -f "versions.env" ]; then
+        source "versions.env"
+    elif [ -f "../../versions.env" ]; then
+        source "../../versions.env"
+        cd ../..
     else
-        echo "✅ OK ($service): Versão correta ($expected_version)"
+        print_error "Arquivo 'versions.env' não encontrado."
+        exit 1
     fi
-}
 
-echo "🔍 Iniciando validação de versões..."
-echo "-----------------------------------"
+# ----------------------------------------------------
+#   SEÇÃO 4: VALIDAÇÃO DE VERSÕES
+# ----------------------------------------------------
 
-validate_service "appserver" "APPSERVER_VERSION"
-validate_service "dbaccess" "DBACCESS_VERSION"
-validate_service "licenseserver" "LICENSESERVER_VERSION"
-validate_service "mssql" "MSSQL_VERSION"
-validate_service "postgres" "POSTGRES_VERSION"
-validate_service "oracle" "ORACLE_VERSION"
-validate_service "smartview" "SMARTVIEW_VERSION"
+    print_info "Iniciando validação de versões..."
+    print_plain "-----------------------------------"
 
-echo "-----------------------------------"
-if [ $EXIT_CODE -ne 0 ]; then
-    echo "🛑 Validação falhou! Algumas versões estão inconsistentes."
-    if [ "$AUTO_FIX" = false ]; then
-        echo "💡 Dica: Execute './scripts/validate-versions.sh --fix' para corrigir automaticamente."
+    # Valida cada label
+    validate_label "release" "${APPSERVER_VERSION}" "appserver"
+    validate_label "build" "${APPSERVER_BUILD_VERSION}" "appserver"
+    validate_label "dbapi" "${APPSERVER_DBAPI_VERSION}" "appserver"
+    validate_label "webapp" "${APPSERVER_WEBAPP_VERSION}" "appserver"
+    validate_label "version" "${DBACCESS_VERSION}" "dbaccess"
+    validate_label "version" "${LICENSESERVER_VERSION}" "licenseserver"
+    validate_label "version" "${MSSQL_VERSION}" "mssql"
+    validate_label "version" "${ORACLE_VERSION}" "oracle"
+    validate_label "version" "${POSTGRES_VERSION}" "postgres"
+    validate_label "version" "${SMARTVIEW_VERSION}" "smartview"
+    
+    print_plain "-----------------------------------"
+    
+    if [ $EXIT_CODE -ne 0 ]; then
+        if [ "$AUTO_FIX" = false ]; then
+            print_info "Dica: Execute './scripts/validation/versions.sh --fix' para corrigir automaticamente."
+        fi
+        exit 1
     fi
-    exit 1
-else
-    echo "🎉 Todas as versões estão sincronizadas."
-    exit 0
-fi
+    
+    print_success "Validação concluída."
