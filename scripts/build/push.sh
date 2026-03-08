@@ -104,22 +104,22 @@ set -euo pipefail
     for APP in "${APPS_TO_PUSH[@]}"; do
         print_progress "Fazendo push do submodulo: $APP"
         
-        if [[ ! -d "$APP" ]]; then
-            print_error "Diretório '$APP' não encontrado."
+        if [[ ! -d "services/$APP" ]]; then
+            print_error "Diretório 'services/$APP' não encontrado."
             FAILED_APPS+=("$APP")
             continue
         fi
 
-        if [[ ! -f "$APP/push.sh" ]]; then
-            print_error "Script de push não encontrado em '$APP/'."
+        if [[ ! -f "services/$APP/push.sh" ]]; then
+            print_error "Script de push não encontrado em 'services/$APP/'."
             FAILED_APPS+=("$APP")
             continue
         fi
 
         # Entra no diretório do app para manter o contexto
-        cd "$APP"
+        cd "services/$APP"
         
-        print_info "Executando push em context: ./$APP"
+        print_info "Executando push em context: ./services/$APP"
         
         # Executa o push do submodulo passando as opções extras
         if ! ./push.sh "${PUSH_OPTIONS[@]+"${PUSH_OPTIONS[@]}"}"; then

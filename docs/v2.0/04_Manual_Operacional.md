@@ -11,7 +11,7 @@ A operação foi otimizada via novos master-scripts em shell `(scripts/*)`, dota
 | **Build** | Constrói infraestrutura Docker garantindo Labels via API | `./scripts/build/build.sh` | `./scripts/build/build.sh appserver` |
 | **Limpeza (Clean)**| Restauração drástica. Remove os binários `*.tar` não versionados, apagando downloads efêmeros do `setup.sh`. Mantém o ambiente "Zero Git State" ideal antes de Commits. | `./scripts/build/clean.sh` | `./scripts/build/clean.sh dbaccess` |
 
-> *Aviso: A manutenção isolada de scripts em pastas internas (ex `appserver/build.sh`) ainda é factível na v2.0 caso precise focar exclusivamente no repositório dequele serviço (o submódulo), mas gerenciar na raiz é recomendado.*
+> *Aviso: A manutenção isolada de scripts em pastas internas (ex `services/appserver/build.sh`) ainda é factível na v2.0 caso precise focar exclusivamente no repositório dequele serviço (o submódulo), mas gerenciar na raiz é recomendado.*
 
 ## 4.2. Fluxos Tradicionais de Docker Compose
 

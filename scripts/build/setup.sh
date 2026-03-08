@@ -85,29 +85,29 @@ set -euo pipefail
     for APP in "${APPS_TO_SETUP[@]}"; do
         print_progress "Iniciando setup do submodulo: $APP"
         
-        if [[ ! -d "$APP" ]]; then
-            print_error "Diretório '$APP' não encontrado."
+        if [[ ! -d "services/$APP" ]]; then
+            print_error "Diretório 'services/$APP' não encontrado."
             FAILED_APPS+=("$APP")
             continue
         fi
 
         # Alguns submodulos podem usar unpack.sh ou setup.sh (interno)
         SETUP_SCRIPT=""
-        if [[ -f "$APP/unpack.sh" ]]; then
+        if [[ -f "services/$APP/unpack.sh" ]]; then
             SETUP_SCRIPT="./unpack.sh"
-        elif [[ -f "$APP/setup-build.sh" ]]; then
+        elif [[ -f "services/$APP/setup-build.sh" ]]; then
             SETUP_SCRIPT="./setup-build.sh"
         fi
 
         if [[ -z "$SETUP_SCRIPT" ]]; then
-            print_info "Nenhum script de setup encontrado em '$APP/'. Pulando..."
+            print_info "Nenhum script de setup encontrado em 'services/$APP/'. Pulando..."
             continue
         fi
 
         # Entra no diretório do app para manter o contexto
-        cd "$APP"
+        cd "services/$APP"
         
-        print_info "Executando $SETUP_SCRIPT em context: ./$APP"
+        print_info "Executando $SETUP_SCRIPT em context: ./services/$APP"
         
         # Executa o setup do submodulo
         if ! bash "$SETUP_SCRIPT" "all"; then

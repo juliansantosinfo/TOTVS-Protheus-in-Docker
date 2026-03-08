@@ -26,23 +26,23 @@ Thumbs.db
 # 4. TOTVS Binaries, Resources and Large Files
 # ------------------------------------------------------------------------------
 # AppServer & RPOs
-appserver/totvs/protheus.tar.gz
-appserver/totvs/protheus_data.tar.gz
+services/appserver/totvs/protheus.tar.gz
+services/appserver/totvs/protheus_data.tar.gz
 
 # DBAccess
-dbaccess/totvs/dbaccess
+services/dbaccess/totvs/dbaccess
 
 # License Server
-licenseserver/totvs/licenseserver
+services/licenseserver/totvs/licenseserver
 
 # Database Resources
-mssql/resources/data.tar.gz
-oracle/resources/data.tar.gz
-postgres/resources/data.tar.gz
+services/mssql/resources/data.tar.gz
+services/oracle/resources/data.tar.gz
+services/postgres/resources/data.tar.gz
 **/LINUX.X64_213000_db_home.zip
 
 # SmartView
-smartview/totvs/smartview.tar.gz
+services/smartview/totvs/smartview.tar.gz
 
 # Component Packages (Local download cache)
 **/packages/**

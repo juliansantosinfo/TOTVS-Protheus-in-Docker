@@ -28,7 +28,7 @@ O arquivo maestro `.github/workflows/deploy.yml` descreve toda a rotina, executa
 No GitHub Web, não dependa apenas do *Push*. Você tem botões de Dispatch (Gatilhos Manuais) para engatilhar rodadas seletivas isoladas na infra (Baixar/Buildar apenas `appserver`, etc).
 
 ## 5.3. Controle de Microservices: Repositório de Submódulos
-Você modificou um Dockerfile na raiz do `TOTVS-Protheus-in-Docker/appserver/` e "commitou" na raiz principal? **Você Errou.**
+Você modificou um Dockerfile na raiz do `TOTVS-Protheus-in-Docker/services/appserver/` e "commitou" na raiz principal? **Você Errou.**
 Submódulos Git são um portal para "Outro Repositório".
 1. Você desce a pasta: `cd appserver`
 2. Você altera e envia lá primeiro: `git commit -m "feat..." && git push origin master`

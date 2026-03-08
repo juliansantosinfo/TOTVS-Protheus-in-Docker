@@ -42,7 +42,7 @@ set -euo pipefail
         local service=$3
         local actual_value
 
-        DOCKERFILE="./${service}/Dockerfile"
+        DOCKERFILE="./services/${service}/Dockerfile"
         EXIT_CODE=0
 
         if [ ! -f "$DOCKERFILE" ]; then

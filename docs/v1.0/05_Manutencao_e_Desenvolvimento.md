@@ -3,7 +3,7 @@
 ## 5.1. Estrutura de Diretórios e Código Fonte
 Para manter este projeto, é crucial entender a organização das pastas.
 
-*   `appserver/`, `dbaccess/`, `licenseserver/`, etc.: Cada diretório raiz representa um microserviço. Dentro dele sempre haverá:
+*   `services/appserver/`, `services/dbaccess/`, `services/licenseserver/`, etc.: Cada diretório raiz representa um microserviço. Dentro dele sempre haverá:
     *   `dockerfile`: A receita de bolo para criar a imagem.
     *   `build.sh`: Script wrapper para facilitar o `docker build`.
     *   `entrypoint.sh`: Script executado **dentro** do container ao iniciar. É aqui que a mágica da configuração dinâmica acontece.
@@ -16,7 +16,7 @@ Se você precisar instalar dependências de SO adicionais (ex: bibliotecas Pytho
 1.  Edite o `dockerfile` do serviço correspondente.
 2.  Localize a seção de instalação de pacotes. O projeto utiliza a abstração `$PKG_MGR` para lidar tanto com `dnf` quanto com `microdnf` em bases Red Hat UBI ou Oracle Linux.
 3.  Adicione os pacotes desejados seguindo a sintaxe: `$PKG_MGR install -y <pacote>`.
-4.  Rebuilde a imagem: `./appserver/build.sh`.
+4.  Rebuilde a imagem: `./services/appserver/build.sh`.
 
 ## 5.3. Entendendo os Entrypoints (Scripts de Inicialização)
 A inteligência de adaptabilidade do ambiente reside nos arquivos `entrypoint.sh`.
@@ -28,7 +28,7 @@ O projeto adota uma filosofia de "Fail Fast" com padrões sensatos:
 *   **Resiliência:** Utiliza checks TCP via `/dev/tcp` para garantir conectividade antes de configurar arquivos `.ini`.
 
 **Exemplo: Como o DBAccess sabe o IP do banco?**
-No `dbaccess/entrypoint.sh`, existe uma lógica que lê a variável de ambiente `DATABASE_SERVER` (definida no docker-compose) e usa o comando `sed` (Stream Editor) para substituir um placeholder no arquivo `odbc.ini`.
+No `services/dbaccess/entrypoint.sh`, existe uma lógica que lê a variável de ambiente `DATABASE_SERVER` (definida no docker-compose) e usa o comando `sed` (Stream Editor) para substituir um placeholder no arquivo `odbc.ini`.
 
 ```bash
 # Trecho ilustrativo do script
@@ -90,7 +90,7 @@ Estes scripts garantem que o código siga os padrões estabelecidos:
 ## 5.8. Integridade de Imagens e Validação de Hashes
 Para garantir que as imagens sejam construídas a partir de arquivos íntegros e não corrompidos, o projeto está implementando validações de hash SHA1.
 
-*   **Oracle Database:** O diretório `oracle/` contém um arquivo `.hashes.sha1`. Durante o `build.sh`, o script valida se os arquivos locais (como scripts SQL e entrypoints) correspondem aos hashes registrados.
+*   **Oracle Database:** O diretório `services/oracle/` contém um arquivo `.hashes.sha1`. Durante o `build.sh`, o script valida se os arquivos locais (como scripts SQL e entrypoints) correspondem aos hashes registrados.
 *   **Como atualizar os hashes:** Se você alterar propositalmente um arquivo e desejar atualizar o registro de integridade, execute:
     ```bash
     find . -type f ! -name ".hashes.sha1" -exec sha1sum {} + > .hashes.sha1

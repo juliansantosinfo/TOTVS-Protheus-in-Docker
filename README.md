@@ -267,34 +267,34 @@ Se preferir construir as imagens Docker localmente em vez de usar as do Docker H
 2.  Execute o script `build.sh` dentro do diretório de cada componente:
     ```bash
     # Construir a imagem do AppServer (que serve para 'application' e 'rest')
-    cd appserver/
+    cd services/appserver/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do DBAccess
-    cd dbaccess/
+    cd services/dbaccess/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do License Server
-    cd licenseserver/
+    cd services/licenseserver/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do MS SQL (se for usar)
-    cd mssql/
+    cd services/mssql/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do PostgreSQL (se for usar)
-    cd postgres/
+    cd services/postgres/
     ./build.sh
-    cd ..
+    cd ../..
 
     # Construir a imagem do Oracle (se for usar)
-    cd oracle/
+    cd services/oracle/
     ./build.sh
-    cd ..
+    cd ../..
     ```
 
 > **Nota:** É altamente recomendado utilizar os scripts mestres (`./scripts/build/build.sh`) na raiz do projeto em vez de acessar os diretórios individualmente, pois eles garantem o contexto e automação consistentes.
@@ -326,7 +326,7 @@ O fluxo oferece um controle granular via *Workflow Dispatch*. Pela interface do 
 
 A configuração dos serviços é feita principalmente por meio de **variáveis de ambiente**. Os arquivos `docker-compose-*.yaml` contêm as configurações padrão.
 
-Os `Dockerfiles` para cada componente estão em seus respectivos diretórios (`appserver/dockerfile`, `dbaccess/dockerfile`, etc.).
+Os `Dockerfiles` para cada componente estão em seus respectivos diretórios (`services/appserver/Dockerfile`, `services/dbaccess/Dockerfile`, etc.).
 
 ## Execução Manual dos Containers
 
