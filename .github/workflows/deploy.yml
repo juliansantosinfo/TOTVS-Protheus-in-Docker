@@ -36,23 +36,42 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Selecione o serviço para build/push (ou "all" para todos)'
+        description: 'Selecione o docker-compose file para smoke test (ou "all" para todos)'
         required: true
         default: "all"
         type: choice
         options:
           - all
-          - appserver
-          - dbaccess
-          - licenseserver
-          - mssql
-          - oracle
-          - postgres
-          - smartview
+          - docker-compose-postgresql.yaml
+          - docker-compose-mssql.yaml
+          - docker-compose-oracle.yaml
 
 jobs:
-  lint-and-validation:
+  setup-runner:
     runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.check.outputs.runner }}
+    steps:
+      - name: Check self-hosted runner availability
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Verificando se há runners self-hosted ativos..."
+          # Consulta a API do GitHub para listar runners 'online' com a label 'self-hosted'
+          RUNNERS=$(gh api /repos/${{ github.repository }}/actions/runners --jq '.runners[] | select(.status=="online" and (.labels[].name=="self-hosted")) | .name' || echo "")
+          
+          if [ -n "$RUNNERS" ]; then
+            echo "Runner self-hosted ONLINE. Utilizando-o para a esteira."
+            echo "runner=self-hosted" >> "$GITHUB_OUTPUT"
+          else
+            echo "Runner self-hosted OFFLINE ou não configurado. Fallback ativado: ubuntu-latest."
+            echo "runner=ubuntu-latest" >> "$GITHUB_OUTPUT"
+          fi
+
+  lint-and-validation:
+    needs: setup-runner
+    runs-on: ${{ needs.setup-runner.outputs.runner }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -87,17 +106,12 @@ jobs:
         run: ./scripts/validation/versions.sh
 
   smoke_test:
-    needs: lint-and-validation
-    runs-on: ubuntu-latest
+    needs: [setup-runner, lint-and-validation]
+    runs-on: ${{ needs.setup-runner.outputs.runner }}
     strategy:
       fail-fast: false
       matrix:
-        service:
-          [
-            docker-compose-postgresql.yaml,
-            docker-compose-mssql.yaml,
-            docker-compose-oracle.yaml,
-          ]
+        service: ${{ (github.event.inputs.service == 'all' || github.event.inputs.service == '') && fromJSON('["docker-compose-postgresql.yaml", "docker-compose-mssql.yaml", "docker-compose-oracle.yaml"]') || fromJSON(format('["{0}"]', github.event.inputs.service)) }}
 
     steps:
       - name: Checkout repository
