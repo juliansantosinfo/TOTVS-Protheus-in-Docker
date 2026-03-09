@@ -6,10 +6,12 @@
 
 PRE_COMMIT_HOOK=".git/hooks/pre-commit"
 COMMIT_MSG_HOOK=".git/hooks/commit-msg"
+POST_CHECKOUT_HOOK=".git/hooks/post-checkout"
 
 # Garante permissão de execução nos scripts de hook
 chmod +x scripts/hooks/pre-commit.sh
 chmod +x scripts/hooks/commit-msg.sh
+chmod +x scripts/hooks/post-checkout.sh
 
 echo "🔧 Configurando Git Hooks..."
 
@@ -28,5 +30,13 @@ cat <<EOF > "$PRE_COMMIT_HOOK"
 ./scripts/hooks/pre-commit.sh
 EOF
 chmod +x "$PRE_COMMIT_HOOK"
+
+# --- 3. Hook Post-Checkout ---
+echo "Instalando post-checkout em $POST_CHECKOUT_HOOK..."
+cat <<EOF > "$POST_CHECKOUT_HOOK"
+#!/bin/bash
+./scripts/hooks/post-checkout.sh "\$1" "\$2" "\$3"
+EOF
+chmod +x "$POST_CHECKOUT_HOOK"
 
 echo "✅ Git Hooks instalados com sucesso!"
