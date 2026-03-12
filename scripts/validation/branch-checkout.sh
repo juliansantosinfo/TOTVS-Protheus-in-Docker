@@ -93,6 +93,13 @@ trocar_branch() {
     # Entra na pasta
     cd "$PASTA" || { echo "Não foi possível acessar a pasta: $PASTA"; return; }
 
+    # Verifica se ja esta na branch solicitada
+    if [ "$(git branch --show-current)" == "$BRANCH" ]; then
+        echo "Ja esta na branch: $BRANCH"
+        echo ""
+        return
+    fi
+
     # Verifica se a branch existe (no computador ou no servidor remoto)
     local BRANCH_EXISTE=false
     git rev-parse --verify "$BRANCH"          >/dev/null 2>&1 && BRANCH_EXISTE=true
