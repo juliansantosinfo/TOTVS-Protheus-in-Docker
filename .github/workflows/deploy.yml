@@ -1,4 +1,4 @@
-name: Test Docker Compose Files
+name: Test Environment
 
 on:
   workflow_dispatch:
@@ -23,66 +23,13 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install ShellCheck and Hadolint
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y shellcheck
-          sudo curl -L https://github.com/hadolint/hadolint/releases/latest/download/hadolint-linux-x86_64 -o /usr/local/bin/hadolint
-          sudo chmod +x /usr/local/bin/hadolint
-
-      - name: Make scripts executable
-        run: |
-          find scripts/ -name "*.sh" -exec chmod +x {} +
-          find services/ -name "*.sh" -exec chmod +x {} +
-
-      - name: Validate .env
-        run: ./scripts/validation/env.sh
-
-      - name: Run Docker Compose Config Check
-        run: ./scripts/validation/lint-compose.sh
-
-      - name: Run Hadolint (Dockerfile)
-        run: ./scripts/validation/lint-dockerfile.sh
-
-      - name: Run ShellCheck
-        run: ./scripts/validation/lint-shell.sh
-
-      - name: Validate Versions
-        run: ./scripts/validation/versions.sh
-
-  smoke_test:
-    needs: lint-and-validation
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        service: ${{ (github.event.inputs.service == 'all' || github.event.inputs.service == '') && fromJSON('["docker-compose-postgresql.yaml", "docker-compose-mssql.yaml", "docker-compose-oracle.yaml"]') || fromJSON(format('["{0}"]', github.event.inputs.service)) }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Make scripts executable
         run: |
           whoami
           echo "Usuário: $(whoami)"
           echo "Usuário do sistema: $USER"
           echo "Diretório: $pwd"
-          find scripts/ -name "*.sh" -exec chmod +x {} +
-          find services/ -name "*.sh" -exec chmod +x {} +
-
-      - name: Run Smoke Test
-        run: |
-          whoami
-          echo "Usuário: $(whoami)"
-          echo "Usuário do sistema: $USER"
-          echo "Diretório: $pwd"
-          ./scripts/test/test-compose.sh -f ${{ matrix.service }}
+          getent group docker
+          getent group docker-host
+          stat /var/run/docker.sock
+          ls -l /var/run/docker.sock
