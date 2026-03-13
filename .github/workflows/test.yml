@@ -1,0 +1,35 @@
+name: Test Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Selecione o docker-compose file para smoke test (ou "all" para todos)'
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - docker-compose-postgresql.yaml
+          - docker-compose-mssql.yaml
+          - docker-compose-oracle.yaml
+
+jobs:
+  lint-and-validation:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Make scripts executable
+        run: |
+          whoami
+          echo "Usuário: $(whoami)"
+          echo "Usuário do sistema: $USER"
+          echo "Diretório: $pwd"
+          getent group docker
+          getent group docker-host
+          stat /var/run/docker.sock
+          ls -l /var/run/docker.sock
