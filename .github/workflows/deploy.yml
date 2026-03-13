@@ -25,11 +25,14 @@ jobs:
 
       - name: Make scripts executable
         run: |
-          whoami
           echo "Usuário: $(whoami)"
           echo "Usuário do sistema: $USER"
           echo "Diretório: $pwd"
           getent group docker
           getent group docker-host
+          echo ""
+          echo "Docker Socket Info"
+          echo ""
           stat /var/run/docker.sock
+          echo ""
           ls -l /var/run/docker.sock
