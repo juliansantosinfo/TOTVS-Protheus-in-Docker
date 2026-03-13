@@ -72,8 +72,17 @@ jobs:
 
       - name: Make scripts executable
         run: |
+          whoami
+          echo "Usuário: $(whoami)"
+          echo "Usuário do sistema: $USER"
+          echo "Diretório: $pwd"
           find scripts/ -name "*.sh" -exec chmod +x {} +
           find services/ -name "*.sh" -exec chmod +x {} +
 
       - name: Run Smoke Test
-        run: ./scripts/test/test-compose.sh -f ${{ matrix.service }}
+        run: |
+          whoami
+          echo "Usuário: $(whoami)"
+          echo "Usuário do sistema: $USER"
+          echo "Diretório: $pwd"
+          ./scripts/test/test-compose.sh -f ${{ matrix.service }}
