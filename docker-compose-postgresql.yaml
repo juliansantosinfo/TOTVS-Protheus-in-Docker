@@ -33,7 +33,7 @@ services:
       start_period: 10s
 
   licenseserver:
-    image: juliansantosinfo/totvs_licenseserver:3.7.0
+    image: juliansantosinfo/totvs_licenseserver:3.7.2
     container_name: totvs_licenseserver
     restart: always
     ulimits:
@@ -61,7 +61,7 @@ services:
       - totvs
 
   dbaccess:
-    image: juliansantosinfo/totvs_dbaccess:24.1.1.0
+    image: juliansantosinfo/totvs_dbaccess:26.1.0.0
     container_name: totvs_dbaccess
     restart: always
     # Expor portas do DbAccess (útil para monitoramento)
@@ -95,7 +95,7 @@ services:
       start_period: 10s
 
   appserver:
-    image: juliansantosinfo/totvs_appserver:12.1.2510
+    image: juliansantosinfo/totvs_appserver:12.1.2610
     container_name: totvs_appserver
     restart: always
     ulimits:
@@ -140,7 +140,7 @@ services:
       start_period: 60s
 
   apprest:
-    image: juliansantosinfo/totvs_appserver:12.1.2510
+    image: juliansantosinfo/totvs_appserver:12.1.2610
     container_name: totvs_apprest
     restart: always
     ulimits:

@@ -24,7 +24,7 @@ fi
 
 # Verifica se a branch é uma das suportadas para restauração automática
 case "$BRANCH_NAME" in
-    12.1.2310|12.1.2410|12.1.2510|main|master)
+    12.1.2310|12.1.2410|12.1.2510|12.1.2610|main|master)
         echo "Hook post-checkout: Sincronizando submódulos para '$BRANCH_NAME'..."
         
         # Chama o script de restauração com a flag --skip-root

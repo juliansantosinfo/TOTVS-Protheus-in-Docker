@@ -13,6 +13,7 @@
 #   ./branch-checkout.sh 12.1.2310
 #   ./branch-checkout.sh 12.1.2410
 #   ./branch-checkout.sh 12.1.2510
+#   ./branch-checkout.sh 12.1.2610
 #   ./branch-checkout.sh main
 # ==============================================================================
 
@@ -59,6 +60,17 @@ obter_branch_do_servico() {
                 mssql)         echo "v2019"             ;;
                 oracle)        echo "v21.3.0"           ;;
                 licenseserver) echo "v3.7.0"            ;;
+                smartview)     echo "v3.9.0.4558336"    ;;
+            esac ;;
+
+        "12.1.2610")
+            case "$SERVICO" in
+                appserver)     echo "12.1.2610"         ;;
+                dbaccess)      echo "v26.1.0.0"         ;;
+                postgres)      echo "v15"               ;;
+                mssql)         echo "v2019"             ;;
+                oracle)        echo "v21.3.0"           ;;
+                licenseserver) echo "v3.7.2"            ;;
                 smartview)     echo "v3.9.0.4558336"    ;;
             esac ;;
 
@@ -137,6 +149,7 @@ if [ -z "${1:-}" ]; then
     echo "Exemplos: $0 12.1.2310"
     echo "          $0 12.1.2410"
     echo "          $0 12.1.2510"
+    echo "          $0 12.1.2610"
     echo "          $0 main"
     exit 1
 fi
