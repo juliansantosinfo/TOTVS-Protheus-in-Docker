@@ -26,6 +26,7 @@ Este repositório é um projeto independente e não possui qualquer afiliação 
 * [**Release 12.1.2310**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2310)
 * [**Release 12.1.2410**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2410)
 * [**Release 12.1.2510**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2510)
+* [**Release 12.1.2610**](https://github.com/juliansantosinfo/TOTVS-Protheus-in-Docker/tree/12.1.2610)
 
 ## 🏗️ Arquitetura e Componentes
 
