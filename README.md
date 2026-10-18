@@ -184,7 +184,7 @@ A partir da raiz do projeto, você pode gerenciar todos os serviços de forma un
 
 | Script | Função |
 |---|---|
-| `./scripts/build/setup.sh [apps...]` | Baixa binários e recursos pré-configurados. Essencial antes do primeiro build. |
+| `./scripts/build/setup.sh [apps...]` | Descompacta e prepara os pacotes TOTVS depositados em `packages/`. Essencial antes do build. |
 | `./scripts/build/build.sh [apps...]` | Realiza o build de imagens localmente. |
 | `./scripts/build/clean.sh [apps...]` | Remove arquivos não versionados e temporários, garantindo um ambiente limpo. |
 | `./scripts/build/push.sh [apps...]` | Envia as imagens construídas para o Docker Hub. |
@@ -313,7 +313,7 @@ O workflow é acionado automaticamente em eventos de `push` e `pull_request` nas
 
 Ele executa três jobs principais:
 1. **Lint e Validação**: Verifica sintaxe de Dockerfiles (Hadolint), Shell Scripts (ShellCheck), consistência de variáveis (`versions.env`) e validação de Compose.
-2. **Smoke Test**: Executa o download de binários (`setup.sh`), build das imagens e sobe todos os perfis do Docker Compose (`postgres`, `mssql`, `oracle`) para garantir que os serviços se comunicam sem erros.
+2. **Smoke Test**: Prepara os binários (`setup.sh`), compila as imagens e sobe os perfis do Docker Compose (`postgres`, `mssql`, `oracle`) para garantir que os serviços se comunicam sem erros.
 3. **Build e Push**: Se o ambiente for válido e estiver rodando em uma branch principal (não-PR), realiza o build e envia as imagens multi-plataforma para o Docker Hub, com as tags apropriadas baseadas no `versions.env` e controle de label `latest`.
 
 ### Gatilho Manual (Workflow Dispatch)
