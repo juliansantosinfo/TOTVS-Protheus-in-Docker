@@ -378,6 +378,7 @@ set -euo pipefail
     NEEDS_VERSION_FIX=false
     NEEDS_BRANCH_SYNC=false
     SERVICES_NEEDING_SETUP=()
+    SERVICES_NEEDING_IMAGEBASE=()
     DIRTY_SUBMODULES=()
     AHEAD_SUBMODULES=()
 
@@ -462,6 +463,14 @@ set -euo pipefail
         if [ "$DOCKER_RUNNING" = true ]; then
             if echo "$DOCKER_IMAGES_LIST" | grep -qx "$full_img"; then
                 img_col="✅ Pronta"
+                # Verifica se a tag IMAGE_BASE correspondente já foi gerada localmente
+                sub_env="services/${svc}/versions.env"
+                if [ -f "$sub_env" ]; then
+                    exp_base=$(grep -E "^IMAGE_BASE=" "$sub_env" | head -n1 | cut -d"=" -f2- | tr -d "\"" | tr -d "'")
+                    if [ -n "$exp_base" ] && ! echo "$DOCKER_IMAGES_LIST" | grep -qx "$exp_base"; then
+                        SERVICES_NEEDING_IMAGEBASE+=("$svc")
+                    fi
+                fi
             else
                 img_col="⚪ Ausente"
             fi
@@ -491,6 +500,10 @@ set -euo pipefail
 
     if [ ${#SERVICES_NEEDING_SETUP[@]} -gt 0 ]; then
         add_recommendation "Extrair pacotes depositados em packages/: ./scripts/build/setup.sh ${SERVICES_NEEDING_SETUP[*]} (ou: make setup)"
+    fi
+
+    if [ ${#SERVICES_NEEDING_IMAGEBASE[@]} -gt 0 ]; then
+        add_recommendation "Imagem(ns) base privada(s) pendente(s) de tag/push (${SERVICES_NEEDING_IMAGEBASE[*]}): Execute 'make imagebase APP=\"${SERVICES_NEEDING_IMAGEBASE[*]}\"' antes de subir alterações para o GitHub."
     fi
 
     if [ ${#DIRTY_SUBMODULES[@]} -gt 0 ]; then

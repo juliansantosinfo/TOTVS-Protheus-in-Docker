@@ -66,6 +66,7 @@ Sempre utilize os scripts existentes na pasta `scripts/` (ou os alvos correspond
 | `./scripts/build/setup.sh [apps...]` (`make setup`) | Descompacta dependências e pacotes TOTVS em `services/*/packages/`. |
 | `./scripts/build/build.sh [apps...] [flags]` (`make build`) | Constrói imagens Docker localmente com argumentos opcionais (`--no-cache`, etc.). |
 | `./scripts/build/push.sh [apps...]` (`make push`) | Envia as imagens construídas para o Docker Hub. |
+| `./scripts/build/imagebase.sh [apps...]` (`make imagebase`) | Tagueia e envia imagens base privadas (IMAGE_BASE) para o Docker Hub. |
 | `./scripts/build/clean.sh` (`make clean`) | Limpa recursos baixados, temporários e caches de build. |
 | `./scripts/validation/versions.sh [--fix]` (`make versions`) | Valida e corrige inconsistências entre `versions.env`, `Dockerfile`s, `services/*/versions.env` e `docker-compose*.yaml`. |
 | `./scripts/validation/lint-compose.sh` | Valida sintaxe e interpolação dos arquivos `docker-compose*.yaml`. |

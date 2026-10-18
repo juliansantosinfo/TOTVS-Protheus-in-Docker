@@ -7,12 +7,13 @@
 #   make fix          -> Corrige versões, hooks e .env automaticamente
 #   make setup        -> Descompacta pacotes em services/*/packages/
 #   make build        -> Constrói todas as imagens (ou APP=appserver)
+#   make imagebase    -> Tagueia e envia imagem base privada (ou APP=appserver)
 #   make validate     -> Executa todos os linters e validações de pré-commit
 #   make checkout V=12.1.2610 -> Alinha branch do root e dos 7 submódulos
 # ==============================================================================
 
 .DEFAULT_GOAL := status
-.PHONY: status doctor help fix versions hooks setup build push clean checkout submodules validate test run
+.PHONY: status doctor help fix versions hooks setup build push imagebase base-push clean checkout submodules validate test run
 
 APP ?=
 V ?=
@@ -39,6 +40,11 @@ build: ## Compila imagens Docker localmente (use APP=<servico> para filtrar)
 
 push: ## Envia imagens para o Docker Hub (use APP=<servico> para filtrar)
 	@./scripts/build/push.sh $(APP)
+
+imagebase: ## Tagueia e envia imagem base privada ao Docker Hub (use APP=<servico>)
+	@./scripts/build/imagebase.sh $(APP)
+
+base-push: imagebase ## Alias para 'make imagebase'
 
 clean: ## Limpa artefatos extraídos e temporários (use APP=<servico> para filtrar)
 	@./scripts/build/clean.sh $(APP)
@@ -72,5 +78,6 @@ help: ## Exibe este guia rápido de comandos de manutenção
 	@echo "Exemplos com parâmetros:"
 	@echo "  make setup APP=appserver          # Extrai pacotes apenas do appserver"
 	@echo "  make build APP=\"appserver dbaccess\" # Compila apenas appserver e dbaccess"
+	@echo "  make imagebase APP=appserver      # Tagueia e envia imagem base privada"
 	@echo "  make checkout V=12.1.2610         # Sincroniza root e submódulos na 12.1.2610"
 	@echo "======================================================================================="
