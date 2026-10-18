@@ -28,9 +28,10 @@ Todos os serviços de aplicação residem em **submódulos Git** sob o diretóri
 - **Regra de Ouro**: Ao alterar qualquer versão ou tag em `versions.env`, execute imediatamente:
   ```bash
   ./scripts/validation/versions.sh --fix
+  # ou: make fix
   ```
-  Isso garante que os `Dockerfile`s em `services/` tenham seus `LABEL` sincronizados.
-- Sempre que houver nova versão ou release, atualize também os arquivos `docker-compose*.yaml` e os scripts de transição de branches (`branch-checkout.sh` e `post-checkout.sh`).
+  Isso garante que os `Dockerfile`s em `services/`, os arquivos `services/*/versions.env` (`IMAGE_BASE`) e as tags nos 4 arquivos `docker-compose*.yaml` sejam sincronizados automaticamente.
+- Sempre que houver uma nova release semestral/anual, atualize também os scripts de transição de branches (`branch-checkout.sh` e `post-checkout.sh`).
 
 ### 2.2. Fluxo de Git Submodules
 - Os diretórios em `services/` são submódulos Git apontando para repositórios individuais da organização.
@@ -57,22 +58,23 @@ Todos os serviços de aplicação residem em **submódulos Git** sob o diretóri
 
 ## 3. Estrutura de Scripts e Automação
 
-Sempre utilize os scripts existentes na pasta `scripts/` antes de criar comandos manuais:
+Sempre utilize os scripts existentes na pasta `scripts/` (ou os alvos correspondentes do `Makefile` na raiz) antes de criar comandos manuais:
 
-| Script | Finalidade |
+| Script / Atalho | Finalidade |
 |---|---|
-| `./scripts/build/setup.sh [apps...]` | Descompacta dependências e pacotes TOTVS em `services/*/packages/`. |
-| `./scripts/build/build.sh [apps...] [flags]` | Constrói imagens Docker localmente com argumentos opcionais (`--no-cache`, etc.). |
-| `./scripts/build/push.sh [apps...]` | Envia as imagens construídas para o Docker Hub. |
-| `./scripts/build/clean.sh` | Limpa recursos baixados, temporários e caches de build. |
-| `./scripts/validation/versions.sh [--fix]` | Valida e corrige inconsistências entre `versions.env` e `Dockerfile`s. |
+| `./scripts/validation/status.sh [--fix]` (`make` / `make fix`) | Diagnóstico Inteligente (Cockpit): raio-X de branches, submódulos, versões, pacotes, hooks e imagens locais. |
+| `./scripts/build/setup.sh [apps...]` (`make setup`) | Descompacta dependências e pacotes TOTVS em `services/*/packages/`. |
+| `./scripts/build/build.sh [apps...] [flags]` (`make build`) | Constrói imagens Docker localmente com argumentos opcionais (`--no-cache`, etc.). |
+| `./scripts/build/push.sh [apps...]` (`make push`) | Envia as imagens construídas para o Docker Hub. |
+| `./scripts/build/clean.sh` (`make clean`) | Limpa recursos baixados, temporários e caches de build. |
+| `./scripts/validation/versions.sh [--fix]` (`make versions`) | Valida e corrige inconsistências entre `versions.env`, `Dockerfile`s, `services/*/versions.env` e `docker-compose*.yaml`. |
 | `./scripts/validation/lint-compose.sh` | Valida sintaxe e interpolação dos arquivos `docker-compose*.yaml`. |
 | `./scripts/validation/lint-dockerfile.sh` | Executa análise estática com Hadolint nos Dockerfiles. |
 | `./scripts/validation/lint-shell.sh` | Executa verificação de scripts com ShellCheck. |
 | `./scripts/validation/secrets.sh` | Valida staged files contra vazamento acidental de chaves/senhas reais. |
-| `./scripts/validation/branch-checkout.sh <versao>` | Alinha a branch do root e de todos os submódulos para a versão desejada. |
-| `./scripts/test/test-compose.sh [-f file] [--full]` | Executa validação e smoke test de subida de containers. |
-| `./run.sh` | Menu interativo de inicialização rápida do ambiente Protheus Docker. |
+| `./scripts/validation/branch-checkout.sh <versao>` (`make checkout V=...`) | Alinha a branch do root e de todos os submódulos para a versão desejada. |
+| `./scripts/test/test-compose.sh [-f file] [--full]` (`make test`) | Executa validação e smoke test de subida de containers. |
+| `./run.sh` (`make run`) | Menu interativo de inicialização rápida do ambiente Protheus Docker. |
 
 ---
 

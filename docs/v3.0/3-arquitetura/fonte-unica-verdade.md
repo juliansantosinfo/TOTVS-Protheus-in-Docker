@@ -27,28 +27,47 @@ O arquivo `versions.env` dita com precisão:
 
 ## 🛡️ 2. O Validador Mestre (`versions.sh`)
 
-Para que a SSOT funcione de maneira infalível, existe o script **`scripts/validation/versions.sh`**.
+Para que a SSOT funcione de maneira infalível, existe o script **`scripts/validation/versions.sh`**, que valida e propaga o `versions.env` para três camadas simultaneamente:
 
-### Como funciona a validação:
-1. O script lê o `versions.env` e mapeia a versão esperada para cada componente.
-2. Varre os arquivos `services/*/Dockerfile` e inspeciona os metadados declarados em diretivas `LABEL`:
+```mermaid
+flowchart LR
+    SSOT["📄 versions.env (Raiz)<br>Fonte Única da Verdade"]
+    VAL["⚙️ scripts/validation/versions.sh<br>(Validação & --fix)"]
+    DF["🐳 services/*/Dockerfile<br>(LABEL release, build, version)"]
+    SUB["📦 services/*/versions.env<br>(IMAGE_BASE & *_VERSION)"]
+    DC["🐙 docker-compose*.yaml<br>(Tags de imagem dos serviços)"]
+
+    SSOT --> VAL
+    VAL --> DF
+    VAL --> SUB
+    VAL --> DC
+```
+
+### Como funciona a validação em 3 camadas:
+1. **Camada 1 — `services/*/Dockerfile`:** Inspeciona os metadados declarados em diretivas `LABEL` (`release`, `build`, `dbapi`, `webapp` e `version`):
    ```dockerfile
-   LABEL maintainer="Julian Santos"
-   LABEL version="12.1.2610"
+   LABEL release="12.1.2610"
+   LABEL build="26.3.0.0"
    ```
-3. Se houver qualquer divergência de caractere, o script reporta a inconsistência e falha com código `1`.
+2. **Camada 2 — `services/*/versions.env`:** Verifica se os arquivos `versions.env` internos de cada submódulo (incluindo a tag composta de `IMAGE_BASE`) estão alinhados com a raiz.
+3. **Camada 3 — `docker-compose*.yaml`:** Confere se as tags `image: <user>/<app>:<tag>` nos 4 arquivos Compose (`docker-compose.yaml`, `mssql`, `postgresql`, `oracle`) correspondem exatamente às versões ativas.
+
+Se houver qualquer divergência em qualquer uma das três camadas, o script reporta a inconsistência e falha com código `1`.
 
 ### Correção Idempotente Automática (`--fix`)
-Ao invés de editar manualmente múltiplos Dockerfiles em pastas diferentes, o desenvolvedor executa:
+Ao invés de editar manualmente múltiplos Dockerfiles, arquivos Compose e `versions.env` internos em pastas diferentes, o desenvolvedor executa:
 ```bash
 ./scripts/validation/versions.sh --fix
+# Ou pelo atalho do Makefile:
+make fix
 ```
-O script reescreve automaticamente as linhas de `LABEL version` e metadados nos Dockerfiles de todos os 7 submódulos, garantindo paridade instantânea.
+O script reescreve automaticamente os `LABEL`s nos Dockerfiles, os `services/*/versions.env` e as tags nos 4 arquivos `docker-compose*.yaml`, garantindo paridade instantânea em todos os 7 submódulos.
 
 ---
 
-## 🔗 3. Integração com a Esteira de Governança
+## 🔗 3. Integração com a Esteira de Governança e Diagnóstico
 
-A consistência de versões não depende da lembrança humana. Ela é imposta em dois checkpoints obrigatórios:
-1. **No Host Local (Git Hook `pre-commit`):** O commit é abortado localmente se as versões estiverem desalinhadas.
-2. **Na Nuvem (GitHub Actions Job `lint-and-validation`):** A esteira rejeita o Pull Request se alguém tentar forçar o commit com versões inconsistentes.
+A consistência de versões não depende da lembrança humana. Ela é imposta em três pontos:
+1. **Diagnóstico Inteligente (`make status` / `./scripts/validation/status.sh`):** Exibe em tempo real na matriz de serviços se algum componente está com versão divergente.
+2. **No Host Local (Git Hook `pre-commit`):** O commit é abortado localmente se as versões estiverem desalinhadas.
+3. **Na Nuvem (GitHub Actions Job `lint-and-validation`):** A esteira rejeita o Pull Request se alguém tentar forçar o commit com versões inconsistentes.

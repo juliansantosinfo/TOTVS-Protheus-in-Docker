@@ -67,17 +67,20 @@ Tabelas completas para consulta rápida durante o desenvolvimento e sustentaçã
 
 | Ação Desejada | Comando / Instrução |
 |---|---|
+| **🩺 Diagnóstico Inteligente do Projeto (Cockpit)** | `make` ou `./scripts/validation/status.sh` |
+| **🔧 Auto-Fix (Versões, Hooks e `.env`)** | `make fix` ou `./scripts/validation/status.sh --fix` |
+| **📋 Ver Todos os Atalhos de Manutenção** | `make help` |
 | **Subir Stack Básica (PostgreSQL)** | `docker compose -f docker-compose-postgresql.yaml up -d` |
 | **Subir Stack Completa (REST + SmartView)** | `docker compose -f docker-compose-postgresql.yaml --profile full up -d` |
 | **Acessar SmartClient Web** | `http://localhost:1235` (Usuário: `admin` / Senha: ` ` - 1 espaço) |
 | **Acessar Monitor DBAccess** | `http://localhost:7890` (ou via TCP via SmartClient) |
-| **Assistente Interativo de Inicialização** | `./run.sh` |
-| **Descompactar e Preparar Pacotes Locais** | `./scripts/build/setup.sh` |
-| **Build de Todas as Imagens** | `./scripts/build/build.sh` |
-| **Build de Serviço Específico** | `./scripts/build/build.sh appserver dbaccess` |
-| **Sincronizar Versões dos Dockerfiles** | `./scripts/validation/versions.sh --fix` |
-| **Instalar Git Hooks de Qualidade** | `./scripts/hooks/install.sh` |
-| **Alternar Versão de Release** | `./scripts/validation/branch-checkout.sh 12.1.2610` |
+| **Assistente Interativo de Inicialização** | `./run.sh` (ou `make run`) |
+| **Descompactar e Preparar Pacotes Locais** | `./scripts/build/setup.sh` (ou `make setup`) |
+| **Build de Todas as Imagens** | `./scripts/build/build.sh` (ou `make build`) |
+| **Build de Serviço Específico** | `./scripts/build/build.sh appserver dbaccess` (ou `make build APP=appserver`) |
+| **Sincronizar Versões (Dockerfiles/Compose/Submódulos)** | `./scripts/validation/versions.sh --fix` (ou `make fix`) |
+| **Instalar Git Hooks de Qualidade** | `./scripts/hooks/install.sh` (ou `make hooks`) |
+| **Alternar Versão de Release** | `./scripts/validation/branch-checkout.sh 12.1.2610` (ou `make checkout V=12.1.2610`) |
 
 ---
 *Documentação Versão 3.0 alinhada à Release 12.1.2610 - Outubro/2026.*

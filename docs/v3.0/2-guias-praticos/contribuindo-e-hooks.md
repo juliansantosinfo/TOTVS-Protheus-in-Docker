@@ -4,19 +4,47 @@ Para manter a qualidade corporativa do código, consistência de versões e segu
 
 ---
 
-## 🪝 1. Instalando os Git Hooks Locais
+## 🩺 1. Diagnóstico Rápido ao Iniciar ou Retomar Manutenção
 
-Após clonar o repositório, o primeiro comando a ser executado na máquina de desenvolvimento é:
+Sempre que clonar o repositório ou voltar a trabalhar nele após algum tempo, você não precisa decorar o estado das branches ou quais scripts rodar. Basta executar na raiz:
+
+```bash
+make
+# ou diretamente:
+./scripts/validation/status.sh
+```
+
+Esse comando abre o **Cockpit do Mantenedor**, inspecionando automaticamente:
+* Branch atual do repositório principal vs. branches esperadas nos 7 submódulos em `services/`.
+* Existência do arquivo `.env` e instalação dos Git Hooks locais.
+* Sincronia tripla de versões (`versions.env` ➔ `Dockerfiles`, `services/*/versions.env` e `docker-compose*.yaml`).
+* Estado dos pacotes em `services/*/packages/` (se já foram extraídos em `totvs/` ou se precisam de `make setup`).
+* Imagens Docker já compiladas na máquina local e **Próximos Passos Recomendados** na ordem certa.
+
+Para corrigir automaticamente hooks ausentes, `.env` faltante e divergências de versão em um único comando:
+```bash
+make fix
+# ou: ./scripts/validation/status.sh --fix
+```
+
+> 💡 **Dica para usuários do VS Code:** Pressione `Ctrl+Shift+P` -> `Tasks: Run Task` para executar o diagnóstico, auto-fix, setup, build ou troca de release diretamente pela interface gráfica (configurado em `.vscode/tasks.json`).
+
+---
+
+## 🪝 2. Instalando os Git Hooks Locais Manualmente
+
+Caso queira instalar apenas os Git Hooks na máquina de desenvolvimento:
 
 ```bash
 ./scripts/hooks/install.sh
+# ou: make hooks
 ```
 
 Esse script instala em `.git/hooks/` os gatilhos que executarão checagens automáticas em cada ação do Git.
 
 ---
 
-## 📝 2. Padrão de Mensagens de Commit (Conventional Commits)
+## 📝 3. Padrão de Mensagens de Commit (Conventional Commits)
 
 O hook `commit-msg` rejeitará qualquer mensagem fora da especificação [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -46,32 +74,35 @@ git commit -m "docs: adicionar documentacao v3.0 em padrao diataxis"
 
 ---
 
-## 🛡️ 3. O que o `pre-commit` valida antes de gravar o commit?
+## 🛡️ 4. O que o `pre-commit` valida antes de gravar o commit?
 
-Ao rodar `git commit`, o hook `pre-commit` dispara automaticamente os seguintes testes em cascata:
+Ao rodar `git commit` (ou `make validate`), o hook `pre-commit` dispara automaticamente os seguintes testes em cascata:
 
-1. **Varredura de Segredos (`secrets.sh`):**  
-   Verifica se arquivos em stage contêm senhas de produção, certificados SSL privados ou API keys reais.
-2. **Consistência de Versões (`versions.sh`):**  
-   Garante que os `LABEL version=*` nos `Dockerfiles` dos submódulos batam exatamente com o `versions.env`. Se houver divergência, execute:
+1. **Consistência de Versões (`versions.sh`):**  
+   Garante que os `LABEL`s nos `Dockerfiles`, os `services/*/versions.env` e as tags nos `docker-compose*.yaml` batam exatamente com o `versions.env` da raiz. Se houver divergência, execute:
    ```bash
-   ./scripts/validation/versions.sh --fix
+   make fix
+   # ou: ./scripts/validation/versions.sh --fix
    ```
-3. **Análise Estática de Scripts Bash (`ShellCheck`):**  
-   Varre os arquivos `.sh` alterados para impedir erros de sintaxe ou variáveis mal interpoladas.
-4. **Análise de Dockerfiles (`Hadolint`):**  
+2. **Análise Estática de Scripts Bash (`ShellCheck`):**  
+   Varre os arquivos `.sh` para impedir erros de sintaxe ou variáveis mal interpoladas.
+3. **Varredura de Segredos (`secrets.sh`):**  
+   Verifica se arquivos em stage contêm senhas de produção, certificados SSL privados ou API keys reais.
+4. **Validação de `.env.example` (`env.sh`):**  
+   Verifica integridade das chaves de variáveis de ambiente documentadas.
+5. **Análise de Dockerfiles (`Hadolint`):**  
    Verifica conformidade com as melhores práticas de imagens corporativas.
-5. **Sintaxe dos Arquivos Docker Compose:**  
-   Valida se todos os `docker-compose-*.yaml` são válidos.
+6. **Sintaxe dos Arquivos Docker Compose (`lint-compose.sh`):**  
+   Valida se todos os `docker-compose*.yaml` são válidos.
 
 ---
 
-## 🤝 4. Fluxo de Pull Request (PR)
+## 🤝 5. Fluxo de Pull Request (PR)
 
 1. Crie uma branch de trabalho a partir da release atual:
    ```bash
    git checkout -b feat/minha-melhoria
    ```
-2. Faça as alterações, garantindo que os hooks passem 100% verdes localmente.
+2. Faça as alterações, garantindo que `make validate` e os hooks passem 100% verdes localmente.
 3. Submeta o Pull Request no GitHub apontando para a branch da release correspondente (ex: `12.1.2610`).
 4. Acompanhe a esteira do GitHub Actions (`deploy.yml`). Seu PR só poderá ser mergeado após todos os checks (lints e smoke tests) passarem com sucesso.

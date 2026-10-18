@@ -9,23 +9,19 @@ O versionamento de todas as imagens, binários e artefatos TOTVS Protheus é est
   - Usuário Docker Hub (`DOCKER_USER`).
   - Versões específicas de componentes (`APPSERVER_BUILD_VERSION`, `APPSERVER_WEBAPP_VERSION`, `APPSERVER_DBAPI_VERSION`, `DBACCESS_VERSION`, `LICENSESERVER_VERSION`, etc.).
 
-## 2. Sincronização Obrigatória com Dockerfiles
+## 2. Sincronização Obrigatória em 3 Camadas (`versions.sh --fix`)
 - Qualquer alteração manual ou automática em `versions.env` DEVE ser sucedida pela execução:
   ```bash
   ./scripts/validation/versions.sh --fix
+  # ou: make fix
   ```
-- Este comando propaga e corrige os valores dos metadados `LABEL release=...`, `LABEL build=...`, `LABEL dbapi=...`, `LABEL webapp=...` e `LABEL version=...` nos `Dockerfile`s em `services/`.
-- O Git Pre-commit Hook bloqueará qualquer commit se houver divergência entre `versions.env` e os `Dockerfile`s.
+- Este comando propaga e corrige automaticamente:
+  1. Os metadados `LABEL release=...`, `LABEL build=...`, `LABEL dbapi=...`, `LABEL webapp=...` e `LABEL version=...` nos `Dockerfile`s em `services/`.
+  2. Os arquivos internos `services/*/versions.env` (incluindo `IMAGE_BASE` e `*_VERSION`).
+  3. As tags de imagens (`image: <user>/<app>:<tag>`) nos 4 arquivos Compose (`docker-compose.yaml`, `docker-compose-mssql.yaml`, `docker-compose-postgresql.yaml`, `docker-compose-oracle.yaml`).
+- O Git Pre-commit Hook bloqueará qualquer commit se houver divergência em qualquer uma dessas 3 camadas.
 
-## 3. Sincronização dos Arquivos Docker Compose
-- Ao criar ou migrar para uma nova versão de serviço (ex: AppServer `12.1.2610`, DbAccess `26.1.0.0`, License Server `3.7.2`), certifique-se de atualizar as referências nos arquivos Compose:
-  - `docker-compose.yaml`
-  - `docker-compose-mssql.yaml`
-  - `docker-compose-postgresql.yaml`
-  - `docker-compose-oracle.yaml`
-- As tags devem refletir exatamente as variáveis definidas em `versions.env`.
-
-## 4. Atualização de Mapeamentos de Branches
+## 3. Atualização de Mapeamentos de Branches
 - Ao introduzir uma nova release anual/semestral do Protheus (ex: `12.1.2610`):
   - Inclua a nova release no `case` de [`scripts/hooks/post-checkout.sh`](../../scripts/hooks/post-checkout.sh).
-  - Adicione a tabela de mapeamento de submódulos correspondente na função `obter_branch_do_servico` de [`scripts/validation/branch-checkout.sh`](../../scripts/validation/branch-checkout.sh).
+  - Adicione a tabela de mapeamento de submódulos correspondente na função `obter_branch_do_servico` de [`scripts/validation/branch-checkout.sh`](../../scripts/validation/branch-checkout.sh) e `get_expected_branch` de [`scripts/validation/status.sh`](../../scripts/validation/status.sh).

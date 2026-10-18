@@ -1,0 +1,113 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "🩺 Diagnóstico: Status do Projeto (Cockpit)",
+            "type": "shell",
+            "command": "./scripts/validation/status.sh",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🔧 Auto-Fix: Sincronizar Versões, Hooks e .env",
+            "type": "shell",
+            "command": "./scripts/validation/status.sh --fix",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🛡️ Validar Tudo (Pre-Commit Check Completo)",
+            "type": "shell",
+            "command": "./scripts/hooks/pre-commit.sh",
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "📦 Setup: Descompactar Todos os Pacotes (setup.sh)",
+            "type": "shell",
+            "command": "./scripts/build/setup.sh",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🐳 Build: Compilar Todas as Imagens (build.sh)",
+            "type": "shell",
+            "command": "./scripts/build/build.sh",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🌿 Submódulos: Alinhar Branches com Release (branch-checkout.sh)",
+            "type": "shell",
+            "command": "./scripts/validation/branch-checkout.sh ${input:releaseVersion}",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🚀 Run: Assistente Interativo Docker Compose (run.sh)",
+            "type": "shell",
+            "command": "./run.sh",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "releaseVersion",
+            "type": "pickString",
+            "description": "Selecione a versão de Release do Protheus para alinhar as branches:",
+            "options": [
+                "12.1.2610",
+                "12.1.2510",
+                "12.1.2410",
+                "12.1.2310",
+                "main"
+            ],
+            "default": "12.1.2610"
+        }
+    ]
+}

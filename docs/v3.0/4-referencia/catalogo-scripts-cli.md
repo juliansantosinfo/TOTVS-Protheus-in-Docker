@@ -70,19 +70,37 @@ Este documento cataloga todos os scripts executáveis da pasta `scripts/` e da r
 
 ## 🔍 2. Scripts de Validação e Qualidade (`scripts/validation/`)
 
-### 2.1. `versions.sh`
-* **Finalidade:** O "cão de guarda" de integridade de versões. Compara o `versions.env` com os labels presentes em cada `Dockerfile` dos submódulos.
+### 2.1. `status.sh` (Diagnóstico Inteligente / Cockpit do Mantenedor)
+* **Finalidade:** Exibe um raio-X unificado do estado atual do projeto para facilitar a retomada de manutenção. Inspeciona:
+  1. **Root & Ambiente:** Branch ativa da raiz, working tree, presença do `.env`, status dos Git Hooks locais e estado do Docker Engine / containers ativos.
+  2. **Matriz dos 7 Submódulos (`services/*`):** Alinhamento de branch por serviço vs esperado na release, status Git (`Limpo`, `Dirty` ou `Ahead`), paridade de versões (`Dockerfile` + `versions.env` interno + `docker-compose*.yaml`), estado de extração dos pacotes (`Extraído`, `Falta setup`, `Sem pacotes` ou `N/A`) e presença da imagem Docker local.
+  3. **Guia de Próximos Passos:** Lista numerada e ordenada com os comandos exatos para corrigir pendências encontradas.
+* **Sintaxe:**
+  ```bash
+  ./scripts/validation/status.sh [--fix]
+  ```
+* **Opções:**
+  * Sem argumentos: Modo 100% leitura (seguro e rápido).
+  * `--fix`: Aplica correções automáticas seguras (instala Git Hooks ausentes, cria `.env` a partir de `.env.example` se ausente e executa `versions.sh --fix`).
+
+---
+
+### 2.2. `versions.sh`
+* **Finalidade:** O "cão de guarda" de integridade de versões. Compara a fonte única da verdade (`versions.env` na raiz) com três camadas:
+  1. Os metadados `LABEL` presentes em cada `services/*/Dockerfile`.
+  2. As variáveis e tags de `IMAGE_BASE` nos arquivos internos `services/*/versions.env`.
+  3. As tags de imagem (`image: <user>/<app>:<tag>`) nos 4 arquivos `docker-compose*.yaml`.
 * **Sintaxe:**
   ```bash
   ./scripts/validation/versions.sh [--fix]
   ```
 * **Opções:**
-  * Sem argumentos: Apenas verifica se há inconsistências e retorna código `1` se houver divergência.
-  * `--fix`: Corrige e sobrescreve automaticamente os labels nos `Dockerfiles`.
+  * Sem argumentos: Verifica se há inconsistências nas 3 camadas e retorna código `1` se houver divergência.
+  * `--fix`: Corrige e sincroniza automaticamente os `Dockerfiles`, os `services/*/versions.env` e os arquivos `docker-compose*.yaml`.
 
 ---
 
-### 2.2. `branch-checkout.sh`
+### 2.3. `branch-checkout.sh`
 * **Finalidade:** Alterna a branch do repositório root e de todos os 7 submódulos simultaneamente para a versão de release selecionada.
 * **Sintaxe:**
   ```bash
@@ -96,7 +114,7 @@ Este documento cataloga todos os scripts executáveis da pasta `scripts/` e da r
 
 ---
 
-### 2.3. Linters Estáticos
+### 2.4. Linters Estáticos
 | Script | Ferramenta Subjacente | Finalidade |
 |---|---|---|
 | `./scripts/validation/lint-compose.sh` | `docker compose config` | Valida sintaxe YAML e interpolação de variáveis em todos os compose files. |
@@ -149,3 +167,25 @@ Este documento cataloga todos os scripts executáveis da pasta `scripts/` e da r
   ./run.sh
   ```
 * **Benefícios:** Não exige memorização de comandos complexos; guia o usuário na escolha do banco (Postgres, SQL Server ou Oracle) e no perfil de execução (`default`, `full`, `with-rest`, `with-smartview`).
+
+---
+
+## 🧭 6. Atalhos de Manutenção (`Makefile` e `.vscode/tasks.json`)
+
+Para eliminar a necessidade de memorizar caminhos de scripts após períodos sem atuar no projeto, a raiz dispõe de um **`Makefile`** (cujo alvo padrão ao digitar apenas `make` é o diagnóstico `status.sh`) e integração nativa com as **Tasks do VS Code** (`Ctrl+Shift+P` -> `Tasks: Run Task`):
+
+| Comando `make` | Script Equivalente | Descrição |
+|---|---|---|
+| `make` ou `make status` | `./scripts/validation/status.sh` | Exibe o painel de Diagnóstico Inteligente e recomendações. |
+| `make fix` | `./scripts/validation/status.sh --fix` | Corrige automaticamente versões, Git Hooks e `.env`. |
+| `make help` | — | Lista todos os alvos disponíveis no terminal com exemplos. |
+| `make versions` | `./scripts/validation/versions.sh` | Valida paridade entre `versions.env`, Dockerfiles, Compose e submódulos. |
+| `make setup [APP=...]` | `./scripts/build/setup.sh [APP]` | Descompacta pacotes de todos os serviços ou de um serviço específico. |
+| `make build [APP=...]` | `./scripts/build/build.sh [APP]` | Compila todas as imagens Docker ou apenas os serviços informados. |
+| `make push [APP=...]` | `./scripts/build/push.sh [APP]` | Envia imagens construídas para o Docker Hub. |
+| `make clean [APP=...]` | `./scripts/build/clean.sh [APP]` | Remove arquivos extraídos e temporários dos submódulos. |
+| `make checkout V=<versao>` | `./scripts/validation/branch-checkout.sh <V>` | Alterna a release no root e nos 7 submódulos simultaneamente. |
+| `make submodules` | `git submodule foreach ...` | Lista branch atual e status curto de cada submódulo em `services/`. |
+| `make validate` | `./scripts/hooks/pre-commit.sh` | Executa toda a bateria de validações e linters de pré-commit. |
+| `make test` | `./scripts/test/test-compose.sh` | Valida a sintaxe de todos os arquivos Docker Compose. |
+| `make run` | `./run.sh` | Abre o assistente interativo para subir a stack. |
